@@ -4,28 +4,12 @@ from django.contrib.admin import ModelAdmin
 from suit.widgets import SuitSplitDateTimeWidget
 
 from .models import (
-    Institution,
-    Manufacturer,
     PlatformType,
     Platform,
     PlatformComment,
-    Instrument,
-    InstrumentComment,
-    InstrumentOnPlatform,
     PlatformDeployment,
-    Sensor,
+    PlatformDeploymentComment
 )
-
-
-# Register your models here.
-@admin.register(Institution)
-class InstitutionAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(Manufacturer)
-class ManufacturerAdmin(admin.ModelAdmin):
-    pass
 
 
 @admin.register(PlatformType)
@@ -52,21 +36,6 @@ class PlatformCommentAdmin(admin.ModelAdmin):
     pass
 
 
-class InstrumentOnPlatformForm(ModelForm):
-    class Meta:
-        model = InstrumentOnPlatform
-        fields = '__all__'
-        widgets = {
-            'start_time': SuitSplitDateTimeWidget,
-            'end_time': SuitSplitDateTimeWidget
-        }
-
-
-class InstrumentOnPlatformAdmin(ModelAdmin):
-    form = InstrumentOnPlatformForm
-admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
-
-
 class PlatformDeploymentForm(ModelForm):
     class Meta:
         model = PlatformDeployment
@@ -82,24 +51,6 @@ class PlatformDeploymentAdmin(ModelAdmin):
 admin.site.register(PlatformDeployment, PlatformDeploymentAdmin)
 
 
-@admin.register(Sensor)
-class SensorAdmin(admin.ModelAdmin):
-    pass
-
-
-class SensorInline(admin.StackedInline):
-    model = Sensor
-    extra = 0
-
-
-@admin.register(Instrument)
-class InstrumentAdmin(admin.ModelAdmin):
-    inlines = [
-        SensorInline,
-    ]
-    pass
-
-
-@admin.register(InstrumentComment)
-class InstrumentCommentAdmin(admin.ModelAdmin):
+@admin.register(PlatformDeploymentComment)
+class PlatformDeploymentCommentAdmin(admin.ModelAdmin):
     pass
