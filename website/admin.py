@@ -5,9 +5,12 @@ from suit.widgets import SuitSplitDateTimeWidget
 
 from .models import (
     Institution,
+    Manufacturer,
     PlatformType,
     Platform,
+    PlatformComment,
     Instrument,
+    InstrumentComment,
     InstrumentOnPlatform,
     PlatformDeployment,
     Sensor,
@@ -17,6 +20,11 @@ from .models import (
 # Register your models here.
 @admin.register(Institution)
 class InstitutionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Manufacturer)
+class ManufacturerAdmin(admin.ModelAdmin):
     pass
 
 
@@ -37,6 +45,11 @@ class PlatformForm(ModelForm):
 class PlatformAdmin(ModelAdmin):
     form = PlatformForm
 admin.site.register(Platform, PlatformAdmin)
+
+
+@admin.register(PlatformComment)
+class PlatformCommentAdmin(admin.ModelAdmin):
+    pass
 
 
 class InstrumentOnPlatformForm(ModelForm):
@@ -84,4 +97,9 @@ class InstrumentAdmin(admin.ModelAdmin):
     inlines = [
         SensorInline,
     ]
+    pass
+
+
+@admin.register(InstrumentComment)
+class InstrumentCommentAdmin(admin.ModelAdmin):
     pass
