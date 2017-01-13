@@ -108,4 +108,4 @@ class Sensor(models.Model):
     modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
-        return "%s - %s" % (self.wgms_name, self.instrument.wgms_name)
+        return "%s - %s" % (self.identifier, self.instrument.identifier)
