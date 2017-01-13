@@ -4,6 +4,7 @@ from django.db import models
 
 
 class Instrument(models.Model):
+    # TODO: make manufacturer a foreign key
     identifier = models.CharField(
         max_length=300,
         help_text="The name used to identify this instrument in the raw data. IE: SATCTD7229, sea_water"
@@ -20,7 +21,11 @@ class Instrument(models.Model):
         blank=True,
         help_text="The full name for the instrument"
     )
-    manufacturer = models.CharField(max_length=300, null=True, blank=True)
+    manufacturer = models.ForeignKey(
+        "general.Manufacturer",
+        null=True,
+        blank=True
+    )
     serial = models.CharField(max_length=300, null=True, blank=True)
     master_instrument = models.ForeignKey(
         "self",
@@ -94,7 +99,12 @@ class Sensor(models.Model):
         blank=True,
         help_text="The official, standard name for the instrument. IE: sea_water_temperature. See CF naming: <a href='http://cfconventions.org/Data/cf-standard-names/39/build/cf-standard-name-table.html'>CF Naming Reference</a>"
     )
-    units = models.CharField(max_length=30, null=True, blank=True)
+    units = models.CharField(
+        max_length=30,
+        null=True,
+        blank=True,
+        help_text="The units for the sensor. <b>Please verify after adding a new sensor</b>"
+    )
     include_in_output = models.BooleanField(
         default=False,
         help_text="Whether or not data from this sensor should be included in any processed output."
