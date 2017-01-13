@@ -73,7 +73,7 @@ class InstrumentOnPlatform(models.Model):
     comment = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return "%s - %s - %s" % (self.instrument, self.platform, self.start_date)
+        return "%s - %s - %s" % (self.instrument, self.platform, self.start_time)
 
 
 class Sensor(models.Model):
