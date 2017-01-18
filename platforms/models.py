@@ -46,7 +46,41 @@ class PlatformDeployment(models.Model):
     start_time = models.DateTimeField(null=False, blank=False)
     deployment_name = models.CharField(max_length=150)
     end_time = models.DateTimeField(null=True, blank=True)
-    comment = models.TextField()
+    comment = models.TextField(null=True, blank=True)
+    acknowledgement = models.CharField(
+        max_length=900,
+        help_text="<b>Example:</b> This deployment is supported by funding from NOAA",
+        null=True,
+        blank=True
+    )
+    contributor_name = models.TextField(
+        help_text="A comma separated list of contributors to this data set<br><b>Example:</b> \"Jerry Garcia, Bob Weir, Bill Graham\"",
+        null=True,
+        blank=True
+    )
+    contributor_role = models.TextField(
+        help_text="A comma separated list of the roles for those specified in the contributor_name attribute<br><b>Example:</b> \"Principal Investigator, Principal Investigator, Data Manager\"",
+        null=True,
+        blank=True
+    )
+    creator_email = models.CharField(
+        max_length=150,
+        help_text="Email address for the person who collected the data.",
+        null=True,
+        blank=True
+    )
+    creator_name = models.CharField(
+        max_length=150,
+        help_text="Name of the person who collected the data.",
+        null=True,
+        blank=True
+    )
+    creator_url = models.CharField(
+        max_length=150,
+        help_text="URL for the person who collected the data.",
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         if self.deployment_name is not None:

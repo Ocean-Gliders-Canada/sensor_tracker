@@ -11,8 +11,6 @@ class Instrument(models.Model):
     )
     short_name = models.CharField(
         max_length=50,
-        null=True,
-        blank=True,
         help_text="The short, general name for the instrument. IE: ctd, fluorometer"
     )
     long_name = models.CharField(
@@ -87,13 +85,13 @@ class Sensor(models.Model):
         max_length=300,
         help_text="The name used to identify this sensor in the raw data. ie: sci_water_temp"
     )
-    short_name = models.CharField(
+    long_name = models.CharField(
         max_length=50,
         null=True,
         blank=True,
-        help_text="The short, general name for the sensor. IE: temperature"
+        help_text="The general name for the sensor. IE: temperature"
     )
-    long_name = models.CharField(
+    standard_name = models.CharField(
         max_length=300,
         null=True,
         blank=True,
@@ -104,6 +102,16 @@ class Sensor(models.Model):
         null=True,
         blank=True,
         help_text="The units for the sensor. <b>Please verify after adding a new sensor</b>"
+    )
+    valid_min = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="The minimum possible value that the sensor could produce"
+    )
+    valid_max = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="The maximum possible value that the sensor could produce"
     )
     include_in_output = models.BooleanField(
         default=False,
