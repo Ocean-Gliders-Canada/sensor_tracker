@@ -28,6 +28,16 @@ class Institution(models.Model):
         return self.name
 
 
+class Project(models.Model):
+    name = models.CharField(
+        max_length=1000,
+        help_text="<b>Example:</b> Collaborative Operations with Mote Marine Laboratory"
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class Manufacturer(models.Model):
     name = models.CharField(max_length=300)
     street = models.TextField(max_length=255, blank=True, null=True)

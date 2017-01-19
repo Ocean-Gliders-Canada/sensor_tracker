@@ -14,7 +14,12 @@ class PlatformType(models.Model):
 class Platform(models.Model):
     name = models.CharField(
         max_length=300,
-        help_text="The colloquial name for the platform"
+        help_text="The name of the platform"
+    )
+    wmo_id = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="The WMO ID for the mission. See: <a href='http://www.jcomm.info/index.php?option=com_oe&task=viewGroupRecord&groupID=155'>WMO Contact Info</a> to acquire"
     )
     serial_number = models.CharField(max_length=300)
     platform_type = models.ForeignKey(PlatformType, on_delete=models.CASCADE)
@@ -51,7 +56,16 @@ class PlatformDeployment(models.Model):
     institution = models.ForeignKey(
         'general.Institution',
         on_delete=models.PROTECT,
-        help_text="The institution responsible for the deployment"
+        help_text="The institution responsible for the deployment."
+    )
+    project = models.ForeignKey(
+        'general.Project',
+        on_delete=models.PROTECT,
+        help_text="The project the data is being collected under."
+    )
+    title = models.CharField(
+        max_length=500,
+        help_text="A short descriptive title for the deployment."
     )
     start_time = models.DateTimeField(null=False, blank=False)
     deployment_name = models.CharField(max_length=150)
@@ -90,6 +104,11 @@ class PlatformDeployment(models.Model):
         help_text="URL for the person who collected the data.",
         null=True,
         blank=True
+    )
+    sea_name = models.CharField(
+        max_length=300,
+        help_text="The sea in which the study is being conducted: <a href='https://www.nodc.noaa.gov/General/NODC-Archive/seanamelist.txt'>Sea Names</a>"
+        default="North Atlantic Ocean"
     )
 
     def __str__(self):
