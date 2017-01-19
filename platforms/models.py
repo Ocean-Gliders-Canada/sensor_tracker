@@ -82,6 +82,14 @@ class PlatformDeployment(models.Model):
         blank=True
     )
 
+    def _get_ioos_id(self):
+        """Gets the IOOS ID for the deployment"""
+        return "%s_%s" % (
+            self.patform.name,
+            self.start_time.strftime('%Y%m%dT%H%M')
+        )
+    ioos_id = property(_get_ioos_id)
+
     def __str__(self):
         if self.deployment_name is not None:
             return "%s - %s - %s" % (
