@@ -9,6 +9,10 @@ class Institution(models.Model):
         max_length=300,
         help_text="Name of the institution"
     )
+    url = models.CharField(
+        max_length=1000,
+        help_text="The institution's URL"
+    )
     # Location of the institution
     street = models.TextField(max_length=255)
     city = models.CharField(max_length=40)

@@ -41,8 +41,18 @@ class PlatformComment(models.Model):
 
 
 class PlatformDeployment(models.Model):
+    wmo_id = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="The WMO ID for the mission. See: <a href='http://www.jcomm.info/index.php?option=com_oe&task=viewGroupRecord&groupID=155'>WMO Contact Info</a> to acquire"
+    )
     deployment_number = models.IntegerField(null=True, blank=True)
     platform = models.ForeignKey(Platform)
+    institution = models.ForeignKey(
+        'general.Institution',
+        on_delete=models.PROTECT,
+        help_text="The institution responsible for the deployment"
+    )
     start_time = models.DateTimeField(null=False, blank=False)
     deployment_name = models.CharField(max_length=150)
     end_time = models.DateTimeField(null=True, blank=True)
