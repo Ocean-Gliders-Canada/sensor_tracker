@@ -5,12 +5,18 @@ from suit.widgets import SuitSplitDateTimeWidget
 
 from .models import (
     Institution,
+    Project,
     Manufacturer
 )
 
 
 @admin.register(Institution)
 class InstitutionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
     pass
 
 
