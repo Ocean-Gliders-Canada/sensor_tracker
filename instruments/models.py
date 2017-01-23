@@ -102,7 +102,21 @@ class Sensor(models.Model):
         null=False,
         blank=True,
         default="f8",
-        help_text="Storage datatype to use for this sensor. Valid datatype specifiers include: 'f4' (32-bit floating point), 'f8' (64-bit floating point), 'i4' (32-bit signed integer), 'i2' (16-bit signed integer), 'i8' (64-bit signed integer), 'i1' (8-bit signed integer), 'u1' (8-bit unsigned integer), 'u2' (16-bit unsigned integer), 'u4' (32-bit unsigned integer), 'u8' (64-bit unsigned integer), or 'S1' (single-character string)"
+        help_text="""Storage datatype to use for this sensor. Valid datatype specifiers include:
+            <table>
+                <tr><th>Type</th><th>Description</th></tr>
+                <tr><td>f4</td><td>32-bit floating point</td></tr>
+                <tr><td>f8</td><td>64-bit floating point</td></tr>
+                <tr><td>i4</td><td>32-bit signed integer</td></tr>
+                <tr><td>i2</td><td>16-bit signed integer</td></tr>
+                <tr><td>i8</td><td>64-bit signed integer</td></tr>
+                <tr><td>i1</td><td>8-bit signed integer</td></tr>
+                <tr><td>u1</td><td>8-bit unsigned integer</td></tr>
+                <tr><td>u2</td><td>16-bit unsigned integer</td></tr>
+                <tr><td>u4</td><td>32-bit unsigned integer</td></tr>
+                <tr><td>u8</td><td>64-bit unsigned integer</td></tr>
+                <tr><td>S1</td><td>single-character string</td></tr>
+            </table>"""
     )
     units = models.CharField(
         max_length=30,
