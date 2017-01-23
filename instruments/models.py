@@ -116,7 +116,7 @@ class Sensor(models.Model):
         blank=False,
         choices=DATATYPES,
         default="f8",
-        help_text="Storage datatype to use for this sensor."
+        help_text="Storage datatype to use for this sensor.<b>The default is correct for most sensors</b>"
     )
     units = models.CharField(
         max_length=30,
