@@ -9,6 +9,7 @@ class Institution(models.Model):
         max_length=300,
         help_text="Name of the institution"
     )
+    # re.match(r'(https?(://)?)?(?P<url>.*)', url)
     url = models.CharField(
         max_length=1000,
         help_text="The institution's URL"
