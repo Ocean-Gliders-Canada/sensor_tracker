@@ -97,24 +97,24 @@ class Sensor(models.Model):
         blank=True,
         help_text="The official, standard name for the instrument. IE: sea_water_temperature. See CF naming: <a href='http://cfconventions.org/Data/cf-standard-names/39/build/cf-standard-name-table.html'>CF Naming Reference</a>"
     )
-    DATATYPES = {
-        'f4': '32-bit floating point',
-        'f8': '64-bit floating point',
-        'i4': '32-bit signed integer',
-        'i2': '16-bit signed integer',
-        'i8': '64-bit signed integer',
-        'i1': '8-bit signed integer',
-        'u1': '8-bit unsigned integer',
-        'u2': '16-bit unsigned integer',
-        'u4': '32-bit unsigned integer',
-        'u8': '64-bit unsigned integer',
-        'S1': 'single-character string'
-    }
+    DATATYPES = (
+        ('f4', '32-bit floating point'),
+        ('f8', '64-bit floating point'),
+        ('i4', '32-bit signed integer'),
+        ('i2', '16-bit signed integer'),
+        ('i8', '64-bit signed integer'),
+        ('i1', '8-bit signed integer'),
+        ('u1', '8-bit unsigned integer'),
+        ('u2', '16-bit unsigned integer'),
+        ('u4', '32-bit unsigned integer'),
+        ('u8', '64-bit unsigned integer'),
+        ('S1', 'single-character string')
+    )
     type = models.CharField(
         max_length=2,
         null=False,
         blank=False,
-        choices=DATATYPES
+        choices=DATATYPES,
         default="f8",
         help_text="Storage datatype to use for this sensor."
     )
