@@ -101,7 +101,7 @@ class Sensor(models.Model):
         max_length=2,
         null=False,
         blank=True,
-        default="f8"
+        default="f8",
         help_text="Storage datatype to use for this sensor. Valid datatype specifiers include: 'f4' (32-bit floating point), 'f8' (64-bit floating point), 'i4' (32-bit signed integer), 'i2' (16-bit signed integer), 'i8' (64-bit signed integer), 'i1' (8-bit signed integer), 'u1' (8-bit unsigned integer), 'u2' (16-bit unsigned integer), 'u4' (32-bit unsigned integer), 'u8' (64-bit unsigned integer), or 'S1' (single-character string)"
     )
     units = models.CharField(
