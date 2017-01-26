@@ -114,7 +114,7 @@ class PlatformDeployment(models.Model):
         return_string = ''
         if self.title is not None:
             return_string += '%s - ' % self.title
-        return_string += '%s - %s' (
+        return_string += '%s - %s' % (
             self.platform.name,
             self.start_time
         )
