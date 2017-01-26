@@ -120,6 +120,7 @@ class PlatformDeployment(models.Model):
         )
         if self.end_time is not None:
             return_string += ' - %s' % self.end_time
+        return return_string
 
 
 class PlatformDeploymentComment(models.Model):
