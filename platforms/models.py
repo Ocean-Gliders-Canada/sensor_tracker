@@ -116,10 +116,10 @@ class PlatformDeployment(models.Model):
             return_string += '%s - ' % self.title
         return_string += '%s - %s' % (
             self.platform.name,
-            self.start_time
+            self.start_time.strftime('%Y-%m-%d')
         )
         if self.end_time is not None:
-            return_string += ' - %s' % self.end_time
+            return_string += ' - %s' % self.end_time.strftime('%Y-%m-%d')
         return return_string
 
 
