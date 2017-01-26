@@ -111,9 +111,9 @@ class PlatformDeployment(models.Model):
     )
 
     def __str__(self):
-        if self.deployment_name is not None:
+        if self.title is not None:
             return "%s - %s - %s" % (
-                self.deployment_name,
+                self.title,
                 self.platform.name,
                 self.start_time
             )
