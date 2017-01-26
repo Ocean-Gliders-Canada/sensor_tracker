@@ -68,7 +68,6 @@ class PlatformDeployment(models.Model):
         help_text="A short descriptive title for the deployment."
     )
     start_time = models.DateTimeField(null=False, blank=False)
-    deployment_name = models.CharField(max_length=150)
     end_time = models.DateTimeField(null=True, blank=True)
     comment = models.TextField(null=True, blank=True)
     acknowledgement = models.CharField(
