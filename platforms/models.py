@@ -111,17 +111,15 @@ class PlatformDeployment(models.Model):
     )
 
     def __str__(self):
+        return_string = ''
         if self.title is not None:
-            return "%s - %s - %s" % (
-                self.title,
-                self.platform.name,
-                self.start_time
-            )
-        else:
-            return "%s - %s" % (
-                self.platform.name,
-                self.start_time
-            )
+            return_string += '%s - ' % self.title
+        return_string += '%s - %s' (
+            self.platform.name,
+            self.start_time
+        )
+        if self.end_time is not None:
+            return_string += ' - %s' % self.end_time
 
 
 class PlatformDeploymentComment(models.Model):
