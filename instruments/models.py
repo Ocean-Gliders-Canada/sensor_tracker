@@ -124,6 +124,21 @@ class Sensor(models.Model):
         blank=True,
         help_text="The units for the sensor. <b>Please verify after adding a new sensor</b>"
     )
+    precision = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="The precision of a sensor is the consistency for repeated measurements. Average deviation about the mean"
+    )
+    accuracy = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="The accuracy of a sensor is the closeness to true values. Average distance from a known, true value"
+    )
+    resolution = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="The resolution of a sensor is the smallest change it can detect in the quantity that it is measuring."
+    )
     valid_min = models.FloatField(
         null=True,
         blank=True,
