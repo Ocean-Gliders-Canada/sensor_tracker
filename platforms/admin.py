@@ -70,6 +70,50 @@ class PlatformListFilter(admin.SimpleListFilter):
         return str(value)
 
 
+class PlatformDeploymentListFilter(admin.SimpleListFilter):
+    """
+    """
+    title = 'Platform Type'
+
+    parameter_name = 'platform_type'
+
+    default_value = 'All'
+
+    def lookups(self, request, model_admin):
+        """Return a list of possible platform types and their respuctive PlatformType.id values
+        """
+        list_of_platform_types = []
+        queryset = PlatformType.objects.all()
+        for platform_type in queryset:
+            list_of_platform_types.append(
+                (str(platform_type.id), platform_type.model)
+            )
+        return sorted(list_of_platform_types, key=lambda tp: tp[1])
+
+    def queryset(self, request, queryset):
+        """Filter the queryset being returned based on the PlatformType that was selected
+        """
+        if self.value():
+            if self.value() == 'All':
+                return queryset
+            else:
+                return queryset.filter(platform__platform_type__id=self.value())
+
+    def value(self):
+        """Return a default value, or the selected platform type
+        """
+        value = super(PlatformDeploymentListFilter, self).value()
+        if value is None:
+            if self.default_value is None:
+                # If there is at least one platform type, return the first by name. Otherwise, None.
+                first_platform_type = PlatformType.objects.first()
+                value = None if first_platform_type is None else first_platform_type.id
+                self.default_value = value
+            else:
+                value = self.default_value
+        return str(value)
+
+
 class PlatformAdmin(ModelAdmin):
     form = PlatformForm
     list_filter = (PlatformListFilter, )
@@ -93,6 +137,7 @@ class PlatformDeploymentForm(ModelForm):
 
 class PlatformDeploymentAdmin(ModelAdmin):
     form = PlatformDeploymentForm
+    list_filter = (PlatformDeploymentListFilter, )
 admin.site.register(PlatformDeployment, PlatformDeploymentAdmin)
 
 
