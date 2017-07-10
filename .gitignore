@@ -1,5 +1,5 @@
-*.pyc
+**.pyc
 *.sqlite
 *.sqlite3
-*.csv
+**.csv
 
