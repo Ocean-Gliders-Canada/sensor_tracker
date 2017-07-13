@@ -10,7 +10,7 @@ from .models import (
     Sensor
 )
 
-from platforms.models import PlatformType
+from platforms.models import PlatformType, Platform
 
 
 class InstrumentOnPlatformForm(ModelForm):
@@ -23,7 +23,60 @@ class InstrumentOnPlatformForm(ModelForm):
         }
 
 
-class InstrumentOnPlatformListFilter(admin.SimpleListFilter):
+class InstrumentOnPlatformPlatformListFilter(admin.SimpleListFilter):
+    """
+    """
+    title = 'Platform Name'
+
+    parameter_name = 'platform_id'
+
+    default_value = 'All'
+
+    def lookups(self, request, model_admin):
+        """Return a list of possible platform types and their respuctive PlatformType.id values
+        """
+        list_of_platforms = []
+        queryset = Platform.objects.all()
+        for platform in queryset:
+            list_of_platforms.append(
+                (str(platform.id), platform.name)
+            )
+        return sorted(list_of_platforms, key=lambda tp: tp[1])
+
+    def queryset(self, request, queryset):
+        """Filter the queryset being returned based on the PlatformType that was selected
+        """
+        if self.value():
+            if self.value() == 'All':
+                return queryset
+            else:
+                all_relevant_instruments = InstrumentOnPlatform.objects.filter(
+                    platform__id=self.value()
+                ).values()
+
+                relevant_instruments_on_platforms = []
+
+                for r in all_relevant_instruments:
+                    relevant_instruments_on_platforms.append(r['id'])
+
+                return queryset.filter(pk__in=relevant_instruments_on_platforms)
+
+    def value(self):
+        """Return a default value, or the selected platform type
+        """
+        value = super(InstrumentOnPlatformPlatformListFilter, self).value()
+        if value is None:
+            if self.default_value is None:
+                # If there is at least one platform type, return the first by name. Otherwise, None.
+                first_platform = Platform.objects.first()
+                value = None if first_platform is None else first_platform.id
+                self.default_value = value
+            else:
+                value = self.default_value
+        return str(value)
+
+
+class InstrumentOnPlatformTypeListFilter(admin.SimpleListFilter):
     """
     """
     title = 'Platform Type'
@@ -64,7 +117,7 @@ class InstrumentOnPlatformListFilter(admin.SimpleListFilter):
     def value(self):
         """Return a default value, or the selected platform type
         """
-        value = super(InstrumentOnPlatformListFilter, self).value()
+        value = super(InstrumentOnPlatformTypeListFilter, self).value()
         if value is None:
             if self.default_value is None:
                 # If there is at least one platform type, return the first by name. Otherwise, None.
@@ -78,7 +131,7 @@ class InstrumentOnPlatformListFilter(admin.SimpleListFilter):
 
 class InstrumentOnPlatformAdmin(ModelAdmin):
     form = InstrumentOnPlatformForm
-    list_filter = (InstrumentOnPlatformListFilter, )
+    list_filter = (InstrumentOnPlatformTypeListFilter, InstrumentOnPlatformPlatformListFilter, )
 admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
 
 
