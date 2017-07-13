@@ -33,7 +33,7 @@ class InstrumentOnPlatformPlatformListFilter(admin.SimpleListFilter):
     default_value = 'All'
 
     def lookups(self, request, model_admin):
-        """Return a list of possible platform types and their respuctive PlatformType.id values
+        """Return a list of possible platforms and their respuctive Platform.id values
         """
         list_of_platforms = []
         queryset = Platform.objects.all()
@@ -44,7 +44,7 @@ class InstrumentOnPlatformPlatformListFilter(admin.SimpleListFilter):
         return sorted(list_of_platforms, key=lambda tp: tp[1])
 
     def queryset(self, request, queryset):
-        """Filter the queryset being returned based on the PlatformType that was selected
+        """Filter the queryset being returned based on the Platform that was selected
         """
         if self.value():
             if self.value() == 'All':
@@ -67,7 +67,7 @@ class InstrumentOnPlatformPlatformListFilter(admin.SimpleListFilter):
         value = super(InstrumentOnPlatformPlatformListFilter, self).value()
         if value is None:
             if self.default_value is None:
-                # If there is at least one platform type, return the first by name. Otherwise, None.
+                # If there is at least one platform, return the first by name. Otherwise, None.
                 first_platform = Platform.objects.first()
                 value = None if first_platform is None else first_platform.id
                 self.default_value = value

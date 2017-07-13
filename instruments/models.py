@@ -7,7 +7,7 @@ class Instrument(models.Model):
     # TODO: make manufacturer a foreign key
     identifier = models.CharField(
         max_length=300,
-        help_text="The name used to identify this instrument in the raw data. IE: SATCTD7229, sea_water"
+        help_text="The name used to identify this instrument in the raw data. IE: SATCTD7229, sci_water"
     )
     short_name = models.CharField(
         max_length=50,
@@ -89,7 +89,7 @@ class Sensor(models.Model):
         max_length=50,
         null=True,
         blank=True,
-        help_text="The general name for the sensor. IE: temperature"
+        help_text="*REQUIRED if 'Include in output' is checked. The general name for the sensor. IE: temperature"
     )
     standard_name = models.CharField(
         max_length=300,
@@ -151,7 +151,7 @@ class Sensor(models.Model):
     )
     include_in_output = models.BooleanField(
         default=False,
-        help_text="Whether or not data from this sensor should be included in any processed output."
+        help_text="Whether or not data from this sensor should be included in any processed output. NOTE: Long name mast be populated if this is checked"
     )
     comment = models.TextField(
         null=True,
