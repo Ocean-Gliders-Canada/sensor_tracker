@@ -110,6 +110,24 @@ class PlatformDeployment(models.Model):
         default="North Atlantic Ocean"
     )
 
+    latitude = models.FloatField(
+        null=True,
+        blank=True,
+        help_text='The latitude of the deployment'
+    )
+
+    longitude = models.FloatField(
+        null=True,
+        blank=True,
+        help_text='The longitude of the deployment'
+    )
+
+    depth = models.FloatField(
+        null=True,
+        blank=True,
+        help_text='The depth of the deployment'
+    )
+
     def __str__(self):
         return_string = ''
         if self.title is not None:
