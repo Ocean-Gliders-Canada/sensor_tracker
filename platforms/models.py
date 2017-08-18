@@ -106,7 +106,7 @@ class PlatformDeployment(models.Model):
     )
     publisher_email = models.CharField(
         max_length=150,
-        help_text="mail address of the publisher of the data.",
+        help_text="E-mail address of the publisher of the data.",
         null=True,
         blank=True
     )
