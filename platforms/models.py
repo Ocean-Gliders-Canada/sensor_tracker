@@ -122,6 +122,12 @@ class PlatformDeployment(models.Model):
         null=True,
         blank=True
     )
+    metadata_link = models.CharField(
+        max_length=150,
+        help_text="This attribute provides a link to a complete metadata record for this data set or the collection that contains this data set.",
+        null=True,
+        blank=True
+    )
     references = models.TextField(
         help_text="Published or web-based references that describe the data or methods used to produce it.",
         null=True,
