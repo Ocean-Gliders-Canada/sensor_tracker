@@ -129,9 +129,56 @@ class InstrumentOnPlatformTypeListFilter(admin.SimpleListFilter):
         return str(value)
 
 
+class InstrumentOnPlatformSortFilter(admin.SimpleListFilter):
+    """
+    """
+    title = 'Sort By'
+
+    parameter_name = 'sort_by'
+
+    default_value = 'All'
+
+    def lookups(self, request, model_admin):
+        """Return a list of possible platform types and their respuctive PlatformType.id values
+        """
+        sort_ops = [
+            ('instrument__identifier', 'Instrument Identifier'),
+            ('instrument__short_name', 'Instrument Short Name'),
+            ('instrument__long_name', 'Instrument Long Name'),
+            ('instrument__modified_date', 'Instrument Date Modified'),
+            ('platform__name', 'Platform Name'),
+            ('platform__purchase_date', 'Platform Purchase Date'),
+            ('platform__name', 'Platform Name'),
+        ]
+        return sort_ops
+
+    def queryset(self, request, queryset):
+        """Filter the queryset being returned based on the PlatformType that was selected
+        """
+        if self.value():
+            if self.value() == 'All':
+                return queryset
+            else:
+                return queryset.order_by(self.value())
+
+    def value(self):
+        """Return a default value, or the selected platform type
+        """
+        value = super(InstrumentOnPlatformSortFilter, self).value()
+        if value is None:
+            if self.default_value is None:
+                # If there is at least one platform type, return the first by name. Otherwise, None.
+                first_platform_type = PlatformType.objects.first()
+                value = None if first_platform_type is None else first_platform_type.id
+                self.default_value = value
+            else:
+                value = self.default_value
+        return str(value)
+
+
 class InstrumentOnPlatformAdmin(ModelAdmin):
     form = InstrumentOnPlatformForm
-    list_filter = (InstrumentOnPlatformTypeListFilter, InstrumentOnPlatformPlatformListFilter, )
+    list_filter = (InstrumentOnPlatformTypeListFilter, InstrumentOnPlatformPlatformListFilter, InstrumentOnPlatformSortFilter)
 
 
 admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
@@ -203,6 +250,9 @@ class InstrumentPlatformTypeFilter(admin.SimpleListFilter):
             else:
                 value = self.default_value
         return str(value)
+
+
+
 
 
 class InstrumentIdentifierFilter(admin.SimpleListFilter):
