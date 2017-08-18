@@ -104,6 +104,11 @@ class PlatformDeployment(models.Model):
         null=True,
         blank=True
     )
+    references = models.TextField(
+        help_text="Published or web-based references that describe the data or methods used to produce it.",
+        null=True,
+        blank=True,
+    )
     sea_name = models.CharField(
         max_length=300,
         help_text="The sea in which the study is being conducted: <a href='https://www.nodc.noaa.gov/General/NODC-Archive/seanamelist.txt'>Sea Names</a>",
