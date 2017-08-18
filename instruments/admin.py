@@ -179,9 +179,11 @@ class InstrumentListFilter(admin.SimpleListFilter):
                 for i in all_relevant_instruments:
                     if i['instrument_id'] not in relevant_instruments:
                         relevant_instruments[i['instrument_id']] = i
-                    elif i['end_time'] > relevant_instruments[i['instrument_id']]['end_time']:
-                        relevant_instruments[i['instrument_id']] = i
+                    elif relevant_instruments[i['instrument_id']]['end_time'] is None:
+                        pass
                     elif i['end_time'] is None:
+                        relevant_instruments[i['instrument_id']] = i
+                    elif i['end_time'] > relevant_instruments[i['instrument_id']]['end_time']:
                         relevant_instruments[i['instrument_id']] = i
 
                 return queryset.filter(pk__in=relevant_instruments.keys())
