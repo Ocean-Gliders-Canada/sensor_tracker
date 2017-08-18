@@ -104,6 +104,24 @@ class PlatformDeployment(models.Model):
         null=True,
         blank=True
     )
+    publisher_email = models.CharField(
+        max_length=150,
+        help_text="mail address of the publisher of the data.",
+        null=True,
+        blank=True
+    )
+    publisher_name = models.CharField(
+        max_length=150,
+        help_text="Name of the publisher of the data.",
+        null=True,
+        blank=True
+    )
+    publisher_url = models.CharField(
+        max_length=150,
+        help_text="A URL for the publisher of the data.",
+        null=True,
+        blank=True
+    )
     references = models.TextField(
         help_text="Published or web-based references that describe the data or methods used to produce it.",
         null=True,
