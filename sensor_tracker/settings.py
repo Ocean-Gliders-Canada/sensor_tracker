@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'general',
     'platforms',
     'instruments'
+    'api'
 ]
 
 MIDDLEWARE_CLASSES = [
