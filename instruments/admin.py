@@ -176,9 +176,68 @@ class InstrumentOnPlatformSortFilter(admin.SimpleListFilter):
         return str(value)
 
 
+class InstrumentIdentifierForPlatformFilter(admin.SimpleListFilter):
+    """
+    """
+    title = 'Instrument Identifier'
+
+    parameter_name = 'identifier'
+
+    default_value = 'All'
+
+    def lookups(self, request, model_admin):
+        """Return a list of possible platform types and their respuctive PlatformType.id values
+        """
+        list_of_platform_types = []
+        queryset = Instrument.objects.all()
+        for instrument in queryset:
+            temp = (instrument.identifier, instrument.identifier)
+            if temp not in list_of_platform_types:
+                list_of_platform_types.append(
+                    temp
+                )
+        return sorted(list_of_platform_types, key=lambda tp: tp[1])
+
+    def queryset(self, request, queryset):
+        """Filter the queryset being returned based on the PlatformType that was selected
+        """
+        if self.value():
+            if self.value() == 'All':
+                return queryset
+            else:
+                print self.value()
+                all_relevant_instruments = InstrumentOnPlatform.objects.filter(
+                    instrument__identifier=self.value()
+                ).values()
+                relevant_instruments = {}
+                for i in all_relevant_instruments:
+                    if i['id'] not in relevant_instruments:
+                        relevant_instruments[i['id']] = i
+                    elif i['modified_date'] > relevant_instruments[i['id']]['modified_date']:
+                        relevant_instruments[i['instrument_id']] = i
+                    # elif i['end_time'] is None:
+                    #     relevant_instruments[i['instrument_id']] = i
+
+                return queryset.filter(pk__in=relevant_instruments.keys())
+
+    def value(self):
+        """Return a default value, or the selected platform type
+        """
+        value = super(InstrumentIdentifierForPlatformFilter, self).value()
+        if value is None:
+            if self.default_value is None:
+                # If there is at least one platform type, return the first by name. Otherwise, None.
+                first_platform_type = PlatformType.objects.first()
+                value = None if first_platform_type is None else first_platform_type.id
+                self.default_value = value
+            else:
+                value = self.default_value
+        return str(value)
+
+
 class InstrumentOnPlatformAdmin(ModelAdmin):
     form = InstrumentOnPlatformForm
-    list_filter = (InstrumentOnPlatformTypeListFilter, InstrumentOnPlatformPlatformListFilter, InstrumentOnPlatformSortFilter)
+    list_filter = (InstrumentOnPlatformTypeListFilter, InstrumentOnPlatformPlatformListFilter, InstrumentIdentifierForPlatformFilter, InstrumentOnPlatformSortFilter)
 
 
 admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
@@ -250,9 +309,6 @@ class InstrumentPlatformTypeFilter(admin.SimpleListFilter):
             else:
                 value = self.default_value
         return str(value)
-
-
-
 
 
 class InstrumentIdentifierFilter(admin.SimpleListFilter):
