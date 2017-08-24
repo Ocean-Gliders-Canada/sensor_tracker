@@ -40,7 +40,7 @@ class Instrument(models.Model):
     modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
-        return '%s - %s - %s' % (self.identifier, self.short_name, self.serial)
+        return '%s - %s - %s - %s' % (self.identifier, self.short_name, self.serial, self.comment)
 
 
 class InstrumentComment(models.Model):
