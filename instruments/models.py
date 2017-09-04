@@ -153,6 +153,10 @@ class Sensor(models.Model):
         default=False,
         help_text="Whether or not data from this sensor should be included in any processed output. NOTE: Long name mast be populated if this is checked"
     )
+    display_in_web_interface = models.BooleanField(
+        default = False,
+        help_text = "Whether of not data from this seneor should be showed in the web interface."
+    )
     comment = models.TextField(
         null=True,
         blank=True,

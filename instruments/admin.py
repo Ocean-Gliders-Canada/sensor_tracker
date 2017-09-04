@@ -245,6 +245,7 @@ admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
 
 @admin.register(Sensor)
 class SensorAdmin(admin.ModelAdmin):
+    search_fields = ['long_name','identifier','standard_name']
     pass
 
 
@@ -377,6 +378,7 @@ class InstrumentAdmin(admin.ModelAdmin):
         SensorInline,
     ]
     list_filter = (InstrumentPlatformTypeFilter, InstrumentIdentifierFilter)
+    search_fields = ['identifier','short_name','long_name','serial']
     pass
 
 

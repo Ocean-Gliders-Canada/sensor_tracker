@@ -104,6 +104,12 @@ class PlatformDeployment(models.Model):
         null=True,
         blank=True
     )
+    data_repository_link = models.CharField(
+        max_length=150,
+        help_text="URL for the repository where the data come from.",
+        null=True,
+        blank=True
+    )
     publisher_email = models.CharField(
         max_length=150,
         help_text="E-mail address of the publisher of the data.",

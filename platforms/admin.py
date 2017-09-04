@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.forms import ModelForm
 from django.contrib.admin import ModelAdmin
+
 from suit.widgets import SuitSplitDateTimeWidget
+
+
 
 from .models import (
     PlatformType,
@@ -34,6 +37,7 @@ class PlatformListFilter(admin.SimpleListFilter):
     parameter_name = 'platform_type'
 
     default_value = 'All'
+
 
     def lookups(self, request, model_admin):
         """Return a list of possible platform types and their respuctive PlatformType.id values
@@ -82,6 +86,7 @@ class PlatformDeploymentListFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         """Return a list of possible platform types and their respuctive PlatformType.id values
         """
+        print(request.GET)
         list_of_platform_types = []
         queryset = PlatformType.objects.all()
         for platform_type in queryset:
@@ -103,6 +108,7 @@ class PlatformDeploymentListFilter(admin.SimpleListFilter):
         """Return a default value, or the selected platform type
         """
         value = super(PlatformDeploymentListFilter, self).value()
+
         if value is None:
             if self.default_value is None:
                 # If there is at least one platform type, return the first by name. Otherwise, None.
@@ -117,6 +123,7 @@ class PlatformDeploymentListFilter(admin.SimpleListFilter):
 class PlatformAdmin(ModelAdmin):
     form = PlatformForm
     list_filter = (PlatformListFilter, )
+    search_fields = ['name','serial_number']
 admin.site.register(Platform, PlatformAdmin)
 
 
@@ -137,7 +144,9 @@ class PlatformDeploymentForm(ModelForm):
 
 class PlatformDeploymentAdmin(ModelAdmin):
     form = PlatformDeploymentForm
+    search_fields = ['title','deployment_number','acknowledgement']
     list_filter = (PlatformDeploymentListFilter, )
+
 admin.site.register(PlatformDeployment, PlatformDeploymentAdmin)
 
 
