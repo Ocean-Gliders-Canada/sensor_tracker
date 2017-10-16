@@ -3,4 +3,12 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-# Create your tests here.
+
+class InstrumentAPITests(TestCase):
+    def setup(self):
+
+class PlatformAPITests(TestCase):
+    pass
+
+class GeneralAPITests(TestCase):
+    pass

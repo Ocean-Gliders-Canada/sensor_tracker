@@ -60,7 +60,9 @@ ROOT_URLCONF = 'sensor_tracker.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'api/html/')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
