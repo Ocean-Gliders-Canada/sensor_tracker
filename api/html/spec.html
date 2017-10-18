@@ -4,9 +4,17 @@
 </head>
 <body>
   <h1>Sensor Tracker API Specification</h1>
-  <div>
-    <h2>/api/</h2>
-    <h3>Possible Arguments</h3>
-    <h3>Description</h3>
-  </div>
+  {% for url in urls %}
+    <div>
+      <h2>{{ url.method }}: /api/{{ url.name }}</h2>
+      <h3>Possible Arguments</h3>
+      <ul>
+        {% for arg in url.args %}
+          <li>{{ arg[0] }} - {{ arg[1] }}: {{ arg[2] }}</li>
+        {% endfor %}
+      </ul>
+      <h3>Description</h3>
+      <p>{{ url.desc }}</p>
+    </div>
+  {% endfor %}
 </html>

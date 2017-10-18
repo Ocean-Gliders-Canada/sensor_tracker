@@ -9,8 +9,13 @@ from django.apps import apps
 from django.core import serializers
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.db import IntegrityError
 from django.db.models import Q
 
+
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 # GET Requests
 
@@ -29,6 +34,7 @@ def get_deployments(request):
     # return serializers.serialize('json', Deployment.objects.all())
 
 
+@api_view(['GET'])
 def get_instruments(request):
     Instrument = apps.get_model('instruments', 'Instrument')
 
@@ -46,6 +52,7 @@ def get_instruments(request):
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
 
+@api_view(['GET'])
 def get_instruments_on_platform(request):
     InstrumentOnPlatform = apps.get_model('instruments', 'InstrumentOnPlatform')
 
@@ -85,6 +92,7 @@ def get_instruments_on_platform(request):
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
 
+@api_view(['GET'])
 def get_sensors(request):
     Sensor = apps.get_model('instruments', 'Sensor')
     if len(request.GET) == 0:
@@ -101,6 +109,7 @@ def get_sensors(request):
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
 
+@api_view(['GET'])
 def get_platform(request):
     Platform = apps.get_model('platforms', 'Platform')
     if len(request.GET) == 0:
@@ -117,6 +126,7 @@ def get_platform(request):
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
 
+@api_view(['GET'])
 def get_manufacturer(request):
     Manufacturer = apps.get_model('general', 'Manufacturer')
     if len(request.GET) == 0:
@@ -133,6 +143,7 @@ def get_manufacturer(request):
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
 
+@api_view(['GET'])
 def get_institutions(request):
     Institution = apps.get_model('general', 'Institution')
     if len(request.GET) == 0:
@@ -149,6 +160,7 @@ def get_institutions(request):
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
 
+@api_view(['GET'])
 def get_project(request):
     Project = apps.get_model('general', 'Project')
     if len(request.GET) == 0:
@@ -165,6 +177,7 @@ def get_project(request):
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
 
+@api_view(['GET'])
 def get_platform_type(request):
     PlatformType = apps.get_model('platforms', 'PlatformType')
     Platform = apps.get_model('platforms', 'Platform')
@@ -188,6 +201,7 @@ def get_platform_type(request):
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
 
+@api_view(['GET'])
 def get_platform_deployments(request):
     PlatformDeployment = apps.get_model('platforms', 'PlatformDeployment')
     if len(request.GET) == 0:
@@ -224,6 +238,7 @@ def get_platform_deployments(request):
             return HttpResponse(json.dumps(error), content_type='application/json')
 
 
+@api_view(['GET'])
 def get_deployment_instruments(request):
     Instrument = apps.get_model('instruments', 'Instrument')
     InstrumentOnPlatform = apps.get_model('instruments', 'InstrumentOnPlatform')
@@ -246,6 +261,7 @@ def get_deployment_instruments(request):
         return HttpResponse(json.dumps(error), content_type='application/json')
 
 
+@api_view(['GET'])
 def get_output_sensors(request):
     Sensor = apps.get_model('instruments', 'Sensor')
     if len(request.GET) == 0:
@@ -268,18 +284,120 @@ def get_output_sensors(request):
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
 
+# POST Requests
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def insert_deployment(request):
+    Deployment = apps.get_model('platforms', 'PlatformDeployment')
+    deployment = create_object_from_request(request, Deployment)
+
+    return save_and_result(deployment)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def insert_platform(request):
+    Platform = apps.get_model('platforms', 'Platform')
+    platform = create_object_from_request(request, Platform)
+
+    return save_and_result(platform)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def insert_project(request):
+    Project = apps.get_model('general', 'Project')
+    project = create_object_from_request(request, Project)
+
+    return save_and_result(project)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def insert_instrument_on_platform(request):
+    InstrumentOnPlatform = apps.get_model('instruments', 'InstrumentOnPlatform')
+    instrument_on_platform = create_object_from_request(request, InstrumentOnPlatform)
+
+    return save_and_result(instrument_on_platform)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def insert_platform_type(request):
+    PlatformType = apps.get_model('instruments', 'PlatformType')
+    platform_type = create_object_from_request(request, PlatformType)
+
+    return save_and_result(platform_type)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def insert_instrument(request):
+    Instrument = apps.get_model('instruments', 'Instrument')
+    instrument = create_object_from_request(request, Instrument)
+
+    return save_and_result(instrument)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def insert_sensor(request):
+    Sensor = apps.get_model('instruments', 'Sensor')
+    sensor = create_object_from_request(request, Sensor)
+
+    return save_and_result(sensor)
+
+
 def spec(request):
     pass
 
 
 # Helpers
+def create_object_from_request(request, Object, time_columns=['start_time', 'end_time']):
+    fields = [x.get_attname_column()[0] for x in Object._meta.fields]
+    kargs = {}
+    for field in fields:
+        if field in request.POST:
+            if field in time_columns:
+                kargs[field] = datetime.datetime.strptime(request.POST.get(field), '%Y-%m-%d %H:%M:%S')
+            else:
+                kargs[field] = request.POST.get(field)
+    print kargs
+    return Object(**kargs)
+
+
+def save_and_result(model):
+    try:
+        model.save()
+        res = {
+            'success': True,
+            'id': model.id
+        }
+        return HttpResponse(json.dumps(res), content_type='application/json')
+    except IntegrityError as e:
+        res = {
+            'success': False,
+            'error': '\'%s\' must be included' % e.message.split('.')[-1]
+        }
+        return HttpResponse(json.dumps(res), content_type='application/json')
+
+
 def convert_times(obj):
-    for k in obj:
-        if type(obj[k]) == datetime.datetime:
-            obj[k] = obj[k].strftime('%Y-%m-%d %H:%M:%S')
+    if type(obj) == dict:
+        for k in obj:
+            if type(obj[k]) == datetime.datetime:
+                obj[k] = obj[k].strftime('%Y-%m-%d %H:%M:%S')
 
 
-def clean_model_dict(models):
+def clean_model_dict(models, no_foreign=['wmo_id']):
     data = []
     print models
     for m in models:
@@ -288,7 +406,7 @@ def clean_model_dict(models):
         keys = m_dict.keys()
         to_add = []
         for key in keys:
-            if 'id' in key and key != 'wmo_id':
+            if 'id' in key and key not in no_foreign:
                 if key != 'id':
                     to_add.append(key.replace('_id', ''))
         for add in to_add:
