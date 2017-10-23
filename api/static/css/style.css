@@ -1,0 +1,8 @@
+.bulletless {
+  list-style-type: none;
+}
+
+.sticky > h3 {
+  margin-left: 15px;
+  margin-top: 5px
+}

@@ -7,18 +7,20 @@ import datetime
 
 from django.apps import apps
 from django.core import serializers
-from django.http import HttpResponse
-from django.shortcuts import render
 from django.db import IntegrityError
 from django.db.models import Q
-
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.template import loader
 
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-# GET Requests
+import specs
 
+
+# GET Requests
 def get_deployments(request):
     Deployment = apps.get_model('platforms', 'PlatformDeployment')
     gets = {}
@@ -42,9 +44,11 @@ def get_instruments(request):
         res = Instrument.objects.all()
     else:
         gets = {}
-        if 'id' in request.GET:
+        if 'id' in request.GET and 'identifier' in request.GET:
+            return error_result('Either include \'id\' or \'identifier\', not both.')
+        elif 'id' in request.GET:
             gets['id'] = request.GET.get('id')
-        if 'identifier' in request.GET:
+        elif 'identifier' in request.GET:
             gets['identifier'] = request.GET.get('identifier')
         res = Instrument.objects.filter(**gets)
     json_obj = {}
@@ -60,6 +64,8 @@ def get_instruments_on_platform(request):
         res = InstrumentOnPlatform.objects.all()
     else:
         query = None
+        if 'id' in request.GET and ('name' in request.GET or 'time' in request.GET or 'identifier' in request.GET):
+            return error_result('If \'id\' is included, it must be the only argument.')
         if 'id' in request.GET:
             query = Q(id=request.GET.get('id'))
         if 'name' in request.GET:
@@ -99,7 +105,10 @@ def get_sensors(request):
         res = Sensor.objects.all()
     else:
         gets = {}
-        if 'id' in request.GET:
+
+        if 'id' in request.GET and 'identifier' in request.GET:
+            return error_result('Either include \'id\' or \'identifier\', not both.')
+        elif 'id' in request.GET:
             gets['id'] = request.GET.get('id')
         if 'identifier' in request.GET:
             gets['identifier'] = request.GET.get('identifier')
@@ -116,9 +125,11 @@ def get_platform(request):
         res = Platform.objects.all()
     else:
         gets = {}
-        if 'id' in request.GET:
+        if 'id' in request.GET and 'name' in request.GET:
+            return error_result('Either include \'id\' or \'name\', not both.')
+        elif 'id' in request.GET:
             gets['id'] = request.GET.get('id')
-        if 'name' in request.GET:
+        elif 'name' in request.GET:
             gets['name'] = request.GET.get('name')
         res = Platform.objects.filter(**gets)
     json_obj = {}
@@ -133,9 +144,11 @@ def get_manufacturer(request):
         res = Manufacturer.objects.all()
     else:
         gets = {}
-        if 'id' in request.GET:
+        if 'id' in request.GET and 'name' in request.GET:
+            return error_result('Either include \'id\' or \'name\', not both.')
+        elif 'id' in request.GET:
             gets['id'] = request.GET.get('id')
-        if 'name' in request.GET:
+        elif 'name' in request.GET:
             gets['name'] = request.GET.get('name')
         res = Manufacturer.objects.filter(**gets)
     json_obj = {}
@@ -150,9 +163,11 @@ def get_institutions(request):
         res = Institution.objects.all()
     else:
         gets = {}
-        if 'id' in request.GET:
+        if 'id' in request.GET and 'name' in request.GET:
+            return error_result('Either include \'id\' or \'name\', not both.')
+        elif 'id' in request.GET:
             gets['id'] = request.GET.get('id')
-        if 'name' in request.GET:
+        elif 'name' in request.GET:
             gets['name'] = request.GET.get('name')
         res = Institution.objects.filter(**gets)
     json_obj = {}
@@ -167,6 +182,8 @@ def get_project(request):
         res = Project.objects.all()
     else:
         gets = {}
+        if 'id' in request.GET and 'name' in request.GET:
+            return error_result('Either include \'id\' or \'name\', not both.')
         if 'id' in request.GET:
             gets['id'] = request.GET.get('id')
         if 'name' in request.GET:
@@ -234,8 +251,7 @@ def get_platform_deployments(request):
             json_obj['data'] = clean_model_dict(res)
             return HttpResponse(json.dumps(json_obj), content_type='application/json')
         else:
-            error = {'error': '\'name\' keyword not found'}
-            return HttpResponse(json.dumps(error), content_type='application/json')
+            return error_result('No valid arguments found.')
 
 
 @api_view(['GET'])
@@ -251,8 +267,6 @@ def get_deployment_instruments(request):
         query = Q(platform__name=request.GET.get('name'))
         query &= Q(start_time__lte=g_time) & (Q(end_time__gte=g_time) | Q(end_time=None))
         res = InstrumentOnPlatform.objects.filter(query)
-        print "he"
-        print res
         json_obj = {}
         json_obj['data'] = clean_model_dict(res)
         return HttpResponse(json.dumps(json_obj), content_type='application/json')
@@ -330,7 +344,7 @@ def insert_instrument_on_platform(request):
 @authentication_classes([TokenAuthentication, SessionAuthentication])
 @permission_classes([IsAuthenticated])
 def insert_platform_type(request):
-    PlatformType = apps.get_model('instruments', 'PlatformType')
+    PlatformType = apps.get_model('platforms', 'PlatformType')
     platform_type = create_object_from_request(request, PlatformType)
 
     return save_and_result(platform_type)
@@ -357,7 +371,12 @@ def insert_sensor(request):
 
 
 def spec(request):
-    pass
+    template = loader.get_template('spec.html')
+    context = {
+        'urls': specs.specs,
+        'links': specs.links
+    }
+    return HttpResponse(template.render(context, request))
 
 
 # Helpers
@@ -365,6 +384,7 @@ def create_object_from_request(request, Object, time_columns=['start_time', 'end
     fields = [x.get_attname_column()[0] for x in Object._meta.fields]
     kargs = {}
     for field in fields:
+        print field
         if field in request.POST:
             if field in time_columns:
                 kargs[field] = datetime.datetime.strptime(request.POST.get(field), '%Y-%m-%d %H:%M:%S')
@@ -383,11 +403,12 @@ def save_and_result(model):
         }
         return HttpResponse(json.dumps(res), content_type='application/json')
     except IntegrityError as e:
-        res = {
-            'success': False,
-            'error': '\'%s\' must be included' % e.message.split('.')[-1]
-        }
-        return HttpResponse(json.dumps(res), content_type='application/json')
+        return error_result(e.message.replace('DETAIL', '').strip())
+
+
+def error_result(error):
+    res = {'error': error}
+    return HttpResponse(json.dumps(res), content_type='application/json')
 
 
 def convert_times(obj):

@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^insert_platform_type/$', views.insert_platform_type, name='insert_platform_type'),
     url(r'^insert_instrument/$', views.insert_instrument, name='insert_instrument'),
     url(r'^insert_sensor/$', views.insert_sensor, name='insert_sensor'),
+    url(r'^spec/$', views.spec, name='spec')
 
 ]
 

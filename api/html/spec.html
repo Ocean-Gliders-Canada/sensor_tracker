@@ -1,20 +1,59 @@
 {% load staticfiles %}
 <html>
 <head>
+  <title>Sensor Tracker API Specification</title>
+  <script
+    src="https://code.jquery.com/jquery-3.2.1.js"
+    integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" type="text/css" href="{% static "semantic.min.css" %}" />
+  <script src="{% static "semantic.min.js" %}"></script>
+  <script src="{% static "js/script.js" %}"></script>
+  <link rel="stylesheet" type="text/css" href="{% static "css/style.css" %}" />
 </head>
 <body>
-  <h1>Sensor Tracker API Specification</h1>
-  {% for url in urls %}
-    <div>
-      <h2>{{ url.method }}: /api/{{ url.name }}</h2>
-      <h3>Possible Arguments</h3>
-      <ul>
-        {% for arg in url.args %}
-          <li>{{ arg[0] }} - {{ arg[1] }}: {{ arg[2] }}</li>
+  <div class="ui rail">
+    <div class="ui sticky">
+      <h3>API Endpoints</h3>
+      <ul class="bulletless">
+        {% for link in links %}
+          <li><a href="#{{ link }}">{{ link }}</a></li>
         {% endfor %}
       </ul>
-      <h3>Description</h3>
-      <p>{{ url.desc }}</p>
     </div>
-  {% endfor %}
+  </div>
+  <div class="ui container" id="content">
+    <h1>Sensor Tracker API Specification</h1>
+    {% for url in urls %}
+      <div class="ui segment">
+        <h2 id="{{ url.name }}">{{ url.method }}: <em>/api/{{ url.name }}</em></h2>
+        <h3>Possible Arguments</h3>
+        <table class="ui very basic collapsing celled table">
+          <thead>
+            <tr>
+              <th>Argument</th>
+              <th>Type</th>
+              <th>Required</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for arg in url.args %}
+            <tr>
+              <td>{{ arg.name }}</td>
+              <td>{{ arg.type }}</td>
+              <td>{{ arg.required }}</td>
+              <td>{{ arg.desc}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% if url.desc %}
+          <h3>Description</h3>
+          <p>{{ url.desc }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</body>
 </html>
