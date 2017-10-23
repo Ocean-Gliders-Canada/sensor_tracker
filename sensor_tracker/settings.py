@@ -137,3 +137,9 @@ SUIT_CONFIG = {
     'ADMIN_NAME': 'Sensor Tracker',
     'SEARCH_URL': ''
 }
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
+}
