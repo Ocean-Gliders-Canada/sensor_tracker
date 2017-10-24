@@ -583,6 +583,27 @@ specs = [
             },
         ]
     },
+    {
+        'method': 'POST',
+        'name': 'update_component',
+        'desc': '''Used to update entries in the different sensor tracker tables.
+        Any column name can be a argument. Multiple columns can be edited at a time.
+        ''',
+        'args': [
+            {
+                'name': 'component',
+                'type': 'String',
+                'required': 'required',
+                'desc': 'The table that will be updated. Options are: sensor, platform, project, instruments_platform, platform_type, instrument, sensor.'
+            },
+            {
+                'name': 'id',
+                'type': 'Integer',
+                'required': 'required',
+                'desc': 'Id of the edited entry.'
+            },
+        ]
+    },
 ]
 
 # Sorters

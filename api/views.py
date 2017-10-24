@@ -378,7 +378,7 @@ def update_component(request):
         'sensor': ('platforms', 'PlatformDeployment'),
         'platform': ('platforms', 'Platform'),
         'project': ('general', 'Project'),
-        'platform': ('instruments', 'InstrumentOnPlatform'),
+        'instruments_platform': ('instruments', 'InstrumentOnPlatform'),
         'platform_type': ('platforms', 'PlatformType'),
         'instrument': ('instruments', 'Instrument'),
         'sensor': ('instruments', 'Sensor'),
