@@ -370,6 +370,51 @@ def insert_sensor(request):
     return save_and_result(sensor)
 
 
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def update_component(request):
+    lookup = {
+        'sensor': ('platforms', 'PlatformDeployment'),
+        'platform': ('platforms', 'Platform'),
+        'project': ('general', 'Project'),
+        'platform': ('instruments', 'InstrumentOnPlatform'),
+        'platform_type': ('platforms', 'PlatformType'),
+        'instrument': ('instruments', 'Instrument'),
+        'sensor': ('instruments', 'Sensor'),
+    }
+    if 'component' in request.POST and 'id' in request.POST:
+        try:
+            Component = apps.get_model(*lookup[request.POST.get('component')])
+        except KeyError:
+            err = "'%s' is not a component." % request.POST.get('component')
+            return error_result(err)
+
+        try:
+            component = Component.objects.filter(id=request.POST.get('id'))
+            if len(component) == 0:
+                err = 'Could not find %s with that id.' % request.POST.get('component')
+                return error_result(err)
+            component = component.first()
+        except ValueError:
+            err = "'id' must be an integer."
+            return error_result(err)
+        fields = [x.get_attname_column()[0] for x in Component._meta.fields]
+        fields.remove('id')
+        for field in fields:
+            if field in request.POST:
+                setattr(component, field, request.POST.get(field))
+        component.save()
+        res = {
+            'success': True,
+            'message': 'Updated \'%s\' with id %s.' % (
+                request.POST.get('component'),
+                request.POST.get('id')
+            )
+        }
+        return HttpResponse(json.dumps(res), content_type='application/json')
+
+
 def spec(request):
     template = loader.get_template('spec.html')
     context = {
@@ -384,13 +429,11 @@ def create_object_from_request(request, Object, time_columns=['start_time', 'end
     fields = [x.get_attname_column()[0] for x in Object._meta.fields]
     kargs = {}
     for field in fields:
-        print field
         if field in request.POST:
             if field in time_columns:
                 kargs[field] = datetime.datetime.strptime(request.POST.get(field), '%Y-%m-%d %H:%M:%S')
             else:
                 kargs[field] = request.POST.get(field)
-    print kargs
     return Object(**kargs)
 
 
@@ -407,7 +450,7 @@ def save_and_result(model):
 
 
 def error_result(error):
-    res = {'error': error}
+    res = {'success': False, 'error': error}
     return HttpResponse(json.dumps(res), content_type='application/json')
 
 
@@ -420,7 +463,6 @@ def convert_times(obj):
 
 def clean_model_dict(models, no_foreign=['wmo_id']):
     data = []
-    print models
     for m in models:
         m_dict = copy.deepcopy(m.__dict__)
         del m_dict['_state']

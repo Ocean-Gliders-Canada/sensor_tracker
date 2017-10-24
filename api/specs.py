@@ -589,4 +589,3 @@ specs = [
 specs.sort(key=lambda x: x['name'])
 
 links = [x['name'] for x in specs]
-print specs
