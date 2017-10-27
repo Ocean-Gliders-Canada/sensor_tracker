@@ -86,21 +86,21 @@ class PlatformDeployment(models.Model):
         null=True,
         blank=True
     )
-    creator_email = models.CharField(
+    creator_email = models.TextField(
         max_length=150,
-        help_text="Email address for the person who collected the data.",
+        help_text="A comma separated of email addresses for the person who collected the data.",
         null=True,
         blank=True
     )
-    creator_name = models.CharField(
+    creator_name = models.TextField(
         max_length=150,
-        help_text="Name of the person who collected the data.",
+        help_text="A comma separated of names of the person who collected the data.",
         null=True,
         blank=True
     )
-    creator_url = models.CharField(
+    creator_url = models.TextField(
         max_length=150,
-        help_text="URL for the person who collected the data.",
+        help_text="A comma separated of URLs for the person who collected the data.",
         null=True,
         blank=True
     )
