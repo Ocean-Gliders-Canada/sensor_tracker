@@ -64,11 +64,16 @@ specs = [
     {
         'method': 'GET',
         'name': 'get_sensors',
-        'desc': '''Takes a maximum of one of the two listed arguments.
-            If no arguments are included, all results will be returned.''',
+        'desc': '''Takes a maximum of one of the three listed arguments.
+            If no argument is included, all results will be returned.''',
         'args': [
             {
                 'name': 'id',
+                'type': 'Integer',
+                'required': 'optional',
+            },
+            {
+                'name': 'instrument_id',
                 'type': 'Integer',
                 'required': 'optional',
             },

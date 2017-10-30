@@ -105,13 +105,14 @@ def get_sensors(request):
         res = Sensor.objects.all()
     else:
         gets = {}
-
-        if 'id' in request.GET and 'identifier' in request.GET:
-            return error_result('Either include \'id\' or \'identifier\', not both.')
-        elif 'id' in request.GET:
+        if 'id' in request.GET and 'identifier' not in request.GET and 'instrument_id' not in request.GET:
             gets['id'] = request.GET.get('id')
-        if 'identifier' in request.GET:
+        elif 'identifier' in request.GET and 'id' not in request.GET and 'instrument_id' not in request.GET:
             gets['identifier'] = request.GET.get('identifier')
+        elif 'instrument_id' in request.GET and 'id' not in request.GET and 'identifier' not in request.GET:
+            gets['instrument_id'] = request.GET.get('instrument_id')
+        else:
+            return error_result('Either include only one of \'id\', \'identifier\', or \'instrument_id\'.')
         res = Sensor.objects.filter(**gets)
     json_obj = {}
     json_obj['data'] = clean_model_dict(res)
