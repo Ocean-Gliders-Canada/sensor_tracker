@@ -12,6 +12,23 @@ print Sensor._meta.get_field('instrument_id').help_text
 
 specs = [
     {
+        'method': 'POST',
+        'name': 'get_token',
+        'desc': '''Takes a user's username and password and returns a token.''',
+        'args': [
+            {
+                'name': 'username',
+                'type': 'String',
+                'required': 'required',
+            },
+            {
+                'name': 'password',
+                'type': 'String',
+                'required': 'required',
+            },
+        ]
+    },
+    {
         'method': 'GET',
         'name': 'get_instruments',
         'desc': '''Takes a maximum of one of the two listed arguments.
