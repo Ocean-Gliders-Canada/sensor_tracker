@@ -616,7 +616,7 @@ specs = [
                 'name': 'component',
                 'type': 'String',
                 'required': 'required',
-                'desc': 'The table that will be updated. Options are: sensor, platform, project, instruments_platform, platform_type, instrument, sensor.'
+                'desc': 'The table that will be updated. Options are: deployment, platform, project, instruments_platform, platform_type, instrument, sensor.'
             },
             {
                 'name': 'id',

@@ -376,7 +376,7 @@ def insert_sensor(request):
 @permission_classes([IsAuthenticated])
 def update_component(request):
     lookup = {
-        'sensor': ('platforms', 'PlatformDeployment'),
+        'deployment': ('platforms', 'PlatformDeployment'),
         'platform': ('platforms', 'Platform'),
         'project': ('general', 'Project'),
         'instruments_platform': ('instruments', 'InstrumentOnPlatform'),
