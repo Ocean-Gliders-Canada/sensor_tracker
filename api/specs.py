@@ -104,7 +104,7 @@ specs = [
     {
         'method': 'GET',
         'name': 'get_platform',
-        'desc': '''Takes a maximum of one of the two listed arguments.
+        'desc': '''Takes a maximum of one of the three listed arguments.
             If no arguments are included, all results will be returned.''',
         'args': [
             {
@@ -116,6 +116,12 @@ specs = [
                 'name': 'name',
                 'type': 'String',
                 'required': 'optional',
+            },
+            {
+                'name': 'type',
+                'type': 'String',
+                'required': 'optional',
+                'desc': 'The type of platform'
             },
         ]
     },
@@ -254,6 +260,25 @@ specs = [
                 'type': 'String',
                 'required': 'optional',
                 'desc': 'The identifier of the instrument'
+            },
+        ]
+    },
+    {
+        'method': 'GET',
+        'name': 'get_most_recent_deployment',
+        'desc': '''Takes exactly of one of the two listed required arguments.''',
+        'args': [
+            {
+                'name': 'id',
+                'type': 'Integer',
+                'required': 'required',
+                'desc': 'The id of the platform'
+            },
+            {
+                'name': 'name',
+                'type': 'String',
+                'required': 'required',
+                'desc': 'The name of the platform'
             },
         ]
     },

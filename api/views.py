@@ -132,6 +132,8 @@ def get_platform(request):
             gets['id'] = request.GET.get('id')
         elif 'name' in request.GET:
             gets['name'] = request.GET.get('name')
+        elif 'type' in request.GET:
+            gets['platform_type__model'] = request.GET.get('type')
         res = Platform.objects.filter(**gets)
     json_obj = {}
     json_obj['data'] = clean_model_dict(res)
@@ -285,7 +287,7 @@ def get_output_sensors(request):
         gets = {
             'include_in_output': True
         }
-        if 'id' in request.GET and 'name' not in request.GET:
+        if 'id' in request.GET and 'identifier' not in request.GET:
             gets['instrument__id'] = request.GET.get('id')
             res = Sensor.objects.filter(**gets)
         elif 'identifier' in request.GET and 'id' not in request.GET:
@@ -298,6 +300,22 @@ def get_output_sensors(request):
     json_obj['data'] = clean_model_dict(res)
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
+
+@api_view(['GET'])
+def get_most_recent_deployment(request):
+    PlatformDeployment = apps.get_model('platforms', 'PlatformDeployment')
+    gets = {}
+    if 'id' in request.GET and 'name' not in request.GET:
+        gets['platform__id'] = request.GET.get('id')
+    elif 'id' not in request.GET and 'name' in request.GET:
+        gets['platform__name'] = request.GET.get('name')
+    else:
+        return error_result('Either \'id\' or \'name\' of a platform is required.')
+    res = PlatformDeployment.objects.filter(**gets).order_by('-start_time')
+    json_obj = {
+        'data': clean_model_dict(res)[0]
+    }
+    return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
 # POST Requests
 
