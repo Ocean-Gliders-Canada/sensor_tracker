@@ -111,8 +111,11 @@ def get_sensors(request):
             gets['identifier'] = request.GET.get('identifier')
         elif 'instrument_id' in request.GET and 'id' not in request.GET and 'identifier' not in request.GET:
             gets['instrument_id'] = request.GET.get('instrument_id')
+        elif 'instrument_id' in request.GET and 'identifier' in request.GET and 'id' not in request.GET:
+            gets['identifier'] = request.GET.get('identifier')
+            gets['instrument_id'] = request.GET.get('instrument_id')
         else:
-            return error_result('Either include only one of \'id\', \'identifier\', or \'instrument_id\'.')
+            return error_result('Invalid arguments')
         res = Sensor.objects.filter(**gets)
     json_obj = {}
     json_obj['data'] = clean_model_dict(res)

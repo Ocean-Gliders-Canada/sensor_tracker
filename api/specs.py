@@ -81,7 +81,7 @@ specs = [
     {
         'method': 'GET',
         'name': 'get_sensors',
-        'desc': '''Takes a maximum of one of the three listed arguments.
+        'desc': '''Takes a 'id' alone, or 'instrument_id' and/or 'identifier'.
             If no argument is included, all results will be returned.''',
         'args': [
             {
