@@ -31,7 +31,7 @@ specs = [
     {
         'method': 'GET',
         'name': 'get_instruments',
-        'desc': '''Takes a maximum of one of the two listed arguments.
+        'desc': '''Takes a 'id' alone, or 'serial' and/or 'identifier'
             If no arguments are included, all results will be returned.''',
         'args': [
             {
@@ -44,6 +44,11 @@ specs = [
                 'type': 'String',
                 'required': 'optional',
             },
+            {
+                'name': 'serial',
+                'type': 'String',
+                'required': 'optional',
+            }
         ]
     },
     {

@@ -44,12 +44,15 @@ def get_instruments(request):
         res = Instrument.objects.all()
     else:
         gets = {}
-        if 'id' in request.GET and 'identifier' in request.GET:
-            return error_result('Either include \'id\' or \'identifier\', not both.')
+        if 'id' in request.GET and ('identifier' in request.GET or 'serial' in request.GET):
+            return error_result('\'id\' must be the only arg if \'id\' is used.')
         elif 'id' in request.GET:
             gets['id'] = request.GET.get('id')
-        elif 'identifier' in request.GET:
-            gets['identifier'] = request.GET.get('identifier')
+        else:
+            if 'identifier' in request.GET:
+                gets['identifier'] = request.GET.get('identifier')
+            if 'serial' in request.GET:
+                gets['serial'] = request.GET.get('serial')
         res = Instrument.objects.filter(**gets)
     json_obj = {}
     json_obj['data'] = clean_model_dict(res)
