@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+
 from django.db import models
 
 
@@ -77,7 +78,6 @@ class InstrumentOnPlatform(models.Model):
 
     def __str__(self):
         return "%s - %s - %s" % (self.instrument, self.platform, self.start_time)
-
 
 class Sensor(models.Model):
     instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE)
@@ -167,3 +167,4 @@ class Sensor(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.identifier, self.instrument.identifier)
+

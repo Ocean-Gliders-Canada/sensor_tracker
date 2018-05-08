@@ -215,8 +215,8 @@ class InstrumentIdentifierForPlatformFilter(admin.SimpleListFilter):
                         relevant_instruments[i['id']] = i
                     elif i['modified_date'] > relevant_instruments[i['id']]['modified_date']:
                         relevant_instruments[i['instrument_id']] = i
-                    # elif i['end_time'] is None:
-                    #     relevant_instruments[i['instrument_id']] = i
+                        # elif i['end_time'] is None:
+                        #     relevant_instruments[i['instrument_id']] = i
 
                 return queryset.filter(pk__in=relevant_instruments.keys())
 
@@ -237,7 +237,9 @@ class InstrumentIdentifierForPlatformFilter(admin.SimpleListFilter):
 
 class InstrumentOnPlatformAdmin(ModelAdmin):
     form = InstrumentOnPlatformForm
-    list_filter = (InstrumentOnPlatformTypeListFilter, InstrumentOnPlatformPlatformListFilter, InstrumentIdentifierForPlatformFilter, InstrumentOnPlatformSortFilter)
+    list_filter = (
+        InstrumentOnPlatformTypeListFilter, InstrumentOnPlatformPlatformListFilter,
+        InstrumentIdentifierForPlatformFilter, InstrumentOnPlatformSortFilter)
 
 
 admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
@@ -245,7 +247,7 @@ admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
 
 @admin.register(Sensor)
 class SensorAdmin(admin.ModelAdmin):
-    search_fields = ['long_name','identifier','standard_name']
+    search_fields = ['long_name', 'identifier', 'standard_name']
     pass
 
 
@@ -352,8 +354,8 @@ class InstrumentIdentifierFilter(admin.SimpleListFilter):
                         relevant_instruments[i['id']] = i
                     elif i['modified_date'] > relevant_instruments[i['id']]['modified_date']:
                         relevant_instruments[i['instrument_id']] = i
-                    # elif i['end_time'] is None:
-                    #     relevant_instruments[i['instrument_id']] = i
+                        # elif i['end_time'] is None:
+                        #     relevant_instruments[i['instrument_id']] = i
 
                 return queryset.filter(pk__in=relevant_instruments.keys())
 
@@ -378,8 +380,7 @@ class InstrumentAdmin(admin.ModelAdmin):
         SensorInline,
     ]
     list_filter = (InstrumentPlatformTypeFilter, InstrumentIdentifierFilter)
-    search_fields = ['identifier','short_name','long_name','serial']
-    pass
+    search_fields = ['identifier', 'short_name', 'long_name', 'serial']
 
 
 @admin.register(InstrumentComment)

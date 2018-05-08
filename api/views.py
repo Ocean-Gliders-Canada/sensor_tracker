@@ -264,6 +264,34 @@ def get_platform_deployments(request):
 
 
 @api_view(['GET'])
+def get_platform_deployment_comments(request):
+    PlatformDeploymentComment = apps.get_model('platforms', 'PlatformDeploymentComment')
+    PlatformDeployment = apps.get_model('platforms', 'PlatformDeployment')
+
+    if (request.GET) == 0:
+        res = PlatformDeploymentComment.objects.all()
+    else:
+        if "name" in request.GET and "time" in request.GET:
+            try:
+                g_time = format_time(request.GET.get('time'))
+            except Exception:
+                error = {'error': 'Time format: Y-m-d H:M:S. %s doesn\'t fit.' % request.GET.get('time')}
+                return HttpResponse(json.dumps(error), content_type='application/json')
+            query = Q(platform__name=request.GET.get('name'))
+            query &= Q(start_time__lte=g_time) & (Q(end_time__gte=g_time) | Q(end_time=None))
+            res = PlatformDeployment.objects.filter(query)
+            PlatformDeploymentId = res[0].id
+            print(PlatformDeploymentId)
+            query = Q(platform_deployment_comment_box__platform_deployment=res)
+            res = PlatformDeploymentComment.objects.filter(query)
+        else:
+            return error_result('No valid arguments found.')
+    json_obj = {}
+    json_obj['data'] = clean_model_dict(res)
+    return HttpResponse(json.dumps(json_obj), content_type='application/json')
+
+
+@api_view(['GET'])
 def get_deployment_instruments(request):
     Instrument = apps.get_model('instruments', 'Instrument')
     InstrumentOnPlatform = apps.get_model('instruments', 'InstrumentOnPlatform')
@@ -322,6 +350,7 @@ def get_most_recent_deployment(request):
         'data': clean_model_dict(res)[0]
     }
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
+
 
 # POST Requests
 

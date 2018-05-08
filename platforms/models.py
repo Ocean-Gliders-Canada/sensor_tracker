@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.contrib.auth.admin import User
 
 
 class PlatformType(models.Model):
@@ -34,15 +35,14 @@ class Platform(models.Model):
         return "%s - %s" % (self.name, self.serial_number)
 
 
-class PlatformComment(models.Model):
-    platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
-    comment = models.TextField(
-        help_text="This is a good place to log any problems or changes with a platform"
+class PlatformPowerType(models.Model):
+    name = models.CharField(
+        max_length=500,
+        help_text="Power source of this deployment"
     )
-    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
-        return "%s - %s" % (self.instrument, self.created_date)
+        return "%s" % (self.name)
 
 
 class PlatformDeployment(models.Model):
@@ -63,13 +63,32 @@ class PlatformDeployment(models.Model):
         on_delete=models.PROTECT,
         help_text="The project the data is being collected under."
     )
+    power_type = models.ForeignKey(
+        PlatformPowerType,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        help_text="The battery type which was using in this deployment."
+    )
+
+    platform_name = models.CharField(
+        max_length=500,
+        help_text="Name of platform.",
+        null=True,
+        blank=True
+    )
+
     title = models.CharField(
         max_length=500,
         help_text="A short descriptive title for the deployment."
     )
     start_time = models.DateTimeField(null=False, blank=False)
     end_time = models.DateTimeField(null=True, blank=True)
-    comment = models.TextField(null=True, blank=True)
+    comment = models.TextField(null=True,
+                               blank=True,
+                               help_text="The general comments for the deployment."
+                               )
+
     acknowledgement = models.CharField(
         max_length=900,
         help_text="<b>Example:</b> This deployment is supported by funding from NOAA",
@@ -87,7 +106,7 @@ class PlatformDeployment(models.Model):
         blank=True
     )
     creator_email = models.TextField(
-        help_text="A comma separated of email addresses for the person who collected the data.",
+        help_text="The email of person collected data.",
         null=True,
         blank=True
     )
@@ -103,7 +122,7 @@ class PlatformDeployment(models.Model):
     )
     data_repository_link = models.CharField(
         max_length=150,
-        help_text="URL for the repository where the data come from.",
+        help_text="URL for the repository from:  <a href='http://belafonte.ocean.dal.ca:8080/erddap/index.html'>Erddap</a>.",
         null=True,
         blank=True
     )
@@ -165,7 +184,7 @@ class PlatformDeployment(models.Model):
         if self.title is not None:
             return_string += '%s - ' % self.title
         return_string += '%s - %s' % (
-            self.platform.name,
+            self.platform_name,
             self.start_time.strftime('%Y-%m-%d')
         )
         if self.end_time is not None:
@@ -173,12 +192,37 @@ class PlatformDeployment(models.Model):
         return return_string
 
 
-class PlatformDeploymentComment(models.Model):
-    platform_deployment = models.ForeignKey(PlatformDeployment, on_delete=models.CASCADE)
-    comment = models.TextField(
-        help_text="This is a good place to log any changes to a deployment"
-    )
-    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+class PlatformDeploymentCommentBox(models.Model):
+    platform_deployment = models.OneToOneField('PlatformDeployment', on_delete=models.PROTECT)
 
     def __str__(self):
-        return "%s - %s" % (self.instrument, self.created_date)
+        return "%s comment box" % (self.platform_deployment)
+
+
+class PlatformDeploymentComment(models.Model):
+    user = models.ForeignKey(User)
+    comment = models.TextField(help_text="Comments")
+    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    platform_deployment_comment_box = models.ForeignKey(PlatformDeploymentCommentBox)
+
+    def __str__(self):
+        return "%s" % (self.id)
+
+
+class PlatformCommentBox(models.Model):
+    platform = models.OneToOneField('Platform', on_delete=models.PROTECT)
+
+    def __str__(self):
+        return "%s comment box" % (self.platform)
+
+
+class PlatformComment(models.Model):
+    user = models.ForeignKey(User)
+    comment = models.TextField(
+        help_text="This is a good place to log any problems or changes with a platform"
+    )
+    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    platform_comment_box = models.ForeignKey(PlatformCommentBox)
+
+    def __str__(self):
+        return "%s" % (self.id)
