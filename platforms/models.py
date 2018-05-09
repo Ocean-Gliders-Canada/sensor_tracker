@@ -84,6 +84,10 @@ class PlatformDeployment(models.Model):
     )
     start_time = models.DateTimeField(null=False, blank=False)
     end_time = models.DateTimeField(null=True, blank=True)
+    is_task_mission = models.BooleanField(
+        default=False,
+        help_text="if this is task mission, check this."
+    )
     comment = models.TextField(null=True,
                                blank=True,
                                help_text="The general comments for the deployment."
