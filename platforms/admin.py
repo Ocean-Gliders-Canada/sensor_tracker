@@ -187,8 +187,11 @@ class PlatformDeploymentCommentBoxForm(ModelForm):
         all_deployment_comment_box_value_list = PlatformDeploymentCommentBox.objects.values_list(
             'platform_deployment_id',
             flat=True)
-        if kwargs.has_key('instance'):
+        if 'instance' in kwargs:
             current_object = kwargs['instance']
+        else:
+            current_object = None
+        if current_object and hasattr(current_object,'platform_deployment_id'):
             current_object_id = current_object.platform_deployment_id
             query_not_include = all_deployment_comment_box_value_list.exclude(platform_deployment_id=current_object_id)
         else:
