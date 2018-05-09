@@ -158,7 +158,7 @@ class PlatformDeploymentForm(ModelForm):
 class PlatformDeploymentAdmin(ModelAdmin):
     form = PlatformDeploymentForm
     search_fields = ['title', 'deployment_number']
-    readonly_fields = ['platform_name']
+    exclude = ('platform_name',)
     list_filter = (PlatformDeploymentListFilter,)
 
     def save_model(self, request, obj, form, change):
