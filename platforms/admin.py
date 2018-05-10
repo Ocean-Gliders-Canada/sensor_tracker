@@ -198,7 +198,8 @@ class PlatformDeploymentCommentBoxForm(ModelForm):
             query_not_include = all_deployment_comment_box_value_list
         self.commentgroups = PlatformDeployment.objects.filter(Q(platform__platform_type__model="Wave Glider SV2") | Q(
             platform__platform_type__model="Slocum Glider G2") | Q(
-            platform__platform_type__model="Slocum Glider G1")).order_by('deployment_number') \
+            platform__platform_type__model="Slocum Glider G1")| Q(
+            platform__platform_type__model="Slocum Glider G3")).order_by('deployment_number') \
             .exclude(id__in=query_not_include)
         super(PlatformDeploymentCommentBoxForm, self).__init__(*args, **kwargs)
         self.fields['platform_deployment'].queryset = self.commentgroups
