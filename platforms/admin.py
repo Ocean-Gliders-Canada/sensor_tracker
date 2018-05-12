@@ -137,7 +137,7 @@ class PlatformCommentAdmin(admin.ModelAdmin):
     list_filter = (PlatformCommentBoxListFilter,)
 
     def save_formset(self, request, form, formset, change):
-        instances = formset.save(commit=False)
+        instances = formset.save(commit=True)
         for instance in instances:
             instance.user = request.user
             instance.save()
@@ -184,6 +184,7 @@ class PlatformDeploymentCommentBoxForm(ModelForm):
         fields = ('platform_deployment',)
 
     def __init__(self, *args, **kwargs):
+        super(PlatformDeploymentCommentBoxForm, self).__init__(*args, **kwargs)
         all_deployment_comment_box_value_list = PlatformDeploymentCommentBox.objects.values_list(
             'platform_deployment_id',
             flat=True)
@@ -191,17 +192,17 @@ class PlatformDeploymentCommentBoxForm(ModelForm):
             current_object = kwargs['instance']
         else:
             current_object = None
-        if current_object and hasattr(current_object,'platform_deployment_id'):
+        if current_object and hasattr(current_object, 'platform_deployment_id'):
             current_object_id = current_object.platform_deployment_id
             query_not_include = all_deployment_comment_box_value_list.exclude(platform_deployment_id=current_object_id)
         else:
             query_not_include = all_deployment_comment_box_value_list
         self.commentgroups = PlatformDeployment.objects.filter(Q(platform__platform_type__model="Wave Glider SV2") | Q(
             platform__platform_type__model="Slocum Glider G2") | Q(
-            platform__platform_type__model="Slocum Glider G1")| Q(
+            platform__platform_type__model="Slocum Glider G1") | Q(
             platform__platform_type__model="Slocum Glider G3")).order_by('deployment_number') \
             .exclude(id__in=query_not_include)
-        super(PlatformDeploymentCommentBoxForm, self).__init__(*args, **kwargs)
+
         self.fields['platform_deployment'].queryset = self.commentgroups
 
 
@@ -213,7 +214,10 @@ class PlatformDeploymentCommentBoxAdmin(ModelAdmin):
     list_filter = (PlatformDeploymentCommentBoxListFilter,)
 
     def save_formset(self, request, form, formset, change):
-        instances = formset.save(commit=False)
+        instances = formset.save(commit=True)
+
+        # Todo: use delete form index to delete form
+
         for instance in instances:
             instance.user = request.user
 

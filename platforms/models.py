@@ -204,10 +204,10 @@ class PlatformDeploymentCommentBox(models.Model):
 
 
 class PlatformDeploymentComment(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     comment = models.TextField(help_text="Comments")
     created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    platform_deployment_comment_box = models.ForeignKey(PlatformDeploymentCommentBox)
+    platform_deployment_comment_box = models.ForeignKey(PlatformDeploymentCommentBox, on_delete=models.CASCADE)
 
     def __str__(self):
         return "%s" % (self.id)
@@ -221,12 +221,12 @@ class PlatformCommentBox(models.Model):
 
 
 class PlatformComment(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     comment = models.TextField(
         help_text="This is a good place to log any problems or changes with a platform"
     )
     created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    platform_comment_box = models.ForeignKey(PlatformCommentBox)
+    platform_comment_box = models.ForeignKey(PlatformCommentBox, on_delete=models.CASCADE)
 
     def __str__(self):
         return "%s" % (self.id)
