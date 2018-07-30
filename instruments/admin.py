@@ -347,7 +347,6 @@ class InstrumentIdentifierFilter(admin.SimpleListFilter):
                 all_relevant_instruments = Instrument.objects.filter(
                     identifier=self.value()
                 ).values()
-                print all_relevant_instruments
                 relevant_instruments = {}
                 for i in all_relevant_instruments:
                     if i['id'] not in relevant_instruments:
