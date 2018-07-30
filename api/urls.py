@@ -26,11 +26,12 @@ urlpatterns = [
     url(r'^insert_instrument/$', views.insert_instrument, name='insert_instrument'),
     url(r'^insert_sensor/$', views.insert_sensor, name='insert_sensor'),
     url(r'^update_component/$', views.update_component, name='update_component'),
-    url(r'get_platform_deployment_comments/', views.get_platform_deployment_comments,name='get_platform_deployment_comments'),
+    url(r'get_platform_deployment_comments/', views.get_platform_deployment_comments,
+        name='get_platform_deployment_comments'),
+    url(r'get_platform_by_type/', views.get_platform_by_type, name='get_platform_by_type'),
     url(r'^spec/$', views.spec, name='spec')
 
 ]
-
 
 # 3rd Party Urls
 urlpatterns += [

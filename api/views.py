@@ -102,6 +102,27 @@ def get_instruments_on_platform(request):
 
 
 @api_view(['GET'])
+def get_deployment_instruments(request):
+    Instrument = apps.get_model('instruments', 'Instrument')
+    InstrumentOnPlatform = apps.get_model('instruments', 'InstrumentOnPlatform')
+    if 'name' in request.GET and 'time' in request.GET:
+        try:
+            g_time = format_time(request.GET.get('time'))
+        except Exception:
+            error = {'error': 'Time format: Y-m-d H:M:S. %s doesn\'t fit.' % request.GET.get('time')}
+            return HttpResponse(json.dumps(error), content_type='application/json')
+        query = Q(platform__name=request.GET.get('name'))
+        query &= Q(start_time__lte=g_time) & (Q(end_time__gte=g_time) | Q(end_time=None))
+        res = InstrumentOnPlatform.objects.filter(query)
+        json_obj = {}
+        json_obj['data'] = clean_model_dict(res)
+        return HttpResponse(json.dumps(json_obj), content_type='application/json')
+    else:
+        error = {'error': 'Both \'name\' and \'time\' are required.'}
+        return HttpResponse(json.dumps(error), content_type='application/json')
+
+
+@api_view(['GET'])
 def get_sensors(request):
     Sensor = apps.get_model('instruments', 'Sensor')
     if len(request.GET) == 0:
@@ -204,6 +225,25 @@ def get_project(request):
 
 
 @api_view(['GET'])
+def get_platform_by_type(request):
+    PlatformType = apps.get_model('platforms', 'PlatformType')
+    Platform = apps.get_model('platforms', 'Platform')
+    if len(request.GET) == 0:
+        res = PlatformType.objects.all()
+    else:
+        if 'model' in request.GET:
+            model = request.GET.get('model')
+            platform_type = PlatformType.objects.filter(model=model)
+            res = Platform.objects.filter(platform_type=platform_type)
+        else:
+            error = {'error': 'Must choose either model or platform name to search by, not both.'}
+            return HttpResponse(json.dumps(error), content_type='application/json')
+    json_obj = {}
+    json_obj['data'] = clean_model_dict(res)
+    return HttpResponse(json.dumps(json_obj), content_type='application/json')
+
+
+@api_view(['GET'])
 def get_platform_type(request):
     PlatformType = apps.get_model('platforms', 'PlatformType')
     Platform = apps.get_model('platforms', 'Platform')
@@ -236,6 +276,7 @@ def get_platform_deployments(request):
         json_obj['data'] = clean_model_dict(res)
         return HttpResponse(json.dumps(json_obj), content_type='application/json')
     else:
+        print(request.GET)
         if 'name' in request.GET and 'time' in request.GET:
             try:
                 g_time = format_time(request.GET.get('time'))
@@ -254,8 +295,8 @@ def get_platform_deployments(request):
             json_obj = {}
             json_obj['data'] = clean_model_dict(res)
             return HttpResponse(json.dumps(json_obj), content_type='application/json')
-        elif 'number' in request.GET:
-            res = PlatformDeployment.objects.filter(deployment_number=request.GET.get('number'))
+        elif 'deployment_number' in request.GET:
+            res = PlatformDeployment.objects.filter(deployment_number=request.GET.get('deployment_number'))
             json_obj = {}
             json_obj['data'] = clean_model_dict(res)
             return HttpResponse(json.dumps(json_obj), content_type='application/json')
@@ -290,37 +331,15 @@ def get_platform_deployment_comments(request):
     json_obj['data'] = clean_model_dict(res)
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
-
-@api_view(['GET'])
-def get_deployment_instruments(request):
-    Instrument = apps.get_model('instruments', 'Instrument')
-    InstrumentOnPlatform = apps.get_model('instruments', 'InstrumentOnPlatform')
-    if 'name' in request.GET and 'time' in request.GET:
-        try:
-            g_time = format_time(request.GET.get('time'))
-        except Exception:
-            error = {'error': 'Time format: Y-m-d H:M:S. %s doesn\'t fit.' % request.GET.get('time')}
-            return HttpResponse(json.dumps(error), content_type='application/json')
-        query = Q(platform__name=request.GET.get('name'))
-        query &= Q(start_time__lte=g_time) & (Q(end_time__gte=g_time) | Q(end_time=None))
-        res = InstrumentOnPlatform.objects.filter(query)
-        json_obj = {}
-        json_obj['data'] = clean_model_dict(res)
-        return HttpResponse(json.dumps(json_obj), content_type='application/json')
-    else:
-        error = {'error': 'Both \'name\' and \'time\' are required.'}
-        return HttpResponse(json.dumps(error), content_type='application/json')
-
-
 @api_view(['GET'])
 def get_output_sensors(request):
     Sensor = apps.get_model('instruments', 'Sensor')
+    gets = {
+        'include_in_output': True
+    }
     if len(request.GET) == 0:
-        res = Sensor.objects.all()
+        res = Sensor.objects.filter(**gets)
     else:
-        gets = {
-            'include_in_output': True
-        }
         if 'id' in request.GET and 'identifier' not in request.GET:
             gets['instrument__id'] = request.GET.get('id')
             res = Sensor.objects.filter(**gets)
