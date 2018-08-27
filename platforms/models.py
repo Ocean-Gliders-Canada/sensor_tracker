@@ -32,7 +32,7 @@ class Platform(models.Model):
     purchase_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return "Platform Name: %s - Serial Number %s" % (self.name, self.serial_number)
+        return "%s - %s" % (self.name, self.serial_number)
 
 
 class PlatformPowerType(models.Model):
@@ -186,21 +186,21 @@ class PlatformDeployment(models.Model):
     def __str__(self):
         return_string = ''
         if self.deployment_number is not None:
-            return_string += 'Deployment Number: %s - ' % self.deployment_number
+            return_string += '%s - ' % self.deployment_number
         if self.title is not None:
-            return_string += 'Title: %s - ' % self.title
+            return_string += '%s - ' % self.title
         if self.platform_name is not None:
-            return_string += 'Platform Name: %s - %s' % (
+            return_string += '%s - %s' % (
                 self.platform_name,
                 self.start_time.strftime('%Y-%m-%d')
             )
         else:
-            return_string += 'Platform Name: %s - Start Time: %s' % (
+            return_string += '%s - %s' % (
                 self.platform.name,
                 self.start_time.strftime('%Y-%m-%d')
             )
         if self.end_time is not None:
-            return_string += ' - End Time: %s' % self.end_time.strftime('%Y-%m-%d')
+            return_string += ' - %s' % self.end_time.strftime('%Y-%m-%d')
         return return_string
 
 
