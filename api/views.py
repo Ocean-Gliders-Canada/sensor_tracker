@@ -331,6 +331,7 @@ def get_platform_deployment_comments(request):
     json_obj['data'] = clean_model_dict(res)
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
+
 @api_view(['GET'])
 def get_output_sensors(request):
     Sensor = apps.get_model('instruments', 'Sensor')
@@ -371,6 +372,22 @@ def get_most_recent_deployment(request):
     return HttpResponse(json.dumps(json_obj), content_type='application/json')
 
 
+@api_view(['GET'])
+def get_power(request):
+    PlatformDeployment = apps.get_model('platforms', 'PlatformPowerType')
+    id = None
+    name = None
+    if "name" in request.GET:
+        name = request.GET.get('name')
+    else:
+        return error_result('name of battery is required.')
+    res = PlatformDeployment.objects.filter(name=name)
+    json_obj = {
+        'data': clean_model_dict(res)[0]
+    }
+    return HttpResponse(json.dumps(json_obj), content_type='application/json')
+
+
 # POST Requests
 
 @api_view(['POST'])
@@ -378,7 +395,14 @@ def get_most_recent_deployment(request):
 @permission_classes([IsAuthenticated])
 def insert_deployment(request):
     Deployment = apps.get_model('platforms', 'PlatformDeployment')
-    deployment = create_object_from_request(request, Deployment)
+    types = {"wmo_id": int, "deployment_number": int, "platform_id": int, "institution_id": int, "project_id": int,
+             "power_type_id": int, "platform_name": str, "title": str, "start_time": str, "end_time": str,
+             "testing_mission": bool, "comment": str, "acknowledgement": str,
+             "contributor_name": str, "contributor_role": str, "creator_email": str, "creator_name": str,
+             "creator_url": str, "data_repository_link": str, "publisher_email": str, "publisher_name": str,
+             "publisher_url": str, "metadata_link": str, "references": str, "sea_name": str,
+             "latitude": float, "longitude": float, "depth": float}
+    deployment = create_object_from_request(request, Deployment, value_type=types)
 
     return save_and_result(deployment)
 
@@ -498,8 +522,10 @@ def spec(request):
 
 
 # Helpers
-def create_object_from_request(request, Object, time_columns=['start_time', 'end_time']):
-    fields = [x.get_attname_column()[0] for x in Object._meta.fields]
+def create_object_from_request(request, object, time_columns=None, value_type=None):
+    if time_columns is None:
+        time_columns = ['start_time', 'end_time']
+    fields = [x.get_attname_column()[0] for x in object._meta.fields]
     kargs = {}
     for field in fields:
         if field in request.POST:
@@ -507,7 +533,23 @@ def create_object_from_request(request, Object, time_columns=['start_time', 'end
                 kargs[field] = datetime.datetime.strptime(request.POST.get(field), '%Y-%m-%d %H:%M:%S')
             else:
                 kargs[field] = request.POST.get(field)
-    return Object(**kargs)
+    if value_type is not None:
+        kargs = check_input_type(kargs, value_type)
+    return object(**kargs)
+
+
+def check_input_type(content, value_type):
+    new_content = {}
+    for key in content:
+        value = content[key]
+        if key in value_type:
+            t = value_type[key]
+            try:
+                new_item = t(value)
+            except:
+                new_item = None
+            new_content[key] = new_item
+    return new_content
 
 
 def save_and_result(model):
@@ -518,7 +560,8 @@ def save_and_result(model):
             'id': model.id
         }
         return HttpResponse(json.dumps(res), content_type='application/json')
-    except IntegrityError as e:
+    except Exception as e:
+        print(e)
         return error_result(e.message.replace('DETAIL', '').strip())
 
 

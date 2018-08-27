@@ -41,7 +41,13 @@ class Instrument(models.Model):
     modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
-        return '%s - %s - %s - %s' % (self.identifier, self.short_name, self.serial, self.comment)
+        return_string = 'Identifier: %s - Short name: ' % self.short_name
+        if self.long_name:
+            return_string += 'Long Name: %s' % self.long_name
+        if self.serial:
+            return_string += ' - Serial Number: %s' % self.serial
+
+        return return_string
 
 
 class InstrumentComment(models.Model):
@@ -77,7 +83,7 @@ class InstrumentOnPlatform(models.Model):
     comment = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return "%s - %s - %s" % (self.instrument, self.platform, self.start_time)
+        return "%s - %s - Start Time: %s" % (self.instrument, self.platform, self.start_time)
 
 class Sensor(models.Model):
     instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE)
@@ -166,5 +172,5 @@ class Sensor(models.Model):
     modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
-        return "%s - %s" % (self.identifier, self.instrument.identifier)
+        return "Identifier: %s - Instrument Identifier: %s" % (self.identifier, self.instrument.identifier)
 

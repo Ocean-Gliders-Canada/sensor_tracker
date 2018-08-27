@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'get_platform_deployment_comments/', views.get_platform_deployment_comments,
         name='get_platform_deployment_comments'),
     url(r'get_platform_by_type/', views.get_platform_by_type, name='get_platform_by_type'),
+    url(r'get_power/', views.get_power, name='get_power'),
     url(r'^spec/$', views.spec, name='spec')
 
 ]
