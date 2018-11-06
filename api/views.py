@@ -6,11 +6,8 @@ import json
 import datetime
 
 from django.apps import apps
-from django.core import serializers
-from django.db import IntegrityError
 from django.db.models import Q
 from django.http import HttpResponse
-from django.shortcuts import render
 from django.template import loader
 
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication

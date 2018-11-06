@@ -197,10 +197,7 @@ class PlatformDeploymentCommentBoxForm(ModelForm):
             query_not_include = all_deployment_comment_box_value_list.exclude(platform_deployment_id=current_object_id)
         else:
             query_not_include = all_deployment_comment_box_value_list
-        self.commentgroups = PlatformDeployment.objects.filter(Q(platform__platform_type__model="Wave Glider SV2") | Q(
-            platform__platform_type__model="Slocum Glider G2") | Q(
-            platform__platform_type__model="Slocum Glider G1") | Q(
-            platform__platform_type__model="Slocum Glider G3")).order_by('deployment_number') \
+        self.commentgroups = PlatformDeployment.objects.order_by('-deployment_number', '-end_time', '-start_time') \
             .exclude(id__in=query_not_include)
 
         self.fields['platform_deployment'].queryset = self.commentgroups
@@ -214,7 +211,7 @@ class PlatformDeploymentCommentBoxAdmin(ModelAdmin):
     list_filter = (PlatformDeploymentCommentBoxListFilter,)
 
     def save_formset(self, request, form, formset, change):
-        instances = formset.save(commit=True)
+        instances = formset.save(commit=False)
 
         # Todo: use delete form index to delete form
 
