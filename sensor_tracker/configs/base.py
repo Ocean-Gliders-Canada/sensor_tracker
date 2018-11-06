@@ -16,18 +16,6 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ci=qvb%v1bu_-9n)m80tke*nk_z*a55kx!3#69hc9%7tqvhu6l'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
-
 # Application definition
 
 LOCAL_APPS = [
@@ -82,23 +70,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'sensor_tracker.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'sensor_tracker',
-        'USER': 'sensor_tracker',
-        'PASSWORD': '12345',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
@@ -137,7 +108,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/sensor_tracker/'
-STATIC_ROOT = '/usr/local/etc/nginx/html/sensor_tracker/'
+
 
 SUIT_CONFIG = {
     'ADMIN_NAME': 'Sensor Tracker',

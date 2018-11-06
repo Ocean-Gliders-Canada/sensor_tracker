@@ -43,4 +43,4 @@ Setup:
 
 **Run the development server**
 
-* `python manage.py runserver --settings=sensor_tracker.settings.development --noreload 0.0.0.0:8000`
+* `python manage.py runserver --settings=sensor_tracker.configs.development --noreload 0.0.0.0:8000`
