@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.forms import ModelForm
 from django.contrib.admin import ModelAdmin
-from django.db.models import Q
 from suit.widgets import SuitSplitDateTimeWidget
+from django.db.models import F
+
 
 from .models import (
     PlatformType,
@@ -197,8 +198,9 @@ class PlatformDeploymentCommentBoxForm(ModelForm):
             query_not_include = all_deployment_comment_box_value_list.exclude(platform_deployment_id=current_object_id)
         else:
             query_not_include = all_deployment_comment_box_value_list
-        self.commentgroups = PlatformDeployment.objects.order_by('-deployment_number', '-end_time', '-start_time') \
-            .exclude(id__in=query_not_include)
+        self.commentgroups = PlatformDeployment.objects.order_by(F('deployment_number').desc(nulls_last=True),
+                                                                 'title', '-end_time',
+                                                                 '-start_time').exclude(id__in=query_not_include)
 
         self.fields['platform_deployment'].queryset = self.commentgroups
 
