@@ -1,7 +1,4 @@
 from django.contrib import admin
-from django.forms import ModelForm
-from django.contrib.admin import ModelAdmin
-from suit.widgets import SuitSplitDateTimeWidget
 
 from .models import (
     Institution,

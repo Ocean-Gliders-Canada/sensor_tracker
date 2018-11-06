@@ -1,6 +1,10 @@
-**.pyc
+*.pyc
 *.sqlite
 *.sqlite3
 **.csv
 .DS_Store
-**/migrations/**
+
+.idea/*
+venv/*
+
+uwsgi.local.ini
