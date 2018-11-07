@@ -44,3 +44,7 @@ Setup:
 **Run the development server**
 
 * `python manage.py runserver --settings=sensor_tracker.configs.development --noreload 0.0.0.0:8000`
+
+** API **
+
+Sensor tracker has a REST API interface included. Specfications can be found at [yourdomain]/sensor_tracker/api/spec
