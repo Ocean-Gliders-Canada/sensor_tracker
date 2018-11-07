@@ -50,4 +50,4 @@ Setup:
 
 **API**
 
-Sensor tracker has a REST API interface included. Specfications can be found at [yourdomain]/sensor_tracker/api/spec
+Sensor tracker has a REST API interface included. Specifications can be found at [yourdomain]/sensor_tracker/api/spec
