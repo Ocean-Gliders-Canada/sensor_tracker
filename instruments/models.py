@@ -101,7 +101,7 @@ class Sensor(models.Model):
         max_length=300,
         null=True,
         blank=True,
-        help_text="The official, standard name for the instrument. IE: sea_water_temperature. See CF naming: <a href='http://cfconventions.org/Data/cf-standard-names/39/build/cf-standard-name-table.html'>CF Naming Reference</a>"
+        help_text="The official, standard name for the instrument. IE: sea_water_temperature. See CF naming: <a href='http://cfconventions.org/standard-names.html'>CF Naming Reference</a>"
     )
     DATATYPES = (
         ('f4', '32-bit floating point'),
