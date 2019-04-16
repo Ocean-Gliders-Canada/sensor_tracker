@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 
 
 from django.db import models
+from django.template.defaultfilters import truncatechars
+
 
 
 class Instrument(models.Model):
@@ -57,6 +59,10 @@ class InstrumentComment(models.Model):
     )
     created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
+    @property
+    def short_comment(self):
+        return truncatechars(self.comment, 100)
+
     def __str__(self):
         return "%s - %s" % (self.instrument, self.created_date)
 
@@ -84,6 +90,7 @@ class InstrumentOnPlatform(models.Model):
 
     def __str__(self):
         return "%s - %s - %s" % (self.instrument, self.platform, self.start_time)
+
 
 class Sensor(models.Model):
     instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE)

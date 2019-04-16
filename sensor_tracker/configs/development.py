@@ -12,7 +12,7 @@ STATIC_ROOT = '/usr/local/etc/nginx/html/sensor_tracker/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'sensor_tracker',
+        'NAME': 'sensor_tracker_2019_04_12',
         'USER': 'sensor_tracker',
         'PASSWORD': '12345',
         'HOST': 'localhost',

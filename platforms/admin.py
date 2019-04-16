@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.forms import ModelForm
-from django.contrib.admin import ModelAdmin
 from suit.widgets import SuitSplitDateTimeWidget
 from django.db.models import F
 
@@ -19,7 +18,8 @@ from .models import (
 
 @admin.register(PlatformType)
 class PlatformTypeAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('model', 'manufacturer')
+    list_filter = ('manufacturer', )
 
 
 class PlatformForm(ModelForm):
@@ -75,17 +75,6 @@ class PlatformListFilter(admin.SimpleListFilter):
         return str(value)
 
 
-class PlatformDeploymentListFilter(PlatformListFilter):
-    def queryset(self, request, queryset):
-        """Filter the queryset being returned based on the PlatformType that was selected
-        """
-        if self.value():
-            if self.value() == 'All':
-                return queryset
-            else:
-                return queryset.filter(platform__platform_type__id=self.value())
-
-
 class PlatformDeploymentCommentBoxListFilter(PlatformListFilter):
     def queryset(self, request, queryset):
         """Filter the queryset being returned based on the PlatformType that was selected
@@ -97,10 +86,11 @@ class PlatformDeploymentCommentBoxListFilter(PlatformListFilter):
                 return queryset.filter(platform_deployment__platform__platform_type__id=self.value())
 
 
-class PlatformAdmin(ModelAdmin):
+class PlatformAdmin(admin.ModelAdmin):
     form = PlatformForm
     list_filter = (PlatformListFilter,)
     search_fields = ['name', 'serial_number']
+    list_display = ('name', 'wmo_id', 'serial_number', 'platform_type', 'institution', 'purchase_date')
 
 
 admin.site.register(Platform, PlatformAdmin)
@@ -136,6 +126,7 @@ class PlatformCommentAdmin(admin.ModelAdmin):
         PlatformCommentBoxInline,
     )
     list_filter = (PlatformCommentBoxListFilter,)
+    list_display = ('platform',)
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=True)
@@ -156,11 +147,45 @@ class PlatformDeploymentForm(ModelForm):
         }
 
 
-class PlatformDeploymentAdmin(ModelAdmin):
+class PlatformDeploymentHasNumber(admin.SimpleListFilter):
+    """
+    """
+    title = 'Has number'
+
+    parameter_name = 'has_number'
+
+    ops = [
+        ('any', 'Any'),
+        ('yes', 'Yes'),
+        ('no', 'No'),
+    ]
+
+    default_value = ops[0]
+
+    def lookups(self, request, model_admin):
+        return self.ops
+
+    def queryset(self, request, queryset):
+        if self.value():
+            if self.value() == 'yes':
+                return queryset.filter(deployment_number__isnull=False)
+            elif self.value() == 'no':
+                return queryset.filter(deployment_number__isnull=True)
+        return queryset
+
+    def value(self):
+        value = super(PlatformDeploymentHasNumber, self).value()
+        if value is None:
+            value = self.default_value
+        return str(value)
+
+
+class PlatformDeploymentAdmin(admin.ModelAdmin):
     form = PlatformDeploymentForm
     search_fields = ['title', 'deployment_number']
     exclude = ('platform_name',)
-    list_filter = (PlatformDeploymentListFilter,)
+    list_filter = ('platform__platform_type', 'platform', PlatformDeploymentHasNumber)
+    list_display = ('title', 'deployment_number', 'platform', 'start_time', 'end_time', 'sea_name', 'testing_mission')
 
     def save_model(self, request, obj, form, change):
         platformname = obj.platform.name
@@ -205,12 +230,18 @@ class PlatformDeploymentCommentBoxForm(ModelForm):
         self.fields['platform_deployment'].queryset = self.commentgroups
 
 
-class PlatformDeploymentCommentBoxAdmin(ModelAdmin):
+class PlatformDeploymentCommentBoxAdmin(admin.ModelAdmin):
     form = PlatformDeploymentCommentBoxForm
     inlines = (
         PlatformDeploymentCommentBoxInline,
     )
     list_filter = (PlatformDeploymentCommentBoxListFilter,)
+    list_display = ('title', 'deployment_number', 'platform',  'start_time', 'end_time')
+    search_fields = [
+        'platform_deployment__deployment_number',
+        'platform_deployment__title',
+        'platform_deployment__platform__name'
+    ]
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
@@ -221,6 +252,29 @@ class PlatformDeploymentCommentBoxAdmin(ModelAdmin):
             instance.user = request.user
 
             instance.save()
+
+    def deployment_number(self, instance):
+        return instance.platform_deployment.deployment_number
+
+    deployment_number.admin_order_field = 'platform_deployment__deployment_number'
+
+    def title(self, instance):
+        return instance.platform_deployment.title
+
+    def platform(self, instance):
+        return instance.platform_deployment.platform
+
+    platform.admin_order_field = 'platform_deployment__platform'
+
+    def start_time(self, instance):
+        return instance.platform_deployment.start_time
+
+    start_time.admin_order_field = 'platform_deployment__start_time'
+
+    def end_time(self, instance):
+        return instance.platform_deployment.end_time
+
+    end_time.admin_order_field = 'platform_deployment__end_time'
 
 
 admin.site.register(PlatformDeploymentCommentBox, PlatformDeploymentCommentBoxAdmin)
