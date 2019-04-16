@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.forms import ModelForm
-from django.contrib.admin import ModelAdmin
 from suit.widgets import SuitSplitDateTimeWidget
 
 from .models import (
@@ -235,11 +234,12 @@ class InstrumentIdentifierForPlatformFilter(admin.SimpleListFilter):
         return str(value)
 
 
-class InstrumentOnPlatformAdmin(ModelAdmin):
+class InstrumentOnPlatformAdmin(admin.ModelAdmin):
     form = InstrumentOnPlatformForm
     list_filter = (
         InstrumentOnPlatformTypeListFilter, InstrumentOnPlatformPlatformListFilter,
         InstrumentIdentifierForPlatformFilter, InstrumentOnPlatformSortFilter)
+    list_display = ('instrument', 'platform', 'start_time', 'end_time', 'comment')
 
 
 admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
@@ -247,11 +247,15 @@ admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
 
 @admin.register(Sensor)
 class SensorAdmin(admin.ModelAdmin):
-    search_fields = ['long_name', 'identifier', 'standard_name']
+    search_fields = ['identifier', 'long_name', 'standard_name', 'instrument']
+    readonly_fields = ('created_date', 'modified_date')
+    list_display = ('identifier', 'long_name', 'standard_name', 'instrument', 'include_in_output', 'created_date', 'modified_date')
+    list_filter = ('include_in_output', )
     pass
 
 
 class SensorInline(admin.StackedInline):
+    readonly_fields = ('created_date', 'modified_date')
     model = Sensor
     extra = 0
 
@@ -375,13 +379,17 @@ class InstrumentIdentifierFilter(admin.SimpleListFilter):
 
 @admin.register(Instrument)
 class InstrumentAdmin(admin.ModelAdmin):
+    readonly_fields = ('created_date', 'modified_date')
     inlines = [
         SensorInline,
     ]
     list_filter = (InstrumentPlatformTypeFilter, InstrumentIdentifierFilter)
-    search_fields = ['identifier', 'short_name', 'long_name', 'serial']
+    search_fields = ['identifier', 'short_name', 'long_name', 'serial', 'manufacturer']
+    list_display = ('identifier', 'short_name', 'long_name', 'serial', 'manufacturer', 'created_date', 'modified_date')
 
 
 @admin.register(InstrumentComment)
 class InstrumentCommentAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('instrument', 'created_date', 'short_comment')
+
+

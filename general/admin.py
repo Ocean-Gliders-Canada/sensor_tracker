@@ -9,7 +9,7 @@ from .models import (
 
 @admin.register(Institution)
 class InstitutionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'street', 'city', 'province', 'postal_code', 'country', 'contact_name', 'contact_phone', 'contact_email', 'url')
 
 
 @admin.register(Project)
@@ -19,4 +19,4 @@ class ProjectAdmin(admin.ModelAdmin):
 
 @admin.register(Manufacturer)
 class ManufacturerAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'street', 'city', 'province', 'postal_code', 'country', 'contact_name', 'contact_phone', 'contact_email')
