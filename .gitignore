@@ -8,3 +8,7 @@
 venv/*
 
 uwsgi.local.ini
+uwsgi.ini.bak
+
+bin/*
+*/bin/*

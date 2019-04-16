@@ -1,4 +1,4 @@
-django==1.10.5
+django==1.11
 django-suit==0.2.23
 djangorestframework==3.7.1
 psycopg2==2.7.4

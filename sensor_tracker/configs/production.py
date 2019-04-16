@@ -21,5 +21,3 @@ DATABASES = {
 }
 
 FORCE_SCRIPT_NAME = '/sensor_tracker'
-
-# WSGI_APPLICATION = 'sensor_tracker.wsgi.application'  # Needed?

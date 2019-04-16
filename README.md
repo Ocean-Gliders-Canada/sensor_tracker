@@ -1,10 +1,13 @@
 # Sensor Tracker (sensor_tracker)
 
+Sensor tracker is a tool which includes a database, web front-end, and REST API for managing deployment, platform,
+instrument, and sensor metadata. This is intended as both informational and to be used during data processing.
+
 For license information, please refer to [**LICENSE.md**](LICENSE.md)
 
 Setup:
 =============
-**Install **
+**Install**
 
 * [**PostGreSQL**](https://www.postgresql.org/download/)
 * [**Python 2.7**](https://www.python.org/downloads/)
@@ -44,3 +47,7 @@ Setup:
 **Run the development server**
 
 * `python manage.py runserver --settings=sensor_tracker.configs.development --noreload 0.0.0.0:8000`
+
+**API**
+
+Sensor tracker has a REST API interface included. Specifications can be found at [yourdomain]/sensor_tracker/api/spec
