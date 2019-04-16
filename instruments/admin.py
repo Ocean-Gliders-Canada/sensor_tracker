@@ -247,9 +247,11 @@ admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
 
 @admin.register(Sensor)
 class SensorAdmin(admin.ModelAdmin):
-    search_fields = ['identifier', 'long_name', 'standard_name', 'instrument']
+    search_fields = ['identifier', 'long_name', 'standard_name', 'instrument__short_name', 'instrument__long_name',
+                     'instrument__serial']
     readonly_fields = ('created_date', 'modified_date')
-    list_display = ('identifier', 'long_name', 'standard_name', 'instrument', 'include_in_output', 'created_date', 'modified_date')
+    list_display = ('identifier', 'long_name', 'standard_name', 'instrument', 'include_in_output', 'created_date',
+                    'modified_date')
     list_filter = ('include_in_output', )
     pass
 
@@ -384,7 +386,7 @@ class InstrumentAdmin(admin.ModelAdmin):
         SensorInline,
     ]
     list_filter = (InstrumentPlatformTypeFilter, InstrumentIdentifierFilter)
-    search_fields = ['identifier', 'short_name', 'long_name', 'serial', 'manufacturer']
+    search_fields = ['identifier', 'short_name', 'long_name', 'serial', 'manufacturer__name']
     list_display = ('identifier', 'short_name', 'long_name', 'serial', 'manufacturer', 'created_date', 'modified_date')
 
 
