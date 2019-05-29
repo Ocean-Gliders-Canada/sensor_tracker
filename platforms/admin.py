@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.forms import ModelForm
 from suit.widgets import SuitSplitDateTimeWidget
 from django.db.models import F
-
+from django_admin_listfilter_dropdown.filters import DropdownFilter
 
 from .models import (
     PlatformType,
@@ -19,7 +19,7 @@ from .models import (
 @admin.register(PlatformType)
 class PlatformTypeAdmin(admin.ModelAdmin):
     list_display = ('model', 'manufacturer')
-    list_filter = ('manufacturer', )
+    list_filter = ('manufacturer',)
 
 
 class PlatformForm(ModelForm):
@@ -86,14 +86,13 @@ class PlatformDeploymentCommentBoxListFilter(PlatformListFilter):
                 return queryset.filter(platform_deployment__platform__platform_type__id=self.value())
 
 
+@admin.register(Platform)
 class PlatformAdmin(admin.ModelAdmin):
     form = PlatformForm
-    list_filter = (PlatformListFilter,)
+    list_filter = (
+        "platform_type",)
     search_fields = ['name', 'serial_number']
     list_display = ('name', 'wmo_id', 'serial_number', 'platform_type', 'institution', 'purchase_date')
-
-
-admin.site.register(Platform, PlatformAdmin)
 
 
 class PlatformCommentBoxListFilter(PlatformListFilter):
@@ -184,8 +183,11 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
     form = PlatformDeploymentForm
     search_fields = ['title', 'deployment_number']
     exclude = ('platform_name',)
-    list_filter = ('platform__platform_type', 'platform', PlatformDeploymentHasNumber)
+    list_filter = ('platform__platform_type',
+                   ('platform__name', DropdownFilter),
+                   PlatformDeploymentHasNumber)
     list_display = ('title', 'deployment_number', 'platform', 'start_time', 'end_time', 'sea_name', 'testing_mission')
+    save_on_top = True
 
     def save_model(self, request, obj, form, change):
         platformname = obj.platform.name
@@ -236,7 +238,7 @@ class PlatformDeploymentCommentBoxAdmin(admin.ModelAdmin):
         PlatformDeploymentCommentBoxInline,
     )
     list_filter = (PlatformDeploymentCommentBoxListFilter,)
-    list_display = ('title', 'deployment_number', 'platform',  'start_time', 'end_time')
+    list_display = ('title', 'deployment_number', 'platform', 'start_time', 'end_time')
     search_fields = [
         'platform_deployment__deployment_number',
         'platform_deployment__title',
@@ -279,7 +281,4 @@ class PlatformDeploymentCommentBoxAdmin(admin.ModelAdmin):
 
 admin.site.register(PlatformDeploymentCommentBox, PlatformDeploymentCommentBoxAdmin)
 
-
-@admin.register(PlatformPowerType)
-class PlatformPowerTypeAdmin(admin.ModelAdmin):
-    pass
+admin.site.register(PlatformPowerType)

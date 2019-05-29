@@ -1,9 +1,5 @@
-from __future__ import unicode_literals
-
-
 from django.db import models
 from django.template.defaultfilters import truncatechars
-
 
 
 class Instrument(models.Model):
@@ -25,7 +21,8 @@ class Instrument(models.Model):
     manufacturer = models.ForeignKey(
         "general.Manufacturer",
         null=True,
-        blank=True
+        blank=True,
+        on_delete=False
     )
     serial = models.CharField(max_length=300, null=True, blank=True)
     master_instrument = models.ForeignKey(
@@ -70,11 +67,13 @@ class InstrumentComment(models.Model):
 class InstrumentOnPlatform(models.Model):
     instrument = models.ForeignKey(
         Instrument,
-        help_text="The instrument that was put on a platform"
+        help_text="The instrument that was put on a platform",
+        on_delete=False
     )
     platform = models.ForeignKey(
         'platforms.Platform',
-        help_text="The platform that the instrument was put on"
+        help_text="The platform that the instrument was put on",
+        on_delete=False
     )
     start_time = models.DateTimeField(
         null=False,
@@ -167,8 +166,8 @@ class Sensor(models.Model):
         help_text="Whether or not data from this sensor should be included in any processed output. NOTE: Long name mast be populated if this is checked"
     )
     display_in_web_interface = models.BooleanField(
-        default = False,
-        help_text = "Whether of not data from this seneor should be showed in the web interface."
+        default=False,
+        help_text="Whether of not data from this seneor should be showed in the web interface."
     )
     comment = models.TextField(
         null=True,
@@ -180,4 +179,3 @@ class Sensor(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.identifier, self.instrument.identifier)
-
