@@ -265,8 +265,58 @@ class InstrumentIdentifierFilter(admin.SimpleListFilter):
         return str(value)
 
 
-class InstrumentForm(ModelForm):
+class InstrumentPlatformFilter(admin.SimpleListFilter):
+    parameter_name = 'platform name'
 
+    default_value = 'All'
+
+    def lookups(self, request, model_admin):
+        """Return a list of possible platform types and their respuctive PlatformType.id values
+        """
+        list_of_platform = []
+        queryset = Platform.objects.all()
+        for platform in queryset:
+            temp = (platform.identifier, platform.identifier)
+            if temp not in list_of_platform:
+                list_of_platform.append(
+                    temp
+                )
+        return sorted(list_of_platform, key=lambda tp: tp[1])
+
+    def queryset(self, request, queryset):
+        if self.value():
+            if self.value() == 'All':
+                return queryset
+            else:
+                all_relevant_instruments = Instrument.objects.filter(
+                    identifier=self.value()
+                ).values()
+                relevant_instruments = {}
+                for i in all_relevant_instruments:
+                    if i['id'] not in relevant_instruments:
+                        relevant_instruments[i['id']] = i
+                    elif i['modified_date'] > relevant_instruments[i['id']]['modified_date']:
+                        relevant_instruments[i['instrument_id']] = i
+                        # elif i['end_time'] is None:
+                        #     relevant_instruments[i['instrument_id']] = i
+
+                return queryset.filter(pk__in=relevant_instruments.keys())
+
+    def value(self):
+        """Return a default value, or the selected platform type
+        """
+        value = super(InstrumentPlatformFilter, self).value()
+        if value is None:
+            if self.default_value is None:
+                # If there is at least one platform type, return the first by name. Otherwise, None.
+                first_platform_type = PlatformType.objects.first()
+                value = None if first_platform_type is None else first_platform_type.id
+                self.default_value = value
+            else:
+                value = self.default_value
+        return str(value)
+
+class InstrumentForm(ModelForm):
     class Meta:
         model = Instrument
         fields = '__all__'
