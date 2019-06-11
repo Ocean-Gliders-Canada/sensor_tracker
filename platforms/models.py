@@ -7,6 +7,8 @@ from django.contrib.auth.admin import User
 class PlatformType(models.Model):
     model = models.CharField(max_length=300)
     manufacturer = models.ForeignKey('general.Manufacturer', on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return "%s - %s" % (self.model, self.manufacturer)
@@ -30,6 +32,8 @@ class Platform(models.Model):
         help_text="The institution who owns the platform"
     )
     purchase_date = models.DateTimeField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return "%s - %s" % (self.name, self.serial_number)
@@ -40,6 +44,8 @@ class PlatformPowerType(models.Model):
         max_length=500,
         help_text="Power source of this deployment"
     )
+    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return "%s" % (self.name)
@@ -182,6 +188,8 @@ class PlatformDeployment(models.Model):
         blank=True,
         help_text='The depth of the deployment'
     )
+    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return_string = ''
@@ -216,6 +224,7 @@ class PlatformDeploymentComment(models.Model):
     comment = models.TextField(help_text="Comments")
     created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     platform_deployment_comment_box = models.ForeignKey(PlatformDeploymentCommentBox, on_delete=models.CASCADE)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return "%s" % (self.id)
@@ -235,6 +244,7 @@ class PlatformComment(models.Model):
     )
     created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     platform_comment_box = models.ForeignKey(PlatformCommentBox, on_delete=models.CASCADE)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return "%s" % (self.id)
