@@ -585,3 +585,104 @@ class JsonMakerTest(TestCase):
         sensor = sensors[0]
         res = convert_model_to_dict_recursive(sensor)
         print(res)
+
+
+class TestCreateInvalidData(TestCase):
+
+    def create_project_obj(self):
+        self.project_obj1 = Project.objects.create(name="project_a")
+        self.project_obj2 = Project.objects.create(name="project_b")
+
+    def create_institution_obj(self):
+        self.organization_objs = {}
+        organization = ["OTN", "meopar", "dalhousie"]
+        for org in organization:
+            obj = Institution.objects.create(name=org)
+            self.organization_objs[org] = obj
+
+        return self.organization_objs
+
+    def create_manufacturer_obj(self):
+        self.manufacturer_obj = Manufacturer.objects.create(name="ceotr")
+
+    def create_instrument_objs(self):
+        self.instrument_obj1 = Instrument.objects.create(identifier="c", short_name="chi", long_name="chi shen me",
+                                                         manufacturer=self.manufacturer_obj)
+        self.instrument_obj2 = Instrument.objects.create(identifier="d", short_name="he",
+                                                         manufacturer=self.manufacturer_obj)
+        self.instrument_obj3 = Instrument.objects.create(identifier="e", short_name="wan",
+                                                         manufacturer=self.manufacturer_obj)
+        self.instrument_obj4 = Instrument.objects.create(identifier="f", short_name="le",
+                                                         manufacturer=self.manufacturer_obj)
+        self.instrument_obj5 = Instrument.objects.create(identifier="g", short_name="hai",
+                                                         manufacturer=self.manufacturer_obj)
+
+    def create_platform_type_objs(self):
+        self.platform_type_objs = {}
+        platform_types = ["mooring", "profiler", "VOS", "Slocum Glider G3", "Slocum Glider G1", "Slocum Glider G2",
+                          "Wave Glider SV2"]
+        for t in platform_types:
+            obj = PlatformType.objects.create(model=t, manufacturer=self.manufacturer_obj)
+            self.platform_type_objs[t] = obj
+        return self.platform_type_objs
+
+    def create_platform_objs(self):
+        self.platform_obj1 = Platform.objects.create(name="cabot", institution=self.organization_objs["OTN"],
+                                                     platform_type=self.platform_type_objs["Slocum Glider G3"])
+        self.platform_obj2 = Platform.objects.create(name="scotia", institution=self.organization_objs["OTN"],
+                                                     platform_type=self.platform_type_objs["Slocum Glider G3"])
+        self.platform_obj3 = Platform.objects.create(name="Fundy", institution=self.organization_objs["OTN"],
+                                                     platform_type=self.platform_type_objs["Slocum Glider G2"])
+        self.platform_obj4 = Platform.objects.create(name="bond", institution=self.organization_objs["OTN"],
+                                                     platform_type=self.platform_type_objs["Slocum Glider G1"])
+
+    def setUp(self):
+        self.create_project_obj()
+        self.create_institution_obj()
+        self.create_manufacturer_obj()
+        self.create_platform_type_objs()
+        self.create_platform_objs()
+        self.create_instrument_objs()
+
+    def test_create_manufacturer(self):
+        self.manufacturer_obj1 = Manufacturer.objects.create(name="ceotr")
+        self.manufacturer_obj1_1 = Manufacturer.objects.create(name="ceotr")
+        self.manufacturer_obj2 = Manufacturer.objects.create(name="CEOTR")
+
+    def test_create_instrument(self):
+        # Duplicate instrument
+        self.instrument_obj1 = Instrument.objects.create(identifier="c", short_name="chi", long_name="chi shen me",
+                                                         manufacturer=self.manufacturer_obj)
+        self.instrument_obj2 = Instrument.objects.create(identifier="c", short_name="chi", long_name="chi shen me",
+                                                         manufacturer=self.manufacturer_obj)
+
+    def test_create_instrument_on_platform(self):
+        # Duplicated Instrument on platform
+        self.instrument_on_platform_obj1 = InstrumentOnPlatform.objects.create(instrument=self.instrument_obj1,
+                                                                               platform=self.platform_obj1,
+                                                                               start_time="2017-03-12 12:00:00",
+                                                                               end_time="2018-06-12 12:00:00")
+        self.instrument_on_platform_obj2 = InstrumentOnPlatform.objects.create(instrument=self.instrument_obj1,
+                                                                               platform=self.platform_obj1,
+                                                                               start_time="2018-05-12 12:00:00",
+                                                                               end_time="2018-06-12 12:00:00")
+        res = get_instrument_on_platform_by_platform("cabot")
+        self.assertEqual(2, len(res))
+
+        # One Instrument one different platform
+        self.instrument_on_platform_obj2 = InstrumentOnPlatform.objects.create(instrument=self.instrument_obj1,
+                                                                               platform=self.platform_obj2,
+                                                                               start_time="2018-05-12 12:00:00",
+                                                                               end_time="2018-06-12 12:00:00")
+        res2 = get_instrument_on_platform_by_platform("scotia")
+        self.assertEqual(1, len(res2))
+
+    def test_create_sensor(self):
+        # create duplicate sensor
+        self.sensor_obj1 = Sensor.objects.create(instrument=self.instrument_obj1, identifier="identifier1",
+                                                 long_name="sensor long name", standard_name="standard name")
+
+        self.sensor_obj2 = Sensor.objects.create(instrument=self.instrument_obj1, identifier="identifier1",
+                                                 long_name="sensor long name", standard_name="standard name")
+        res = list(Sensor.objects.filter(instrument=self.instrument_obj1))
+        self.assertEqual(2, len(res))

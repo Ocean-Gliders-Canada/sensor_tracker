@@ -37,8 +37,9 @@ from rest_framework.permissions import IsAuthenticated
 
 class GetInstrumentOnPlatform(ApiBase):
     accept = {
-        "platform_name": "the name of the platform which the instrument attach on"
+        "platform_name": "The name of the platform which the instrument attach on"
     }
+
     variable_error_message = 'must provide name'
 
     @classmethod
@@ -142,7 +143,6 @@ class GetDeploymentByPlatformNameStartTime(ApiBase):
 
 
 class GetAllDeployments(ApiBase):
-    # todo: finish it
     accept = {
         "platform_name": "The name of deployment's platform",
     }
@@ -163,7 +163,6 @@ class GetInstrument(ApiBase):
         "long_name": "The full name for the instrument",
         "serial": "Serial number of instrument"
     }
-    summary = "Return all the deployment"
     variable_error_message = 'No variable accept'
 
     @classmethod
@@ -197,7 +196,7 @@ class GetPlatform(ApiBase):
     @api_view(['GET'])
     @receiver
     def get_platform(cls, request):
-        return cls.api_get(request, get_platform)
+        return cls.api_get(request, g_platform)
 
 
 class GetManufacturer(ApiBase):
@@ -221,7 +220,7 @@ class GetInstitutions(ApiBase):
     @api_view(['GET'])
     @receiver
     def get_institutions(cls, request):
-        return cls.api_get(request, request)
+        return cls.api_get(request, g_institutions)
 
 
 class GetProject(ApiBase):
@@ -233,21 +232,23 @@ class GetProject(ApiBase):
     @api_view(['GET'])
     @receiver
     def get_project(cls, request):
-        return cls.api_get(request, request)
+        return cls.api_get(request, g_project)
 
 
 class GetPower(ApiBase):
     accept_option = {
         "name": "The name of the battery."
     }
+
     @classmethod
     @api_view(['GET'])
     @receiver
     def get_power(cls, request):
-        return cls.api_get(request, request)
+        return cls.api_get(request, g_power)
 
 
 # POST Requests
+
 
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication, SessionAuthentication])

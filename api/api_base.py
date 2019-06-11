@@ -4,12 +4,10 @@ from api.core.exceptions import VariableError
 
 class ApiBase(object):
     """Don't know how to do this yet"""
-    accept = {}
-    accept_option = {}
+    accept = []
+    accept_option = []
     mutual_exclusion = []
     variable_error_message = ""
-
-
 
     @classmethod
     def variable_check(cls, the_get):
