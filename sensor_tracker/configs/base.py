@@ -33,7 +33,6 @@ DJANGO_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_admin_listfilter_dropdown',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS

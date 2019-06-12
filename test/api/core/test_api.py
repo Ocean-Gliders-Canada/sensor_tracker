@@ -686,3 +686,16 @@ class TestCreateInvalidData(TestCase):
                                                  long_name="sensor long name", standard_name="standard name")
         res = list(Sensor.objects.filter(instrument=self.instrument_obj1))
         self.assertEqual(2, len(res))
+        # should we implement sensor time tracking first
+
+    def test_create_deployment(self):
+        # create_duplicated deployment
+        self.deployment_obj1 = PlatformDeployment.objects.create(
+            deployment_number=1, platform=self.platform_obj1, project=self.project_obj1,
+            institution=self.organization_objs["OTN"], start_time="2017-03-12 12:00:00", end_time="2017-04-18 12:00:00")
+
+        self.deployment_obj2 = PlatformDeployment.objects.create(
+            deployment_number=1, platform=self.platform_obj1, project=self.project_obj1,
+            institution=self.organization_objs["OTN"], start_time="2017-03-12 12:00:00", end_time="2017-04-18 12:00:00")
+        res = get_deployments_by_platform('cabot')
+        self.assertEqual(len(res), 2)

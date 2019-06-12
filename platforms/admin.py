@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.forms import ModelForm
 from suit.widgets import SuitSplitDateTimeWidget
 from django.db.models import F
-from django_admin_listfilter_dropdown.filters import DropdownFilter
+
 
 from .models import (
     PlatformType,
@@ -20,6 +20,8 @@ from .models import (
 class PlatformTypeAdmin(admin.ModelAdmin):
     list_display = ('model', 'manufacturer')
     list_filter = ('manufacturer',)
+    readonly_fields = ('created_date', 'modified_date',)
+
 
 
 class PlatformForm(ModelForm):
@@ -89,8 +91,8 @@ class PlatformDeploymentCommentBoxListFilter(PlatformListFilter):
 @admin.register(Platform)
 class PlatformAdmin(admin.ModelAdmin):
     form = PlatformForm
-    list_filter = (
-        "platform_type",)
+    list_filter = (PlatformListFilter,)
+    readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['name', 'serial_number']
     list_display = ('name', 'wmo_id', 'serial_number', 'platform_type', 'institution', 'purchase_date')
 
@@ -109,9 +111,9 @@ class PlatformCommentBoxListFilter(PlatformListFilter):
 class PlatformCommentBoxInline(admin.TabularInline):
     model = PlatformComment
     extra = 0
-    readonly_fields = ('user', 'created_date',)
+    readonly_fields = ('user', 'created_date', 'modified_date')
 
-    fields = ('user', 'created_date', 'comment',)
+    fields = ('user', 'created_date', 'modified_date', 'comment')
 
 
 class PlatformCommentForm(ModelForm):
@@ -181,11 +183,10 @@ class PlatformDeploymentHasNumber(admin.SimpleListFilter):
 
 class PlatformDeploymentAdmin(admin.ModelAdmin):
     form = PlatformDeploymentForm
+    readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['title', 'deployment_number']
     exclude = ('platform_name',)
-    list_filter = ('platform__platform_type',
-                   ('platform__name', DropdownFilter),
-                   PlatformDeploymentHasNumber)
+    list_filter = ('platform__platform_type', 'platform', PlatformDeploymentHasNumber)
     list_display = ('title', 'deployment_number', 'platform', 'start_time', 'end_time', 'sea_name', 'testing_mission')
     save_on_top = True
 
@@ -201,9 +202,9 @@ admin.site.register(PlatformDeployment, PlatformDeploymentAdmin)
 class PlatformDeploymentCommentBoxInline(admin.TabularInline):
     model = PlatformDeploymentComment
     extra = 0
-    readonly_fields = ('user', 'created_date',)
+    readonly_fields = ('user', 'created_date', 'modified_date')
 
-    fields = ('user', 'created_date', 'comment',)
+    fields = ('user', 'created_date', 'modified_date', 'comment')
 
 
 class PlatformDeploymentCommentBoxForm(ModelForm):
@@ -281,4 +282,8 @@ class PlatformDeploymentCommentBoxAdmin(admin.ModelAdmin):
 
 admin.site.register(PlatformDeploymentCommentBox, PlatformDeploymentCommentBoxAdmin)
 
-admin.site.register(PlatformPowerType)
+
+
+@admin.register(PlatformPowerType)
+class PlatformPowerTypeAdmin(admin.ModelAdmin):
+    readonly_fields = ('created_date', 'modified_date',)

@@ -55,6 +55,7 @@ class InstrumentComment(models.Model):
         help_text="This is a good place to log any problems or changes with an instrument"
     )
     created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     @property
     def short_comment(self):
@@ -86,6 +87,8 @@ class InstrumentOnPlatform(models.Model):
         help_text="The date the instrument was removed from the platform"
     )
     comment = models.TextField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return "%s - %s - %s" % (self.instrument, self.platform, self.start_time)
