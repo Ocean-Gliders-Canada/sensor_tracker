@@ -9,8 +9,6 @@ from django.forms.widgets import ClearableFileInput
 from cgi import escape
 from django.utils.encoding import force_unicode
 
-
-
 from .models import (
     PlatformType,
     Platform,
@@ -191,8 +189,6 @@ class PlatformDeploymentHasNumber(admin.SimpleListFilter):
 
 
 class ImageFileInput(ClearableFileInput):
-    initial_text = ""
-    input_text = ""
     template_with_initial = u'%(initial)s<br /> %(input)s'
 
     def render(self, name, value, attrs=None, renderer=None):
@@ -202,7 +198,7 @@ class ImageFileInput(ClearableFileInput):
         }
         template = u'%(input)s'
 
-        input_template = """<input type="file" name="{}" id="i{}" />""".format(name, attrs['id'])
+        input_template = """<input type="file" name="{}" id="{}" />""".format(name, attrs['id'])
         substitutions[
             'input'] = input_template
         if value and hasattr(value, "url"):
@@ -212,7 +208,10 @@ class ImageFileInput(ClearableFileInput):
                                         % (escape(title),
                                            escape(value.url),
                                            escape(
-                                               force_unicode(os.path.basename(value.url)))))
+                                               force_unicode(os.path.basename(value.url))
+                                           )
+                                           )
+                                        )
 
         return mark_safe(template % substitutions)
 
@@ -230,8 +229,8 @@ class ImageInline(admin.StackedInline):
     form = ImageForm
 
     model = DeploymentImage
-    fields = ['title', 'image_tag', 'picture']
-    readonly_fields = ('created_date', 'modified_date', 'image_tag')
+    fields = ['title', 'image_tag', 'picture', 'created_date', 'modified_date', ]
+    readonly_fields = ('image_tag', 'created_date', 'modified_date',)
     extra = 0
 
     def image_tag(self, obj):
