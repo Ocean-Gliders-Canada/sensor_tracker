@@ -208,7 +208,7 @@ class ImageFileInput(ClearableFileInput):
         if value and hasattr(value, "url"):
             template = self.template_with_initial
             title = value.instance.title
-            substitutions['initial'] = (u'<a download=%s href="%s">%s</a>'
+            substitutions['initial'] = (u'<a download="%s" href="%s">%s</a>'
                                         % (escape(title),
                                            escape(value.url),
                                            escape(
