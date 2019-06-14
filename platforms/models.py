@@ -34,6 +34,7 @@ class Platform(models.Model):
         help_text="The institution who owns the platform"
     )
     purchase_date = models.DateTimeField(null=True, blank=True)
+    active = models.BooleanField(default=True, null=False, help_text="check if the platform is currently active")
     created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
