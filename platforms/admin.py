@@ -31,6 +31,34 @@ class PlatformForm(ModelForm):
         }
 
 
+class PlatformActiveFilter(admin.SimpleListFilter):
+    title = 'active platform'
+
+    parameter_name = 'active'
+
+
+
+    def lookups(self, request, model_admin):
+        """Return a list of possible platform types and their respuctive PlatformType.id values
+        """
+        return (
+            ('0', (u'All')),
+            ('1', (u'Yes')),
+            ('2', (u'No')),
+        )
+
+    def queryset(self, request, queryset):
+        """Filter the queryset being returned based on the PlatformType that was selected
+        """
+        if self.value() == '0':
+            return queryset
+        if self.value() == '1':
+            return queryset.filter(active=True)
+        if self.value() == '2':
+            return queryset.filter(active=False)
+        return  queryset.filter(active=True)
+
+
 class PlatformListFilter(admin.SimpleListFilter):
     """
     """
@@ -88,7 +116,7 @@ class PlatformDeploymentCommentBoxListFilter(PlatformListFilter):
 
 class PlatformAdmin(admin.ModelAdmin):
     form = PlatformForm
-    list_filter = (PlatformListFilter,)
+    list_filter = (PlatformListFilter, PlatformActiveFilter)
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['name', 'serial_number']
     list_display = ('name', 'wmo_id', 'serial_number', 'platform_type', 'institution', 'purchase_date')
