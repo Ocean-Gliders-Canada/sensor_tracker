@@ -36,8 +36,6 @@ class PlatformActiveFilter(admin.SimpleListFilter):
 
     parameter_name = 'active'
 
-
-
     def lookups(self, request, model_admin):
         """Return a list of possible platform types and their respuctive PlatformType.id values
         """
@@ -56,7 +54,7 @@ class PlatformActiveFilter(admin.SimpleListFilter):
             return queryset.filter(active=True)
         if self.value() == '2':
             return queryset.filter(active=False)
-        return  queryset.filter(active=True)
+        return queryset.filter(active=True)
 
 
 class PlatformListFilter(admin.SimpleListFilter):
@@ -276,12 +274,10 @@ class PlatformDeploymentCommentBoxAdmin(admin.ModelAdmin):
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
 
-        # Todo: use delete form index to delete form
-
         for instance in instances:
             instance.user = request.user
 
-            instance.save()
+        formset.save()
 
     def deployment_number(self, instance):
         return instance.platform_deployment.deployment_number
