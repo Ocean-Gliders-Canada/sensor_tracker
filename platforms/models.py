@@ -78,13 +78,6 @@ class PlatformDeployment(models.Model):
         help_text="The battery type which was using in this deployment."
     )
 
-    platform_name = models.CharField(
-        max_length=500,
-        help_text="Name of platform.",
-        null=True,
-        blank=True
-    )
-
     title = models.CharField(
         max_length=500,
         help_text="A short descriptive title for the deployment."
@@ -198,16 +191,17 @@ class PlatformDeployment(models.Model):
             return_string += '%s - ' % self.deployment_number
         if self.title is not None:
             return_string += '%s - ' % self.title
-        if self.platform_name is not None:
-            return_string += '%s - %s' % (
-                self.platform_name,
-                self.start_time.strftime('%Y-%m-%d')
-            )
+        # if self.platform_name is not None:
+
         else:
             return_string += '%s - %s' % (
                 self.platform.name,
                 self.start_time.strftime('%Y-%m-%d')
             )
+        return_string += '%s - %s' % (
+            self.platform.name,
+            self.start_time.strftime('%Y-%m-%d')
+        )
         if self.end_time is not None:
             return_string += ' - %s' % self.end_time.strftime('%Y-%m-%d')
         return return_string

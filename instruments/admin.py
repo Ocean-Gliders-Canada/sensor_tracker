@@ -263,6 +263,13 @@ class SensorInline(admin.StackedInline):
     model = Sensor
     extra = 0
 
+    def get_queryset(self, request):
+        queryset = super(SensorInline, self).get_queryset(request)
+        queryset = queryset.prefetch_related('instrument')
+        if not self.has_change_permission(request):
+            queryset = queryset.none()
+        return queryset
+
 
 class InstrumentPlatformTypeFilter(admin.SimpleListFilter):
     """
@@ -391,6 +398,10 @@ class InstrumentAdmin(admin.ModelAdmin):
     search_fields = ['identifier', 'short_name', 'long_name', 'serial', 'manufacturer__name']
     list_display = ('identifier', 'short_name', 'long_name', 'serial', 'manufacturer', 'created_date', 'modified_date')
 
+    def get_queryset(self, request):
+        qs = super(InstrumentAdmin, self).get_queryset(request)
+        qs = qs.prefetch_related('manufacturer')
+        return qs
 
 class InstrumentCommentBoxInline(admin.TabularInline):
     model = InstrumentComment
@@ -421,6 +432,11 @@ class InstrumentCommentBoxAdmin(admin.ModelAdmin):
             instance.user = request.user
 
         formset.save()
+
+    def get_queryset(self, request):
+        qs = super(InstrumentCommentBoxAdmin, self).get_queryset(request)
+        qs = qs.prefetch_related('instrument')
+        return qs
 
     def instrument_identifier(self, instance):
         return instance.instrument.identifier

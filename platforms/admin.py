@@ -215,10 +215,9 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
     list_filter = ('platform__platform_type', 'platform', PlatformDeploymentHasNumber)
     list_display = ('title', 'deployment_number', 'platform', 'start_time', 'end_time', 'sea_name', 'testing_mission')
 
-    def save_model(self, request, obj, form, change):
-        platformname = obj.platform.name
-        obj.platform_name = platformname
-        obj.save()
+    def get_queryset(self, request):
+        qs = super(PlatformDeploymentAdmin, self).get_queryset(request)
+        return qs
 
 
 admin.site.register(PlatformDeployment, PlatformDeploymentAdmin)
@@ -230,6 +229,13 @@ class PlatformDeploymentCommentBoxInline(admin.TabularInline):
     readonly_fields = ('user', 'created_date', 'modified_date')
 
     fields = ('user', 'created_date', 'modified_date', 'comment')
+
+    def get_queryset(self, request):
+        queryset = super(PlatformDeploymentCommentBoxInline, self).get_queryset(request)
+        queryset = queryset.prefetch_related("user")
+        if not self.has_change_permission(request):
+            queryset = queryset.none()
+        return queryset
 
 
 class PlatformDeploymentCommentBoxForm(ModelForm):
@@ -254,7 +260,7 @@ class PlatformDeploymentCommentBoxForm(ModelForm):
         self.commentgroups = PlatformDeployment.objects.order_by(F('deployment_number').desc(nulls_last=True),
                                                                  'title', '-end_time',
                                                                  '-start_time').exclude(id__in=query_not_include)
-
+        self.commentgroups = self.commentgroups.prefetch_related('platform')
         self.fields['platform_deployment'].queryset = self.commentgroups
 
 
@@ -270,6 +276,12 @@ class PlatformDeploymentCommentBoxAdmin(admin.ModelAdmin):
         'platform_deployment__title',
         'platform_deployment__platform__name'
     ]
+
+    def get_queryset(self, request):
+        qs = super(PlatformDeploymentCommentBoxAdmin, self).get_queryset(request)
+        qs = qs.prefetch_related('platform_deployment')
+        qs = qs.prefetch_related('platform_deployment__platform')
+        return qs
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
