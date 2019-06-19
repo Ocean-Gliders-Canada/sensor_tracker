@@ -8,7 +8,6 @@ PlatformType = apps.get_model('platforms', 'PlatformType')
 Instrument = apps.get_model('instruments', 'Instrument')
 Sensor = apps.get_model('instruments', 'Sensor')
 
-print Sensor._meta.get_field('instrument_id').help_text
 
 specs = [
     {

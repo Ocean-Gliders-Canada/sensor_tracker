@@ -250,10 +250,9 @@ admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
 
 @admin.register(Sensor)
 class SensorAdmin(admin.ModelAdmin):
-    search_fields = ['identifier', 'long_name', 'standard_name', 'instrument__short_name', 'instrument__long_name',
-                     'instrument__serial']
+    search_fields = ['identifier', 'long_name', 'standard_name']
     readonly_fields = ('created_date', 'modified_date')
-    list_display = ('identifier', 'long_name', 'standard_name', 'instrument', 'include_in_output', 'created_date',
+    list_display = ('identifier', 'long_name', 'standard_name', 'include_in_output', 'created_date',
                     'modified_date')
     list_filter = ('include_in_output',)
 
