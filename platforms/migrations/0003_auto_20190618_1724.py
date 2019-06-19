@@ -10,11 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='platform',
-            name='active',
-            field=models.BooleanField(default=True, help_text='check if the platform is currently active'),
-        ),
         migrations.AlterField(
             model_name='platformdeployment',
             name='platform',

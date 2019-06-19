@@ -5,9 +5,11 @@ from django_admin_listfilter_dropdown.filters import DropdownFilter
 
 from .models import (
     Instrument,
-    InstrumentComment,
     InstrumentOnPlatform,
-    Sensor
+    Sensor,
+    InstrumentCommentBox,
+    InstrumentComment
+
 )
 
 from platforms.models import PlatformType, Platform
@@ -302,7 +304,55 @@ class InstrumentAdmin(admin.ModelAdmin):
     form = InstrumentForm
 
 
-@admin.register(InstrumentComment)
-class InstrumentCommentAdmin(admin.ModelAdmin):
-    list_display = ('instrument', 'created_date', 'short_comment')
-    readonly_fields = ('created_date', 'modified_date',)
+class InstrumentCommentBoxInline(admin.TabularInline):
+    model = InstrumentComment
+    extra = 0
+    readonly_fields = ('user', 'created_date', 'modified_date')
+
+    fields = ('user', 'created_date', 'modified_date', 'comment')
+
+
+class InstrumentCommentBoxForm(ModelForm):
+    class Meta:
+        model = InstrumentCommentBox
+        fields = ('instrument',)
+
+
+class InstrumentCommentBoxAdmin(admin.ModelAdmin):
+    form = InstrumentCommentBoxForm
+    inlines = [
+        InstrumentCommentBoxInline
+    ]
+    list_display = ('instrument_identifier', 'instrument_short_name', 'instrument_serial', 'on_platform')
+    search_fields = ['instrument__identifier', 'instrument__short_name', 'instrument__long_name', 'instrument__serial']
+
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+
+        for instance in instances:
+            instance.user = request.user
+
+        formset.save()
+
+    def instrument_identifier(self, instance):
+        return instance.instrument.identifier
+
+    def instrument_short_name(self, instance):
+        return instance.instrument.short_name
+
+    def instrument_serial(self, instance):
+        return instance.instrument.serial
+
+    def on_platform(self, instance):
+        platform_obj_queryset = InstrumentOnPlatform.objects.filter(instrument=instance.instrument)
+        platform_names = []
+        for o in list(platform_obj_queryset):
+            if not o.end_time:
+                platform_names.append(o.platform.name)
+        if not platform_names:
+            return '-'
+        else:
+            return " and ".join(platform_names)
+
+
+admin.site.register(InstrumentCommentBox, InstrumentCommentBoxAdmin)
