@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db import models
 from django.template.defaultfilters import truncatechars
 from django.contrib.auth.admin import User
@@ -24,7 +22,8 @@ class Instrument(models.Model):
     manufacturer = models.ForeignKey(
         "general.Manufacturer",
         null=True,
-        blank=True
+        blank=True,
+        on_delete=False
     )
     serial = models.CharField(max_length=300, null=True, blank=True)
     master_instrument = models.ForeignKey(
@@ -72,11 +71,13 @@ class InstrumentComment(models.Model):
 class InstrumentOnPlatform(models.Model):
     instrument = models.ForeignKey(
         Instrument,
-        help_text="The instrument that was put on a platform"
+        help_text="The instrument that was put on a platform",
+        on_delete=False
     )
     platform = models.ForeignKey(
         'platforms.Platform',
-        help_text="The platform that the instrument was put on"
+        help_text="The platform that the instrument was put on",
+        on_delete=False
     )
     start_time = models.DateTimeField(
         null=False,

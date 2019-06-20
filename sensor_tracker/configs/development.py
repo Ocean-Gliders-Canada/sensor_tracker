@@ -12,8 +12,8 @@ STATIC_ROOT = '/usr/local/etc/nginx/html/sensor_tracker/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'sensor_tracker',
-        'USER': 'sensor_tracker',
+        'NAME': 'sensor_tracker3',
+        'USER': 'xiang',
         'PASSWORD': '12345',
         'HOST': 'localhost',
         'PORT': '',
@@ -29,6 +29,6 @@ INSTALLED_APPS = INSTALLED_APPS + DEVELOPMENT_APPS
 DEVELOPMENT_MIDDLEWAARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
-MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + DEVELOPMENT_MIDDLEWAARE
+MIDDLEWARE = MIDDLEWARE + DEVELOPMENT_MIDDLEWAARE
 
 INTERNAL_IPS = ['127.0.0.1']

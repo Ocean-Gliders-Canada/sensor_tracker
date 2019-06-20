@@ -10,7 +10,7 @@ Setup:
 **Install**
 
 * [**PostGreSQL**](https://www.postgresql.org/download/)
-* [**Python 2.7**](https://www.python.org/downloads/)
+* [**Python 3.7**](https://www.python.org/downloads/)
 * [**NGINX**](https://www.nginx.com/resources/wiki/start/topics/tutorials/install/)
 
 **Download code**
@@ -23,7 +23,7 @@ Setup:
 
 * `pip install virtualenv`
 * `mkdir venv`
-* `virtualenv -p /path/to/python2.7 venv`
+* `virtualenv -p /path/to/python3.7 venv`
 * `source venv/bin/activate`
 * `pip install -r ~/code/sensor_tracker/requirements.txt`
 

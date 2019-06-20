@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('platforms', '0004_deactivate_platforms_vr3_vr4'),
+        ('platforms', '0005_deactivate_platforms_vr3_vr4'),
     ]
 
     operations = [

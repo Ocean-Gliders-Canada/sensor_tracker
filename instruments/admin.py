@@ -1,6 +1,7 @@
 from django.contrib import admin
-from django.forms import ModelForm
+from django.forms import ModelForm, CharField
 from suit.widgets import SuitSplitDateTimeWidget
+from django_admin_listfilter_dropdown.filters import DropdownFilter
 
 from .models import (
     Instrument,
@@ -22,59 +23,6 @@ class InstrumentOnPlatformForm(ModelForm):
             'start_time': SuitSplitDateTimeWidget,
             'end_time': SuitSplitDateTimeWidget
         }
-
-
-class InstrumentOnPlatformPlatformListFilter(admin.SimpleListFilter):
-    """
-    """
-    title = 'Platform Name'
-
-    parameter_name = 'platform_id'
-
-    default_value = 'All'
-
-    def lookups(self, request, model_admin):
-        """Return a list of possible platforms and their respuctive Platform.id values
-        """
-        list_of_platforms = []
-        queryset = Platform.objects.all()
-        for platform in queryset:
-            list_of_platforms.append(
-                (str(platform.id), platform.name)
-            )
-        return sorted(list_of_platforms, key=lambda tp: tp[1])
-
-    def queryset(self, request, queryset):
-        """Filter the queryset being returned based on the Platform that was selected
-        """
-        if self.value():
-            if self.value() == 'All':
-                return queryset
-            else:
-                all_relevant_instruments = InstrumentOnPlatform.objects.filter(
-                    platform__id=self.value()
-                ).values()
-
-                relevant_instruments_on_platforms = []
-
-                for r in all_relevant_instruments:
-                    relevant_instruments_on_platforms.append(r['id'])
-
-                return queryset.filter(pk__in=relevant_instruments_on_platforms)
-
-    def value(self):
-        """Return a default value, or the selected platform type
-        """
-        value = super(InstrumentOnPlatformPlatformListFilter, self).value()
-        if value is None:
-            if self.default_value is None:
-                # If there is at least one platform, return the first by name. Otherwise, None.
-                first_platform = Platform.objects.first()
-                value = None if first_platform is None else first_platform.id
-                self.default_value = value
-            else:
-                value = self.default_value
-        return str(value)
 
 
 class InstrumentOnPlatformTypeListFilter(admin.SimpleListFilter):
@@ -149,7 +97,6 @@ class InstrumentOnPlatformSortFilter(admin.SimpleListFilter):
             ('instrument__modified_date', 'Instrument Date Modified'),
             ('platform__name', 'Platform Name'),
             ('platform__purchase_date', 'Platform Purchase Date'),
-            ('platform__name', 'Platform Name'),
         ]
         return sort_ops
 
@@ -177,70 +124,14 @@ class InstrumentOnPlatformSortFilter(admin.SimpleListFilter):
         return str(value)
 
 
-class InstrumentIdentifierForPlatformFilter(admin.SimpleListFilter):
-    """
-    """
-    title = 'Instrument Identifier'
-
-    parameter_name = 'identifier'
-
-    default_value = 'All'
-
-    def lookups(self, request, model_admin):
-        """Return a list of possible platform types and their respuctive PlatformType.id values
-        """
-        list_of_platform_types = []
-        queryset = Instrument.objects.all()
-        for instrument in queryset:
-            temp = (instrument.identifier, instrument.identifier)
-            if temp not in list_of_platform_types:
-                list_of_platform_types.append(
-                    temp
-                )
-        return sorted(list_of_platform_types, key=lambda tp: tp[1])
-
-    def queryset(self, request, queryset):
-        """Filter the queryset being returned based on the PlatformType that was selected
-        """
-        if self.value():
-            if self.value() == 'All':
-                return queryset
-            else:
-                print self.value()
-                all_relevant_instruments = InstrumentOnPlatform.objects.filter(
-                    instrument__identifier=self.value()
-                ).values()
-                relevant_instruments = {}
-                for i in all_relevant_instruments:
-                    if i['id'] not in relevant_instruments:
-                        relevant_instruments[i['id']] = i
-                    elif i['modified_date'] > relevant_instruments[i['id']]['modified_date']:
-                        relevant_instruments[i['instrument_id']] = i
-                        # elif i['end_time'] is None:
-                        #     relevant_instruments[i['instrument_id']] = i
-
-                return queryset.filter(pk__in=relevant_instruments.keys())
-
-    def value(self):
-        """Return a default value, or the selected platform type
-        """
-        value = super(InstrumentIdentifierForPlatformFilter, self).value()
-        if value is None:
-            if self.default_value is None:
-                # If there is at least one platform type, return the first by name. Otherwise, None.
-                first_platform_type = PlatformType.objects.first()
-                value = None if first_platform_type is None else first_platform_type.id
-                self.default_value = value
-            else:
-                value = self.default_value
-        return str(value)
-
-
 class InstrumentOnPlatformAdmin(admin.ModelAdmin):
     form = InstrumentOnPlatformForm
     list_filter = (
-        InstrumentOnPlatformTypeListFilter, InstrumentOnPlatformPlatformListFilter,
-        InstrumentIdentifierForPlatformFilter, InstrumentOnPlatformSortFilter)
+        InstrumentOnPlatformTypeListFilter,
+        ('platform__name', DropdownFilter),
+        ('instrument__identifier', DropdownFilter),
+        InstrumentOnPlatformSortFilter)
+
     list_display = ('instrument', 'platform', 'start_time', 'end_time', 'comment')
     readonly_fields = ('created_date', 'modified_date',)
 
@@ -358,7 +249,6 @@ class InstrumentIdentifierFilter(admin.SimpleListFilter):
             if self.value() == 'All':
                 return queryset
             else:
-                print self.value()
                 all_relevant_instruments = Instrument.objects.filter(
                     identifier=self.value()
                 ).values()
@@ -388,15 +278,37 @@ class InstrumentIdentifierFilter(admin.SimpleListFilter):
         return str(value)
 
 
+class InstrumentForm(ModelForm):
+    class Meta:
+        model = Instrument
+        fields = '__all__'
+
+
+class PlatformInline(admin.StackedInline):
+    model = InstrumentOnPlatform
+
+    exclude = ["comment"]
+    readonly_fields = ["platform", "start_time", "end_time"]
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(Instrument)
 class InstrumentAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date')
     inlines = [
+        PlatformInline,
         SensorInline,
     ]
-    list_filter = (InstrumentPlatformTypeFilter, InstrumentIdentifierFilter)
+    list_filter = (InstrumentPlatformTypeFilter,
+                   ('identifier', DropdownFilter))
     search_fields = ['identifier', 'short_name', 'long_name', 'serial', 'manufacturer__name']
     list_display = ('identifier', 'short_name', 'long_name', 'serial', 'manufacturer', 'created_date', 'modified_date')
+    form = InstrumentForm
 
     def get_queryset(self, request):
         qs = super(InstrumentAdmin, self).get_queryset(request)
