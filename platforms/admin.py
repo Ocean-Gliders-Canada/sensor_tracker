@@ -4,10 +4,14 @@ from django.contrib import admin
 from django.forms import ModelForm
 from suit.widgets import SuitSplitDateTimeWidget
 from django.db.models import F
+
 from django.utils.safestring import mark_safe
 from django.forms.widgets import ClearableFileInput
 from cgi import escape
-from django.utils.encoding import force_unicode
+#from django.utils.encoding import force_unicode
+
+from django_admin_listfilter_dropdown.filters import DropdownFilter
+
 
 from .models import (
     PlatformType,
@@ -119,15 +123,14 @@ class PlatformDeploymentCommentBoxListFilter(PlatformListFilter):
                 return queryset.filter(platform_deployment__platform__platform_type__id=self.value())
 
 
+@admin.register(Platform)
 class PlatformAdmin(admin.ModelAdmin):
     form = PlatformForm
-    list_filter = (PlatformListFilter, PlatformActiveFilter)
+    list_filter = (
+        "platform_type",)
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['name', 'serial_number']
     list_display = ('name', 'wmo_id', 'serial_number', 'platform_type', 'institution', 'purchase_date')
-
-
-admin.site.register(Platform, PlatformAdmin)
 
 
 class PlatformCommentBoxListFilter(PlatformListFilter):
@@ -234,7 +237,7 @@ class ImageFileInput(ClearableFileInput):
                                         % (escape(title),
                                            escape(value.url),
                                            escape(
-                                               force_unicode(os.path.basename(value.url))
+                                               (os.path.basename(value.url))
                                            )
                                            )
                                         )
@@ -271,7 +274,10 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['title', 'deployment_number']
     exclude = ('platform_name',)
-    list_filter = ('platform__platform_type', 'platform', PlatformDeploymentHasNumber)
+    list_filter = ('platform__platform_type',
+                   ('platform__name', DropdownFilter),
+                   PlatformDeploymentHasNumber)
+
     list_display = ('title', 'deployment_number', 'platform', 'start_time', 'end_time', 'sea_name', 'testing_mission')
     inlines = [
         ImageInline,
