@@ -19,3 +19,16 @@ DATABASES = {
         'PORT': '',
     }
 }
+
+DEVELOPMENT_APPS = [
+    'debug_toolbar',
+]
+
+INSTALLED_APPS = INSTALLED_APPS + DEVELOPMENT_APPS
+
+DEVELOPMENT_MIDDLEWAARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware'
+]
+MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + DEVELOPMENT_MIDDLEWAARE
+
+INTERNAL_IPS = ['127.0.0.1']

@@ -8,7 +8,9 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
+
         ('platforms', '0003_auto_20190614_1948'),
+
     ]
     migrations.AddField(
         model_name='platform',
