@@ -15,6 +15,8 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+PROJECT_NAME = "sensor_tracker"
+
 # Application definition
 
 LOCAL_APPS = [
@@ -114,3 +116,15 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     )
 }
+
+
+def check_create_dir(file_dir):
+    if not os.path.isdir(file_dir):
+        os.mkdir(file_dir)
+    return file_dir
+
+
+RESOURCE_DIR = check_create_dir(os.path.join(os.path.expanduser("~"), "resource"))
+PROJECT_RESOURCE_DIR = check_create_dir(os.path.join(RESOURCE_DIR, PROJECT_NAME))
+MEDIA_ROOT = PROJECT_RESOURCE_DIR
+MEDIA_URL = '/media/'

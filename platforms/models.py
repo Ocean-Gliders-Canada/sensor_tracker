@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
-
+import os
 from django.db import models
 from django.contrib.auth.admin import User
+from django.conf import settings
+from django.utils.safestring import mark_safe
 
 
 class PlatformType(models.Model):
@@ -50,6 +52,12 @@ class PlatformPowerType(models.Model):
 
     def __str__(self):
         return "%s" % (self.name)
+
+
+def check_create_dir(file_dir):
+    if not os.path.isdir(file_dir):
+        os.mkdir(file_dir)
+    return file_dir
 
 
 class PlatformDeployment(models.Model):
@@ -211,6 +219,21 @@ class PlatformDeployment(models.Model):
         if self.end_time is not None:
             return_string += ' - %s' % self.end_time.strftime('%Y-%m-%d')
         return return_string
+
+
+class DeploymentImage(models.Model):
+    class Meta:
+        verbose_name = "Image"
+        verbose_name_plural = "Images"
+
+    platform_deployment = models.ForeignKey('PlatformDeployment', on_delete=models.CASCADE)
+    title = models.CharField(max_length=300, null=False)
+    picture = models.ImageField(upload_to="uploaded_media", null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def __str__(self):
+        return "%s picture" % (self.platform_deployment)
 
 
 class PlatformDeploymentCommentBox(models.Model):

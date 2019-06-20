@@ -1,8 +1,17 @@
+import os
+
 from django.contrib import admin
 from django.forms import ModelForm
 from suit.widgets import SuitSplitDateTimeWidget
 from django.db.models import F
+
+from django.utils.safestring import mark_safe
+from django.forms.widgets import ClearableFileInput
+from cgi import escape
+#from django.utils.encoding import force_unicode
+
 from django_admin_listfilter_dropdown.filters import DropdownFilter
+
 
 from .models import (
     PlatformType,
@@ -12,7 +21,8 @@ from .models import (
     PlatformDeploymentCommentBox,
     PlatformDeploymentComment,
     PlatformPowerType,
-    PlatformCommentBox
+    PlatformCommentBox,
+    DeploymentImage
 )
 
 
@@ -207,6 +217,58 @@ class PlatformDeploymentHasNumber(admin.SimpleListFilter):
         return str(value)
 
 
+class ImageFileInput(ClearableFileInput):
+    template_with_initial = u'%(initial)s<br /> %(input)s'
+
+    def render(self, name, value, attrs=None, renderer=None):
+        substitutions = {
+            'initial_text': self.initial_text,
+            'input_text': self.input_text,
+        }
+        template = u'%(input)s'
+
+        input_template = """<input type="file" name="{}" id="{}" />""".format(name, attrs['id'])
+        substitutions[
+            'input'] = input_template
+        if value and hasattr(value, "url"):
+            template = self.template_with_initial
+            title = value.instance.title
+            substitutions['initial'] = (u'<a download="%s" href="%s">%s</a>'
+                                        % (escape(title),
+                                           escape(value.url),
+                                           escape(
+                                               (os.path.basename(value.url))
+                                           )
+                                           )
+                                        )
+
+        return mark_safe(template % substitutions)
+
+
+class ImageForm(ModelForm):
+    class Meta:
+        model = DeploymentImage
+        widgets = {
+            'picture': ImageFileInput,
+        }
+        exclude = []
+
+
+class ImageInline(admin.StackedInline):
+    form = ImageForm
+
+    model = DeploymentImage
+    fields = ['title', 'image_tag', 'picture', 'created_date', 'modified_date', ]
+    readonly_fields = ('image_tag', 'created_date', 'modified_date',)
+    extra = 0
+
+    def image_tag(self, obj):
+        u = mark_safe('<img src="{url}" width="150" height="150" />'.format(
+            url=obj.picture.url))
+
+        return u
+
+
 class PlatformDeploymentAdmin(admin.ModelAdmin):
     form = PlatformDeploymentForm
     readonly_fields = ('created_date', 'modified_date',)
@@ -217,10 +279,13 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
                    PlatformDeploymentHasNumber)
 
     list_display = ('title', 'deployment_number', 'platform', 'start_time', 'end_time', 'sea_name', 'testing_mission')
+    inlines = [
+        ImageInline,
+    ]
 
     def save_model(self, request, obj, form, change):
-        platformname = obj.platform.name
-        obj.platform_name = platformname
+        platform_name = obj.platform.name
+        obj.platform_name = platform_name
         obj.save()
 
 
