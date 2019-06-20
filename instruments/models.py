@@ -1,9 +1,7 @@
 from __future__ import unicode_literals
 
-
 from django.db import models
 from django.template.defaultfilters import truncatechars
-
 
 
 class Instrument(models.Model):
@@ -58,6 +56,7 @@ class InstrumentComment(models.Model):
         help_text="This is a good place to log any problems or changes with an instrument"
     )
     created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     @property
     def short_comment(self):
@@ -87,6 +86,8 @@ class InstrumentOnPlatform(models.Model):
         help_text="The date the instrument was removed from the platform"
     )
     comment = models.TextField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return "%s - %s - %s" % (self.instrument, self.platform, self.start_time)
@@ -167,8 +168,8 @@ class Sensor(models.Model):
         help_text="Whether or not data from this sensor should be included in any processed output. NOTE: Long name mast be populated if this is checked"
     )
     display_in_web_interface = models.BooleanField(
-        default = False,
-        help_text = "Whether of not data from this seneor should be showed in the web interface."
+        default=False,
+        help_text="Whether of not data from this seneor should be showed in the web interface."
     )
     comment = models.TextField(
         null=True,
@@ -180,4 +181,3 @@ class Sensor(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.identifier, self.instrument.identifier)
-

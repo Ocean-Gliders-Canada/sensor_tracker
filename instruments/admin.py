@@ -240,6 +240,7 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
         InstrumentOnPlatformTypeListFilter, InstrumentOnPlatformPlatformListFilter,
         InstrumentIdentifierForPlatformFilter, InstrumentOnPlatformSortFilter)
     list_display = ('instrument', 'platform', 'start_time', 'end_time', 'comment')
+    readonly_fields = ('created_date', 'modified_date',)
 
 
 admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
@@ -252,8 +253,7 @@ class SensorAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date')
     list_display = ('identifier', 'long_name', 'standard_name', 'instrument', 'include_in_output', 'created_date',
                     'modified_date')
-    list_filter = ('include_in_output', )
-    pass
+    list_filter = ('include_in_output',)
 
 
 class SensorInline(admin.StackedInline):
@@ -393,5 +393,4 @@ class InstrumentAdmin(admin.ModelAdmin):
 @admin.register(InstrumentComment)
 class InstrumentCommentAdmin(admin.ModelAdmin):
     list_display = ('instrument', 'created_date', 'short_comment')
-
-
+    readonly_fields = ('created_date', 'modified_date',)
