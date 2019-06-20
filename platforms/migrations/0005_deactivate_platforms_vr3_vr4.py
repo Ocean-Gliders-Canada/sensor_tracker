@@ -7,7 +7,8 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('platforms', '0003_platform_active'),
+
+        ('platforms', '0004_platform_active'),
     ]
 
     operations = [

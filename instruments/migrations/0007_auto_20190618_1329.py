@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('instruments', '0005_migrate_data_from_ol_instrument_comment_to_new_instrument_comment'),
+        ('instruments', '0006_migrate_data_from_ol_instrument_comment_to_new_instrument_comment'),
     ]
 
     operations = [

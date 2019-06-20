@@ -7,7 +7,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('instruments', '0004_instrumentcommentbox_instrumentcommentinbox'),
+        ('instruments', '0005_instrumentcommentbox_instrumentcommentinbox'),
     ]
 
     operations = [
