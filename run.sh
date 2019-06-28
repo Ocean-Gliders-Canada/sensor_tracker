@@ -77,7 +77,7 @@ load_database()
 
 update_venv()
 {
-    source venv/bin/activate
+    source $REPO/venv/bin/activate
     pip install -r $REPO/requirements.txt
 }
 
@@ -91,7 +91,7 @@ start()
     if ! status; then
         echo "-> Starting django server"
         gzip $LOGS/*.log
-        nohup uwsgi $REPO/uwsgi.ini >> "$LOGS/server.$(date "+%Y_%m_%d_%I_%M_%p").log" 2>&1 &
+        nohup uwsgi UWSGI_CONFIG >> "$LOGS/server$SUFFIX.$(date "+%Y_%m_%d_%I_%M_%p").log" 2>&1 &
     fi
 }
 
