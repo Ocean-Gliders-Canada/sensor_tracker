@@ -1,22 +1,22 @@
 from sensor_tracker.configs.base import *
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '12345'
+SECRET_KEY = ''  # refer to ceotr-admin
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['bugs.ocean.dal.ca']
 
-STATIC_ROOT = '/usr/local/etc/nginx/html/sensor_tracker_dev/'
+STATIC_ROOT = '/etc/nginx/html/sensor_tracker_stg/'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'sensor_tracker_dev',
+        'NAME': 'sensor_tracker_stg',
         'USER': 'sensor_tracker',
-        'PASSWORD': '12345',
+        'PASSWORD': '',  # refer to ceotr-admin
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '5432',
     }
 }
 
@@ -31,4 +31,5 @@ DEVELOPMENT_MIDDLEWAARE = [
 ]
 MIDDLEWARE = MIDDLEWARE + DEVELOPMENT_MIDDLEWAARE
 
-INTERNAL_IPS = ['127.0.0.1']
+FORCE_SCRIPT_NAME = '/sensor_tracker_stg'
+

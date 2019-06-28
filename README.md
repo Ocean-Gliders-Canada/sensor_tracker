@@ -15,38 +15,27 @@ Setup:
 
 **Download code**
 
-* Create a folder to hold repository code, `cd` into it
+* Create ~/code/ if it does not exist `cd` into it
 * `git clone git@gitlab.oceantrack.org:ocean-gliders-canada/sensor_tracker.git`
 * `cd sensor_tracker`
 
-**Setup virtualenv**
+**Setup virtualenv and create database**
 
-* `pip install virtualenv`
-* `mkdir venv`
-* `virtualenv -p /path/to/python3.7 venv`
-* `source venv/bin/activate`
-* `pip install -r ~/code/sensor_tracker/requirements.txt`
-
-**Create sensor_tracker database**
-
-* Open psql shell
-* `CREATE ROLE sensor_tracker WITH LOGIN PASSWORD 'yourpass';`
-* `ALTER ROLE sensor_tracker CREATEDB;`
-* `CREATE DATABASE sensor_tracker;`
-* Close psql shell
-* `python manage.py migrate`
-* `python manage.py createsuperuser`
-* In settings/development.py, edit the DATABASES object to include the username and password used to create your database.
+* `./run.sh init`
 
 **Run the production server**
-
- * `python manage.py collectstatic`
  * Start nginx
+ * `python manage.py collectstatic`
  * `uwsgi uwsgi.ini`
 
 **Run the development server**
 
-* `python manage.py runserver --settings=sensor_tracker.configs.development --noreload 0.0.0.0:8000`
+Debug
+ * `python manage.py runserver --settings=sensor_tracker.configs.development --noreload 0.0.0.0:8010`
+
+Run
+ * Start nginx
+ * `./run.sh start`
 
 **API**
 
