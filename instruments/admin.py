@@ -365,7 +365,9 @@ def make_edit_link(instance):
 
 @admin.register(SensorOnInstrument)
 class SensorOnInstrumentAdmin(admin.ModelAdmin):
-    ...
+
+    def has_module_permission(self, request):
+        return False
 
 
 class InstrumentCommentBoxInline(admin.TabularInline):
