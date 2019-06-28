@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
-
+import os
 from django.db import models
 from django.contrib.auth.admin import User
+from django.conf import settings
+from django.utils.safestring import mark_safe
 
 
 class PlatformType(models.Model):
@@ -52,6 +54,12 @@ class PlatformPowerType(models.Model):
         return "%s" % (self.name)
 
 
+def check_create_dir(file_dir):
+    if not os.path.isdir(file_dir):
+        os.mkdir(file_dir)
+    return file_dir
+
+
 class PlatformDeployment(models.Model):
     wmo_id = models.IntegerField(
         null=True,
@@ -59,7 +67,7 @@ class PlatformDeployment(models.Model):
         help_text="The WMO ID for the mission. See: <a href='http://www.jcomm.info/index.php?option=com_oe&task=viewGroupRecord&groupID=155'>WMO Contact Info</a> to acquire"
     )
     deployment_number = models.IntegerField(null=True, blank=True)
-    platform = models.ForeignKey(Platform)
+    platform = models.ForeignKey(Platform, on_delete=False)
     institution = models.ForeignKey(
         'general.Institution',
         on_delete=models.PROTECT,
@@ -76,13 +84,6 @@ class PlatformDeployment(models.Model):
         blank=True,
         null=True,
         help_text="The battery type which was using in this deployment."
-    )
-
-    platform_name = models.CharField(
-        max_length=500,
-        help_text="Name of platform.",
-        null=True,
-        blank=True
     )
 
     title = models.CharField(
@@ -198,19 +199,35 @@ class PlatformDeployment(models.Model):
             return_string += '%s - ' % self.deployment_number
         if self.title is not None:
             return_string += '%s - ' % self.title
-        if self.platform_name is not None:
-            return_string += '%s - %s' % (
-                self.platform_name,
-                self.start_time.strftime('%Y-%m-%d')
-            )
+        # if self.platform_name is not None:
+
         else:
             return_string += '%s - %s' % (
                 self.platform.name,
                 self.start_time.strftime('%Y-%m-%d')
             )
+        return_string += '%s - %s' % (
+            self.platform.name,
+            self.start_time.strftime('%Y-%m-%d')
+        )
         if self.end_time is not None:
             return_string += ' - %s' % self.end_time.strftime('%Y-%m-%d')
         return return_string
+
+
+class DeploymentImage(models.Model):
+    class Meta:
+        verbose_name = "Image"
+        verbose_name_plural = "Images"
+
+    platform_deployment = models.ForeignKey('PlatformDeployment', on_delete=models.CASCADE)
+    title = models.CharField(max_length=300, null=False)
+    picture = models.ImageField(upload_to="uploaded_media", null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def __str__(self):
+        return "%s picture" % (self.platform_deployment)
 
 
 class PlatformDeploymentCommentBox(models.Model):

@@ -16,37 +16,38 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-# Application definition
+PROJECT_NAME = "sensor_tracker"
+
 
 LOCAL_APPS = [
     'general',
     'platforms',
     'instruments',
-    'api'
+    'api',
+    'log',
 ]
 
 DJANGO_APPS = [
+    'django.contrib.admin',
     'rest_framework',
     'rest_framework.authtoken',
-    'suit',
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles'
+    'django.contrib.staticfiles',
+    'django_admin_listfilter_dropdown',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
 
-MIDDLEWARE_CLASSES = [
-    'django.middleware.security.SecurityMiddleware',
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -56,7 +57,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'api/html/')
+            os.path.join(BASE_DIR, 'api/html/'),
+            os.path.join(BASE_DIR, 'sensor_tracker/templates/'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -67,9 +69,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
         },
-    },
+    }
 ]
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
@@ -89,7 +90,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
@@ -103,12 +103,10 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/sensor_tracker/'
-
 
 SUIT_CONFIG = {
     'ADMIN_NAME': 'Sensor Tracker',
@@ -120,3 +118,15 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     )
 }
+
+
+def check_create_dir(file_dir):
+    if not os.path.isdir(file_dir):
+        os.mkdir(file_dir)
+    return file_dir
+
+
+RESOURCE_DIR = check_create_dir(os.path.join(os.path.expanduser("~"), "resource"))
+PROJECT_RESOURCE_DIR = check_create_dir(os.path.join(RESOURCE_DIR, PROJECT_NAME))
+MEDIA_ROOT = PROJECT_RESOURCE_DIR
+MEDIA_URL = '/media/'

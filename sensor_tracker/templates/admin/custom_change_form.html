@@ -1,0 +1,18 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block after_field_sets %}
+    {% if extra_content %}
+        <h3>Instrument On platform</h3>
+        {% include "admin/instrument_on_platform_info.html" %}
+    {% endif %}
+    {% if inline_content %}
+        <h3>Sensor On Instrument</h3>
+        {% include "admin/sensor_on_instrument_info.html" %}
+    {% endif %}
+{% endblock %}
+{% block inline_field_sets %}
+    {% for inline_admin_formset in inline_admin_formsets %}
+        {% include inline_admin_formset.opts.template %}
+    {% endfor %}
+{% endblock %}

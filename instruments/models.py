@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db import models
 from django.template.defaultfilters import truncatechars
 from django.contrib.auth.admin import User
@@ -24,7 +22,8 @@ class Instrument(models.Model):
     manufacturer = models.ForeignKey(
         "general.Manufacturer",
         null=True,
-        blank=True
+        blank=True,
+        on_delete=False
     )
     serial = models.CharField(max_length=300, null=True, blank=True)
     master_instrument = models.ForeignKey(
@@ -72,11 +71,13 @@ class InstrumentComment(models.Model):
 class InstrumentOnPlatform(models.Model):
     instrument = models.ForeignKey(
         Instrument,
-        help_text="The instrument that was put on a platform"
+        help_text="The instrument that was put on a platform",
+        on_delete=False
     )
     platform = models.ForeignKey(
         'platforms.Platform',
-        help_text="The platform that the instrument was put on"
+        help_text="The platform that the instrument was put on",
+        on_delete=False
     )
     start_time = models.DateTimeField(
         null=False,
@@ -184,28 +185,31 @@ class Sensor(models.Model):
     def __str__(self):
         return "%s" % (self.identifier)
 
-    class SensorOnInstrument(models.Model):
-        instrument = models.ForeignKey(
-            Instrument,
-            help_text="The instrument that was put on a platform"
-        )
-        sensor = models.ForeignKey(
-            'Sensor',
-            help_text="The platform that the instrument was put on"
-        )
-        start_time = models.DateTimeField(
-            null=False,
-            blank=False,
-            help_text="The date the instrument was put on the platform"
-        )
-        end_time = models.DateTimeField(
-            null=True,
-            blank=True,
-            help_text="The date the instrument was removed from the platform"
-        )
-        comment = models.TextField(null=True, blank=True)
-        created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-        modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
-        def __str__(self):
-            return "%s - %s - %s" % (self.sensor, self.instrument, self.start_time)
+class SensorOnInstrument(models.Model):
+    instrument = models.ForeignKey(
+        Instrument,
+        help_text="The instrument that was put on a platform",
+        on_delete=False
+    )
+    sensor = models.ForeignKey(
+        'Sensor',
+        help_text="The platform that the instrument was put on",
+        on_delete=False
+    )
+    start_time = models.DateTimeField(
+        null=False,
+        blank=False,
+        help_text="The date the instrument was put on the platform"
+    )
+    end_time = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="The date the instrument was removed from the platform"
+    )
+    comment = models.TextField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def __str__(self):
+        return "%s - %s - %s" % (self.sensor, self.instrument, self.start_time)

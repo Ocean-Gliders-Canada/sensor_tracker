@@ -6,9 +6,8 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('instruments', '0009_sensor_sensor_in_instrument'),
+        ('instruments', '0012_sensor_sensor_in_instrument'),
     ]
 
     operations = [
