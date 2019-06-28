@@ -366,6 +366,11 @@ def make_edit_link(instance):
 @admin.register(SensorOnInstrument)
 class SensorOnInstrumentAdmin(admin.ModelAdmin):
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        return qs
+
     def has_module_permission(self, request):
         return False
 
