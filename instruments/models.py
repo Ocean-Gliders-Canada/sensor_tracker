@@ -1,5 +1,6 @@
 from django.db import models
 from django.template.defaultfilters import truncatechars
+from django.contrib.auth.admin import User
 
 
 class Instrument(models.Model):
@@ -49,20 +50,22 @@ class Instrument(models.Model):
         return return_string
 
 
-class InstrumentComment(models.Model):
-    instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE)
-    comment = models.TextField(
-        help_text="This is a good place to log any problems or changes with an instrument"
-    )
-    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
-
-    @property
-    def short_comment(self):
-        return truncatechars(self.comment, 100)
+class InstrumentCommentBox(models.Model):
+    instrument = models.OneToOneField('Instrument', on_delete=models.PROTECT)
 
     def __str__(self):
-        return "%s - %s" % (self.instrument, self.created_date)
+        return "%s comment box" % (self.instrument)
+
+
+class InstrumentComment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    comment = models.TextField(help_text="Comments")
+    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    instrument_comment_box = models.ForeignKey(InstrumentCommentBox, on_delete=models.CASCADE)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def __str__(self):
+        return "%s" % (self.id)
 
 
 class InstrumentOnPlatform(models.Model):

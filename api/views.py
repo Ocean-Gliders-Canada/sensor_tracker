@@ -34,6 +34,8 @@ from rest_framework.authentication import TokenAuthentication, SessionAuthentica
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
+from api import specs
+
 
 class GetInstrumentOnPlatform(ApiBase):
     accept = {

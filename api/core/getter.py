@@ -1,6 +1,3 @@
-"""
-
-"""
 import re
 
 from platforms.models import *
@@ -46,9 +43,9 @@ def get_sensors_by_platform(platform_name=None, output=True):
     except ObjectDoesNotExist:
         raise ObjectDoesNotExist("No platform name match {}".format(platform_name))
 
-    instrument_on_platform_objs = InstrumentOnPlatform.objects.filter(platform=platform_obj)
+    instrument_on_platform_qs = InstrumentOnPlatform.objects.filter(platform=platform_obj)
     instrument_list = []
-    for obj in instrument_on_platform_objs:
+    for obj in instrument_on_platform_qs:
         instrument_list.append(obj.instrument)
 
     for obj in instrument_list:

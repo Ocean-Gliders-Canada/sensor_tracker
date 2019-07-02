@@ -15,13 +15,18 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Application definition
+
+
+PROJECT_NAME = "sensor_tracker"
+
+
 
 LOCAL_APPS = [
     'general',
     'platforms',
     'instruments',
-    'api'
+    'api',
+    'log',
 ]
 
 DJANGO_APPS = [
@@ -33,6 +38,7 @@ DJANGO_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_admin_listfilter_dropdown',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
@@ -113,3 +119,15 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     )
 }
+
+
+def check_create_dir(file_dir):
+    if not os.path.isdir(file_dir):
+        os.mkdir(file_dir)
+    return file_dir
+
+
+RESOURCE_DIR = check_create_dir(os.path.join(os.path.expanduser("~"), "resource"))
+PROJECT_RESOURCE_DIR = check_create_dir(os.path.join(RESOURCE_DIR, PROJECT_NAME))
+MEDIA_ROOT = PROJECT_RESOURCE_DIR
+MEDIA_URL = '/media/'
