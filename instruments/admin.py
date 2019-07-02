@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.forms import ModelForm, CharField
+from django.forms import ModelForm
 from suit.widgets import SuitSplitDateTimeWidget
 from django_admin_listfilter_dropdown.filters import DropdownFilter
 
@@ -146,19 +146,6 @@ class SensorAdmin(admin.ModelAdmin):
     list_display = ('identifier', 'long_name', 'standard_name', 'include_in_output', 'created_date',
                     'modified_date')
     list_filter = ('include_in_output',)
-
-
-# class SensorInline(admin.StackedInline):
-#     readonly_fields = ('created_date', 'modified_date')
-#     model = Sensor
-#     extra = 0
-#
-#     def get_queryset(self, request):
-#         queryset = super(SensorInline, self).get_queryset(request)
-#         #queryset = queryset.prefetch_related('instrument')
-#         if not self.has_change_permission(request):
-#             queryset = queryset.none()
-#         return queryset
 
 
 class InstrumentPlatformTypeFilter(admin.SimpleListFilter):
