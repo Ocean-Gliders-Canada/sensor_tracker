@@ -19,23 +19,19 @@ Setup:
 * `git clone git@gitlab.oceantrack.org:ocean-gliders-canada/sensor_tracker.git`
 * `cd sensor_tracker`
 
-**Setup virtualenv and create database**
+**Setup**
 
-* `./run.sh init`
-
-**Run the production server**
- * Start nginx
- * `python manage.py collectstatic`
- * `uwsgi uwsgi.ini`
-
-**Run the development server**
-
-Debug
- * `python manage.py runserver --settings=sensor_tracker.configs.development --noreload 0.0.0.0:8010`
-
-Run
- * Start nginx
- * `./run.sh start`
+* Refer to run.sh for most setup operations 
+* Setup virtualenv and create database locally
+  * `./run.sh dev init`
+* Run server locally
+  * `./run.sh dev start`
+* Run server in production
+  * `./run.sh master start`
+* Debug in PyCharm: 
+  * Additional options: --settings=sensor_tracker.configs.development --noreload
+  * Port: 8010
+  * Python interpreter: ~/code/sensor_tracker/venv/bin/python
 
 **API**
 
