@@ -58,6 +58,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'api/html/'),
+            os.path.join(BASE_DIR, 'sensor_tracker/templates/'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {

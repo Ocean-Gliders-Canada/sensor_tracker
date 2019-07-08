@@ -1,10 +1,13 @@
 from django.contrib.admin.models import LogEntry
 from django.contrib import admin
+from django.utils.html import format_html
 
 
 @admin.register(LogEntry)
 class PlatformTypeAdmin(admin.ModelAdmin):
-    list_display = ('user', 'action_time', 'message', 'target_obj', 'action')
+    list_display = ('user', 'action_time', 'message', 'target_obj', 'action',)
+
+    list_display_links = None
 
     def get_queryset(self, request):
         user = request.user
@@ -15,9 +18,9 @@ class PlatformTypeAdmin(admin.ModelAdmin):
         return qs
 
     def message(self, instance):
-        return """<a href="{}">{}</a>""".format(instance.get_admin_url(), instance.change_message)
 
-    message.allow_tags = True
+        the_str = '<a href=\"{}\">{}</a>'.format(instance.get_admin_url(), instance)
+        return format_html(the_str)
 
     def action(self, instance):
         """

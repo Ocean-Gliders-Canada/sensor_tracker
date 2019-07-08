@@ -98,7 +98,6 @@ class InstrumentOnPlatform(models.Model):
 
 
 class Sensor(models.Model):
-    instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE)
     identifier = models.CharField(
         max_length=300,
         help_text="The name used to identify this sensor in the raw data. ie: sci_water_temp"
@@ -184,4 +183,33 @@ class Sensor(models.Model):
     modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
-        return "%s - %s" % (self.identifier, self.instrument.identifier)
+        return "%s" % (self.identifier)
+
+
+class SensorOnInstrument(models.Model):
+    instrument = models.ForeignKey(
+        Instrument,
+        help_text="The instrument that was put on a platform",
+        on_delete=False
+    )
+    sensor = models.ForeignKey(
+        'Sensor',
+        help_text="The platform that the instrument was put on",
+        on_delete=False
+    )
+    start_time = models.DateTimeField(
+        null=False,
+        blank=False,
+        help_text="The date the instrument was put on the platform"
+    )
+    end_time = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="The date the instrument was removed from the platform"
+    )
+    comment = models.TextField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def __str__(self):
+        return "%s - %s - %s" % (self.sensor, self.instrument, self.start_time)
