@@ -57,8 +57,11 @@ def convert_times(obj):
 def convert_model_to_dict_simple(model):
     """Convert object into dict, no recursive convert"""
     m_dict = copy.deepcopy(model.__dict__)
-    del m_dict['_state']
-    del m_dict['id']
+    try:
+        del m_dict['_state']
+        del m_dict['id']
+    except KeyError as e:
+        print("keyerror {}".format(e))
     to_add_id_key = []
     for id_key in get_all_model_id_name():
         if id_key in m_dict:

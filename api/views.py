@@ -4,95 +4,140 @@ import json
 import datetime
 
 from api.specs import specs
-from api.core.getter import (
-    get_instrument_by_platform,
-    get_instruments_by_deployment,
+from api.core import qs_getter
+from api.core.qs_getter import (
+    # get_instrument_by_platform,
+    # get_instruments_by_deployment,
     get_platform_type,
-    get_deployment_comment,
     get_deployment_by_platform_name_start_time,
     get_sensors_by_deployment,
     get_deployments_by_platform,
     get_sensors_by_platform as get_sensor_b_platform,
-    get_instruments as g_instruments,
-    get_sensors as g_sensors,
-    get_platform as g_platform,
-    get_manufacturer as g_manufacturer,
-    get_institutions as g_institutions,
-    get_project as g_project,
-    get_power as g_power
+
 )
 from api.core.receiver import receiver
 from api.core.exceptions import VariableError
-from api.api_base import ApiBase
+from api.api_base import ApiBaseView
 
 from django.apps import apps
-from django.db.models import Q
 from django.http import HttpResponse
 from django.template import loader
-
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
-
 from api import specs
+from api.core import serializer
+
+from api.core.qs_getter import GetQuerySetMethod
 
 
-class GetInstrumentOnPlatform(ApiBase):
-    accept = {
-        "platform_name": "The name of the platform which the instrument attach on"
-    }
+# General Models
 
-    variable_error_message = 'must provide name'
-
-    @classmethod
-    @api_view(['GET'])
-    @receiver
-    def get_instruments_on_platform(cls, request):
-        return cls.api_get(request, get_instrument_by_platform)
-
-
-class GetDeploymentInstruments(ApiBase):
-    accept = {
-        "platform_name": "The name of deployment's platform",
-        "start_time": "The start time of deployment"
-    }
-
-    @classmethod
-    @api_view(['GET'])
-    @receiver
-    def get_deployment_instruments(cls, request):
-        return cls.api_get(request, get_instruments_by_deployment)
-
-
-class GetPlatformByType(ApiBase):
-    accept = {
-        "model": "Platform model name"
-    }
+class GetManufacturer(ApiBaseView):
     accept_option = {
-        "how": "Specific how to search, possible options are match, contains, regular expression"
+        "name": "The name of manufactures"
     }
-
-    @classmethod
-    @api_view(['GET'])
-    @receiver
-    def get_platform_by_type(cls, request):
-        return cls.api_get(request, get_platform_type)
+    serializer_class = serializer.ManufacturerSerializer
+    queryset_method = GetQuerySetMethod.get_manufacturer
 
 
-class GetPlatformDeploymentComment(ApiBase):
-    accept = {
-        "platform_name": "The name of deployment's platform",
+class GetInstitutions(ApiBaseView):
+    accept_option = {
+        "name": "The name of the institution."
+    }
+    queryset_method = GetQuerySetMethod.get_institutions
+    serializer_class = serializer.InstitutionSerializer
+
+
+class GetProject(ApiBaseView):
+    accept_option = {
+        "name": "The name of the project."
+    }
+    queryset_method = GetQuerySetMethod.get_project
+    serializer_class = serializer.ProjectSerializer
+
+
+# Instrument models
+class GetInstrument(ApiBaseView):
+    accept_option = {
+        "identifier": "The name used to identify this instrument in the raw data.",
+        "short_name": "The short, general name for the instrument.",
+        "long_name": "The full name for the instrument",
+        "serial": "Serial number of instrument",
+        "manufacturer": "",
+        "platform_name": "",
+        "start_time": ""
+    }
+    mutual_exclusion = (
+        ["identifier", "short_name", "long_name", "serial", "manufacturer"], ["platform_name", "start_time"])
+    variable_error_message = 'No variable accept'
+    serializer_class = serializer.InstrumentSerializer
+    queryset_method = GetQuerySetMethod.get_instruments
+
+
+class GetSensor(ApiBaseView):
+    accept_option = [
+        "identifier",
+        "short_name",
+        "long_name",
+        "platform_name",
+        "start_time"
+    ]
+    mutual_exclusion = (
+        ["identifier",
+         "short_name",
+         "long_name"], ["platform_name", "start_time"])
+    serializer_class = serializer.SensorSerializer
+    queryset_method = GetQuerySetMethod.get_sensors
+
+
+# platform model
+class GetPower(ApiBaseView):
+    accept_option = {
+        "name": "The name of the battery."
+    }
+    serializer_class = serializer.PlatformPowerTypeSerializer
+    queryset_method = GetQuerySetMethod.get_power
+
+
+class GetPlatform(ApiBaseView):
+    accept_option = {
+        "platform_name": "The name used to identify this instrument in the raw data.",
+        "serial_name": "",
+        "model": "",
+        "how": ""
+    }
+    mutual_exclusion = (
+        ["platform_name", "serial_name"], ["model", "how"])
+    serializer_class = serializer.PlatformSerializer
+    queryset_method = GetQuerySetMethod.get_platform
+
+
+class GetDeployment(ApiBaseView):
+    accept_option = [
+        "wmo_id", "platform_name", "institution_name", "project_name", "testing_mission", "start_time",
+        "deployment_number", "model", "how"
+    ]
+    mutual_exclusion = (
+        ["wmo_id", "platform_name", "institution_name", "project_name", "testing_mission", "start_time",
+         "deployment_number"], ["model", "how"])
+    serializer_class = serializer.PlatformDeploymentSerializer
+    queryset_method = GetQuerySetMethod.get_deployment
+
+
+class GetPlatformDeploymentComment(ApiBaseView):
+    accept_option = {
+        "platform": "The name of deployment's platform",
         "start_time": "The start time of deployment"
     }
-
-    @classmethod
-    @api_view(['GET'])
-    @receiver
-    def get_platform_deployment_comments(cls, request):
-        return cls.api_get(request, get_deployment_comment)
+    serializer_class = serializer.PlatformDeploymentCommentSerializer
+    queryset_method = GetQuerySetMethod.get_deployment_comment
 
 
-class GetPlatformDeployments(ApiBase):
+# special Apis
+
+
+class GetPlatformDeployments(ApiBaseView):
     accept = {
         "platform_name": "The name of deployment's platform",
         "start_time": "The start time of deployment"
@@ -105,7 +150,7 @@ class GetPlatformDeployments(ApiBase):
         return cls.api_get(request, get_deployments_by_platform)
 
 
-class GetSensorsByPlatform(ApiBase):
+class GetSensorsByPlatform(ApiBaseView):
     accept = {
         "platform_name": "The name of deployment's platform",
     }
@@ -117,7 +162,7 @@ class GetSensorsByPlatform(ApiBase):
         return cls.api_get(request, get_sensor_b_platform)
 
 
-class GetSensorByDeployment(ApiBase):
+class GetSensorByDeployment(ApiBaseView):
     accept = {
         "platform_name": "The name of deployment's platform",
         "start_time": "The start time of deployment"
@@ -131,7 +176,7 @@ class GetSensorByDeployment(ApiBase):
         return cls.api_get(the_get, get_sensors_by_deployment)
 
 
-class GetDeploymentByPlatformNameStartTime(ApiBase):
+class GetDeploymentByPlatformNameStartTime(ApiBaseView):
     accept = {
         "platform_name": "The name of deployment's platform",
         "start_time": "The start time of deployment"
@@ -144,7 +189,7 @@ class GetDeploymentByPlatformNameStartTime(ApiBase):
         return cls.api_get(request, get_deployment_by_platform_name_start_time)
 
 
-class GetAllDeployments(ApiBase):
+class GetAllDeployments(ApiBaseView):
     accept = {
         "platform_name": "The name of deployment's platform",
     }
@@ -158,95 +203,21 @@ class GetAllDeployments(ApiBase):
         return cls.api_get(request, get_instrument_by_platform)
 
 
-class GetInstrument(ApiBase):
-    accept_option = {
-        "identifier": "The name used to identify this instrument in the raw data.",
-        "short_name": "The short, general name for the instrument.",
-        "long_name": "The full name for the instrument",
-        "serial": "Serial number of instrument"
-    }
-    variable_error_message = 'No variable accept'
-
-    @classmethod
-    @api_view(['GET'])
-    @receiver
-    def get_instruments(cls, request):
-        return cls.api_get(request, g_instruments)
-
-
-class GetSensors(ApiBase):
-    accept_option = {
-        "identifier": "The name used to identify this instrument in the raw data.",
-        "standard_name": "The official, standard name for the instrument. IE: sea_water_temperature. ",
-        "long_name": "The full name for the instrument",
-    }
-
-    @classmethod
-    @api_view(['GET'])
-    @receiver
-    def get_sensors(cls, request):
-        return cls.api_get(request, g_sensors)
-
-
-class GetPlatform(ApiBase):
-    accept_option = {
-        "platform_name": "The name used to identify this instrument in the raw data.",
-        "serial_name": "The official, standard name for the instrument. IE: sea_water_temperature. ",
-    }
-
-    @classmethod
-    @api_view(['GET'])
-    @receiver
-    def get_platform(cls, request):
-        return cls.api_get(request, g_platform)
-
-
-class GetManufacturer(ApiBase):
-    accept_option = {
-        "name": "The name of manufactures"
-    }
-
-    @classmethod
-    @api_view(['GET'])
-    @receiver
-    def get_manufacturer(cls, request):
-        return cls.api_get(request, g_manufacturer)
-
-
-class GetInstitutions(ApiBase):
-    accept_option = {
-        "name": "The name of the institution."
-    }
-
-    @classmethod
-    @api_view(['GET'])
-    @receiver
-    def get_institutions(cls, request):
-        return cls.api_get(request, g_institutions)
-
-
-class GetProject(ApiBase):
-    accept_option = {
-        "name": "The name of the project."
-    }
-
-    @classmethod
-    @api_view(['GET'])
-    @receiver
-    def get_project(cls, request):
-        return cls.api_get(request, g_project)
-
-
-class GetPower(ApiBase):
-    accept_option = {
-        "name": "The name of the battery."
-    }
-
-    @classmethod
-    @api_view(['GET'])
-    @receiver
-    def get_power(cls, request):
-        return cls.api_get(request, g_power)
+#
+# class GetInstrument(ApiBase):
+#     accept_option = {
+#         "identifier": "The name used to identify this instrument in the raw data.",
+#         "short_name": "The short, general name for the instrument.",
+#         "long_name": "The full name for the instrument",
+#         "serial": "Serial number of instrument"
+#     }
+#     variable_error_message = 'No variable accept'
+#
+#     @classmethod
+#     @api_view(['GET'])
+#     @receiver
+#     def get_instruments(cls, request):
+#         return cls.api_get(request, g_instruments)
 
 
 # POST Requests

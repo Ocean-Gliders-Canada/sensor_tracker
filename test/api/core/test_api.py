@@ -1,15 +1,10 @@
-import datetime
-import copy
 from django.test import TestCase
 
 from platforms.models import *
-from instruments.models import *
-from general.models import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.admin import User
 
-from api.core.getter import (
-    get_platform_by_name,
+from api.core.qs_getter import (
     get_sensors_by_platform,
     get_sensors_by_deployment,
 
@@ -32,7 +27,7 @@ from api.core.getter import (
     get_power
 )
 from api.core.json_maker import get_apps_model_name, convert_model_to_dict_simple, convert_model_to_dict_recursive
-
+from api.core.serializer import *
 
 class GetterTest(TestCase):
     def create_project_obj(self):
@@ -699,3 +694,154 @@ class TestCreateInvalidData(TestCase):
             institution=self.organization_objs["OTN"], start_time="2017-03-12 12:00:00", end_time="2017-04-18 12:00:00")
         res = get_deployments_by_platform('cabot')
         self.assertEqual(len(res), 2)
+
+
+class TestSerializer(TestCase):
+    def create_project_obj(self):
+        self.project_obj1 = Project.objects.create(name="project_a")
+        self.project_obj2 = Project.objects.create(name="project_b")
+
+    def create_institution_obj(self):
+        self.organization_objs = {}
+        organization = ["OTN", "meopar", "dalhousie"]
+        for org in organization:
+            obj = Institution.objects.create(name=org)
+            self.organization_objs[org] = obj
+
+        return self.organization_objs
+
+    def create_manufacturer_obj(self):
+        self.manufacturer_obj = Manufacturer.objects.create(name="ceotr")
+
+    def create_platform_type_objs(self):
+        self.platform_type_objs = {}
+        platform_types = ["mooring", "profiler", "VOS", "Slocum Glider G3", "Slocum Glider G1", "Slocum Glider G2",
+                          "Wave Glider SV2"]
+        for t in platform_types:
+            obj = PlatformType.objects.create(model=t, manufacturer=self.manufacturer_obj)
+            self.platform_type_objs[t] = obj
+        return self.platform_type_objs
+
+    def create_platform_objs(self):
+        self.platform_obj1 = Platform.objects.create(name="cabot", institution=self.organization_objs["OTN"],
+                                                     platform_type=self.platform_type_objs["Slocum Glider G3"])
+        self.platform_obj2 = Platform.objects.create(name="scotia", institution=self.organization_objs["OTN"],
+                                                     platform_type=self.platform_type_objs["Slocum Glider G3"])
+        self.platform_obj3 = Platform.objects.create(name="Fundy", institution=self.organization_objs["OTN"],
+                                                     platform_type=self.platform_type_objs["Slocum Glider G2"])
+        self.platform_obj4 = Platform.objects.create(name="bond", institution=self.organization_objs["OTN"],
+                                                     platform_type=self.platform_type_objs["Slocum Glider G1"])
+
+    def create_deployments_objs(self):
+        self.deployment_obj1 = PlatformDeployment.objects.create(
+            deployment_number=1, platform=self.platform_obj1, project=self.project_obj1,
+            institution=self.organization_objs["OTN"], start_time="2017-03-12 12:00:00", end_time="2017-04-18 12:00:00")
+
+        self.deployment_obj2 = PlatformDeployment.objects.create(
+            deployment_number=2, platform=self.platform_obj1, project=self.project_obj1,
+            institution=self.organization_objs["OTN"], start_time="2018-05-12 12:00:00", end_time="2018-06-12 12:00:00")
+        self.deployment_obj3 = PlatformDeployment.objects.create(
+            deployment_number=3, platform=self.platform_obj1, project=self.project_obj1,
+            institution=self.organization_objs["OTN"], start_time="2019-05-12 12:00:00", end_time="2019-06-01 12:00:00")
+        self.deployment_obj4 = PlatformDeployment.objects.create(
+            deployment_number=4, platform=self.platform_obj2, project=self.project_obj1,
+            institution=self.organization_objs["OTN"], start_time="2019-06-12 12:00:00")
+
+    def create_instrument_objs(self):
+        self.instrument_obj1 = Instrument.objects.create(identifier="c", short_name="chi", long_name="chi shen me",
+                                                         manufacturer=self.manufacturer_obj)
+        self.instrument_obj2 = Instrument.objects.create(identifier="d", short_name="he",
+                                                         manufacturer=self.manufacturer_obj)
+        self.instrument_obj3 = Instrument.objects.create(identifier="e", short_name="wan",
+                                                         manufacturer=self.manufacturer_obj)
+        self.instrument_obj4 = Instrument.objects.create(identifier="f", short_name="le",
+                                                         manufacturer=self.manufacturer_obj)
+        self.instrument_obj5 = Instrument.objects.create(identifier="g", short_name="hai",
+                                                         manufacturer=self.manufacturer_obj)
+
+    def create_instrument_on_platform_objs(self):
+        self.instrument_on_platform_obj1 = InstrumentOnPlatform.objects.create(instrument=self.instrument_obj1,
+                                                                               platform=self.platform_obj1,
+                                                                               start_time="2017-03-12 12:00:00",
+                                                                               end_time=None)
+        self.instrument_on_platform_obj2 = InstrumentOnPlatform.objects.create(instrument=self.instrument_obj2,
+                                                                               platform=self.platform_obj1,
+                                                                               start_time="2018-05-12 12:00:00",
+                                                                               end_time="2018-06-12 12:00:00")
+        self.instrument_on_platform_obj3 = InstrumentOnPlatform.objects.create(instrument=self.instrument_obj3,
+                                                                               platform=self.platform_obj1,
+                                                                               start_time="2019-05-12 12:00:00",
+                                                                               end_time="2019-06-01 12:00:00")
+        self.instrument_on_platform_obj4 = InstrumentOnPlatform.objects.create(instrument=self.instrument_obj4,
+                                                                               platform=self.platform_obj1,
+                                                                               start_time="2018-05-12 12:00:00",
+                                                                               end_time=None)
+        self.instrument_on_platform_obj5 = InstrumentOnPlatform.objects.create(instrument=self.instrument_obj5,
+                                                                               platform=self.platform_obj1,
+                                                                               start_time="2019-06-12 12:00:00",
+                                                                               end_time=None)
+
+    def create_user(self):
+        self.user_obj = User.objects.create(username="l", first_name="l", last_name="b", password='123')
+
+    def create_deployment_commend_box_and_deployment_comments(self):
+        self.deployment_comment_box_obj = PlatformDeploymentCommentBox.objects.create(
+            platform_deployment=self.deployment_obj1)
+        self.deployment_comment1 = PlatformDeploymentComment.objects.create(user=self.user_obj, comment="test_comment",
+                                                                            platform_deployment_comment_box=self.deployment_comment_box_obj)
+        self.deployment_comment1 = PlatformDeploymentComment.objects.create(user=self.user_obj, comment="test_comment2",
+                                                                            platform_deployment_comment_box=self.deployment_comment_box_obj)
+
+    def setUp(self):
+        self.create_project_obj()
+        self.create_institution_obj()
+        self.create_manufacturer_obj()
+        self.create_platform_type_objs()
+        self.create_platform_objs()
+        self.create_deployments_objs()
+        self.create_instrument_objs()
+        self.create_instrument_on_platform_objs()
+        self.create_user()
+        self.create_deployment_commend_box_and_deployment_comments()
+        project_obj = Project.objects.create(name="the project")
+        institution_obj = Institution.objects.create(name="institution A")
+        manufacturer_obj = Manufacturer.objects.create(name="factory A")
+        instrument_obj = Instrument.objects.create(identifier="a", short_name="short a", manufacturer=manufacturer_obj)
+        instrument_obj2 = Instrument.objects.create(identifier="b", short_name="short a", manufacturer=manufacturer_obj)
+        platform_type = PlatformType.objects.create(model="platform type model", manufacturer=manufacturer_obj)
+        platform_obj = Platform.objects.create(name="platform a", institution=institution_obj,
+                                               platform_type=platform_type)
+        platform_obj2 = Platform.objects.create(name="platform b", institution=institution_obj,
+                                                platform_type=platform_type)
+        platform_deployment = PlatformDeployment.objects.create(platform=platform_obj, start_time="2019-03-12 14:55:02",
+                                                                institution=institution_obj, project=project_obj,
+                                                                deployment_number=1)
+
+        platform_deployment2 = PlatformDeployment.objects.create(platform=platform_obj,
+                                                                 start_time="2018-03-12 14:55:02",
+                                                                 end_time="2018-03-13 14:55:02",
+                                                                 institution=institution_obj, project=project_obj,
+                                                                 deployment_number=1)
+
+        instrument_on_platform = InstrumentOnPlatform.objects.create(instrument=instrument_obj, platform=platform_obj,
+                                                                     start_time="2019-03-12 14:55:02")
+        instrument_on_platform2 = InstrumentOnPlatform.objects.create(instrument=instrument_obj2,
+                                                                      platform=platform_obj2,
+                                                                      start_time="2019-03-12 14:55:02")
+
+        instrument_on_platform3 = InstrumentOnPlatform.objects.create(instrument=instrument_obj2, platform=platform_obj,
+                                                                      start_time="2019-03-12 14:55:02")
+
+        self.sensor_obj1 = Sensor.objects.create(instrument=instrument_obj, identifier="sensor id",
+                                                 long_name="sensor long name", standard_name="standard name")
+
+        self.sensor_obj2 = Sensor.objects.create(instrument=instrument_obj, identifier="sensor_id2",
+                                                 long_name="sensor long name2", standard_name="standard name2")
+
+    def test_instrument_serializer(self):
+        i_o = Instrument.objects.get(id=1)
+        i_s = InstrumentSerializer(i_o)
+        i_s.Meta.depth = 2
+        print(i_s._readable_fields)
+        print(i_s.data)
+
