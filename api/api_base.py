@@ -10,7 +10,7 @@ from api.core.simple_serializer_factory import serializer_factory
 
 
 class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin):
-    # either accept accept option or use default get_method and post method
+    # either accept accept_option or use default get_method and post method
     accept = []
     accept_option = []
     mutual_exclusion = []

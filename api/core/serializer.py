@@ -3,6 +3,8 @@ from instruments.models import Instrument, InstrumentComment, InstrumentOnPlatfo
 from platforms.models import PlatformType, Platform, PlatformPowerType, PlatformDeployment, PlatformDeploymentComment, \
     PlatformComment
 from rest_framework.serializers import ModelSerializer
+from django.contrib.auth.models import User
+from collections import OrderedDict
 
 
 class ManufacturerSerializer(ModelSerializer):
@@ -60,6 +62,16 @@ class PlatformCommentSerializer(ModelSerializer):
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if 'user' in ret:
+            if type(ret['user']) is not int:
+                new_user_dict = OrderedDict()
+                new_user_dict["id"] = ret['user']["id"]
+                new_user_dict["username"] = ret['user']["username"]
+                ret['user'] = new_user_dict
+        return ret
+
 
 class PlatformTypeSerializer(ModelSerializer):
     class Meta:
@@ -95,3 +107,13 @@ class PlatformDeploymentCommentSerializer(ModelSerializer):
         model = PlatformDeploymentComment
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if 'user' in ret:
+            if type(ret['user']) is not int:
+                new_user_dict = OrderedDict()
+                new_user_dict["id"] = ret['user']["id"]
+                new_user_dict["username"] = ret['user']["username"]
+                ret['user'] = new_user_dict
+        return ret

@@ -236,7 +236,7 @@ class GetQuerySetMethod:
         return qs
 
     @staticmethod
-    @query_optimize_decorator()
+    @query_optimize_decorator(['user', 'platform_deployment_comment_box'])
     def get_deployment_comment(platform=None, start_time=None):
         # query optimize problem
         if not any([platform, start_time]):
@@ -287,8 +287,9 @@ class GetQuerySetMethod:
     @staticmethod
     @query_optimize_decorator()
     def get_instruments_by_deployment(platform_name=None, start_time=None):
+        # todo :check if this function correct
         pk_list = []
-        instrument_on_platform_objs = get_instrument_on_platform_by_platform(platform_name)
+        instrument_on_platform_objs = GetQuerySetMethod.get_instrument_on_platform_by_platform(platform_name)
         if instrument_on_platform_objs:
             deployment_obj = get_deployment_by_platform_name_start_time(platform_name, start_time)
             start_t = deployment_obj.start_time
@@ -408,7 +409,7 @@ class GetQuerySetMethod:
         return qs
 
     @staticmethod
-    @query_optimize_decorator()
+    @query_optimize_decorator(['user', 'platform_comment_box'])
     def get_platform_comment(platform_name=None):
         if platform_name:
             box_qs = PlatformCommentBox.objects.filter(platform__name=platform_name)
