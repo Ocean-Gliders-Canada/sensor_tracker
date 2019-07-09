@@ -8,7 +8,7 @@ from api.core import qs_getter
 from api.core.qs_getter import (
     # get_instrument_by_platform,
     # get_instruments_by_deployment,
-    get_platform_type,
+    # get_platform_type,
     get_deployment_by_platform_name_start_time,
     get_sensors_by_deployment,
     get_deployments_by_platform,
@@ -91,6 +91,34 @@ class GetSensor(ApiBaseView):
     queryset_method = GetQuerySetMethod.get_sensors
 
 
+# todo : think about how ppl would use this
+# class GetInstrumentComment(ApiBaseView):
+#     accept_option = [
+#         "identifier",
+#         "short_name",
+#         "long_name",
+#         "platform_name",
+#         "start_time"
+#     ]
+#     mutual_exclusion = (
+#         ["identifier",
+#          "short_name",
+#          "long_name"], ["platform_name", "start_time"])
+#     serializer_class = serializer.InstrumentCommentSerializer
+#     queryset_method = GetQuerySetMethod.get_sensors
+
+class GetInstrumentOnPlatform(ApiBaseView):
+    accept_option = [
+        "identifier",
+        "platform_name"
+    ]
+    mutual_exclusion = (
+        "identifier",
+        "platform_name")
+    serializer_class = serializer.InstrumentOnPlatformSerializer
+    queryset_method = GetQuerySetMethod.get_instrument_on_platform
+
+
 # platform model
 class GetPower(ApiBaseView):
     accept_option = {
@@ -113,6 +141,12 @@ class GetPlatform(ApiBaseView):
     queryset_method = GetQuerySetMethod.get_platform
 
 
+class GetPlatformType(ApiBaseView):
+    accept_option = ["model", "how"]
+    serializer_class = serializer.PlatformTypeSerializer
+    queryset_method = GetQuerySetMethod.get_platform_type
+
+
 class GetDeployment(ApiBaseView):
     accept_option = [
         "wmo_id", "platform_name", "institution_name", "project_name", "testing_mission", "start_time",
@@ -132,6 +166,14 @@ class GetPlatformDeploymentComment(ApiBaseView):
     }
     serializer_class = serializer.PlatformDeploymentCommentSerializer
     queryset_method = GetQuerySetMethod.get_deployment_comment
+
+
+class GetPlatformComment(ApiBaseView):
+    accept_option = {
+        "platform": "The name of deployment's platform",
+    }
+    serializer_class = serializer.PlatformCommentSerializer
+    queryset_method = GetQuerySetMethod.get_platform_comment
 
 
 # special Apis

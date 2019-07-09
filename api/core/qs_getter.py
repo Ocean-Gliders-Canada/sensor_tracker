@@ -7,23 +7,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from api.core.exceptions import ImproperInput
 from api.core.decorator import query_optimize_decorator
 from django.db.models import Q
+from api.core.util import *
 
 
 def get_platform_by_name(platform_name=None):
     platform_obj = Platform.objects.filter(name=platform_name)
 
     return platform_obj
-
-
-def get_instrument_on_platform_by_platform(platform_name=None):
-    res = []
-    platform_obj = get_platform_by_name(platform_name)
-    if not platform_obj:
-        return res
-
-    instrument_on_platform_objs = list(InstrumentOnPlatform.objects.filter(platform=platform_obj))
-
-    return instrument_on_platform_objs
 
 
 def get_sensors_by_platform(platform_name=None, output=True):
@@ -88,68 +78,6 @@ def get_sensors_by_deployment(platform_name=None, start_time=None, output=True):
     return sensor_list
 
 
-def filter_objs(objs, way_to_filter):
-    new_objs = []
-    for o in objs:
-        if way_to_filter(o):
-            new_objs.append(o)
-
-    return new_objs
-
-
-def get_platform_type(model=None, how="match"):
-    # ["match", "contains", "regex"]
-    # all exceptions will be handled in upper level
-
-    try:
-        lower_how = how.lower()
-    except AttributeError:
-        raise AttributeError("Invalid model")
-
-    if lower_how == "match":
-        try:
-            platform_model_obj = PlatformType.objects.get(model=model)
-        except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(
-                "Could no find exact match for model {}, you can set how = contains for partial match or"
-                " set how = regex for Regular Expression match".format(
-                    model))
-        else:
-            objs = [platform_model_obj]
-    elif lower_how == 'contains':
-        all_objs_query = PlatformType.objects.all()
-
-        def filter_fun(obj):
-            try:
-                return (model.lower()) in obj.model.lower()
-            except AttributeError:
-                raise AttributeError("Invalid model")
-
-        objs = filter_objs(all_objs_query,
-                           filter_fun
-                           )
-    elif lower_how == 'regex':
-        all_objs_query = PlatformType.objects.all()
-
-        def filter_fun(obj):
-            name = obj.model
-            try:
-                if re.match(model, name):
-                    return True
-                else:
-                    return False
-            except TypeError:
-                raise TypeError("Invalid regex format")
-
-        objs = filter_objs(all_objs_query,
-                           filter_fun
-                           )
-    else:
-        raise ImproperInput("how should be match or contains or regex")
-
-    return objs
-
-
 def get_deployments_by_platform(platform_name=None):
     deployment_objs = []
     platform_obj = get_platform_by_name(platform_name)
@@ -157,14 +85,6 @@ def get_deployments_by_platform(platform_name=None):
     if platform_obj:
         deployment_objs = list(PlatformDeployment.objects.filter(platform=platform_obj))
     return deployment_objs
-
-
-def no_none_dict(value):
-    the_dict = dict()
-    for x in value:
-        if x and value[x]:
-            the_dict[x] = value[x]
-    return the_dict
 
 
 class GetQuerySetMethod:
@@ -216,7 +136,8 @@ class GetQuerySetMethod:
         if model is None:
             qs = Platform.objects.all()
         else:
-            platform_types = get_platform_type(model, how)
+            platform_type_qs = GetQuerySetMethod.get_platform_type(model, how)
+            platform_types = list(platform_type_qs)
             if platform_types:
                 q_obj = Q(platform_type=platform_types[0])
                 for i in range(1, len(platform_types)):
@@ -397,4 +318,104 @@ class GetQuerySetMethod:
                                                   manufacturer=manufacturer,
                                                   serial=serial, **kwargs)
 
+        return qs
+
+    @staticmethod
+    def get_instrument_comment(_, identifier=None, short_name=None, long_name=None, manufacturer=None, serial=None,
+                               platform_name=None, start_time=None, **kwargs):
+        # todo: think about how to get comments
+        ...
+
+    @staticmethod
+    @query_optimize_decorator(['platform', 'instrument'])
+    def _get_instrument_on_platform(identifier=None):
+        if identifier:
+            qs = InstrumentOnPlatform.objects.filter(instrument__identifier=identifier)
+        else:
+            qs = InstrumentOnPlatform.objects.all()
+        return qs
+
+    @staticmethod
+    @query_optimize_decorator(['platform', 'instrument'])
+    def get_instrument_on_platform_by_platform(platform_name=None):
+
+        instrument_on_platform_objs = InstrumentOnPlatform.objects.filter(platform__name=platform_name)
+
+        return instrument_on_platform_objs
+
+    @staticmethod
+    def get_instrument_on_platform(_, identifier=None, platform_name=None, **kwargs):
+        if platform_name:
+            qs = GetQuerySetMethod.get_instrument_on_platform_by_platform(platform_name=platform_name, **kwargs)
+        else:
+            qs = GetQuerySetMethod._get_instrument_on_platform(identifier=identifier, **kwargs)
+        return qs
+
+    @staticmethod
+    @query_optimize_decorator(["manufacturer"])
+    def get_platform_type(model=None, how="match"):
+        # ["match", "contains", "regex"]
+        # all exceptions will be handled in upper level
+        if model:
+
+            try:
+                lower_how = how.lower()
+            except AttributeError:
+                raise AttributeError("Invalid model")
+
+            if lower_how == "match":
+                qs = PlatformType.objects.filter(model=model)
+            elif lower_how == 'contains':
+                all_objs_query = PlatformType.objects.all()
+
+                def filter_fun(obj):
+                    try:
+                        return (model.lower()) in obj.model.lower()
+                    except AttributeError:
+                        raise AttributeError("Invalid model")
+
+                res_objs = filter_objs(all_objs_query,
+                                       filter_fun
+                                       )
+                res_pk_list = []
+                for o in res_objs:
+                    res_pk_list.append(o.id)
+                qs = PlatformType.objects.filter(pk__in=res_pk_list)
+            elif lower_how == 'regex':
+                all_objs_query = PlatformType.objects.all()
+
+                def filter_fun(obj):
+                    name = obj.model
+                    try:
+                        if re.match(model, name):
+                            return True
+                        else:
+                            return False
+                    except TypeError:
+                        raise TypeError("Invalid regex format")
+
+                res_objs = filter_objs(all_objs_query,
+                                       filter_fun
+                                       )
+                res_pk_list = []
+                for o in res_objs:
+                    res_pk_list.append(o.id)
+                qs = PlatformType.objects.filter(pk__in=res_pk_list)
+            else:
+                raise ImproperInput("how should be match or contains or regex")
+        else:
+            qs = PlatformType.objects.all()
+        return qs
+
+    @staticmethod
+    @query_optimize_decorator()
+    def get_platform_comment(platform_name=None):
+        if platform_name:
+            box_qs = PlatformCommentBox.objects.filter(platform__name=platform_name)
+            box_pk_list = []
+            for o in box_qs:
+                box_pk_list.append(o.id)
+            qs = PlatformComment.objects.filter(pk__in=box_pk_list)
+        else:
+            qs = PlatformComment.objects.all()
         return qs

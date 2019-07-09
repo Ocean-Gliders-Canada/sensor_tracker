@@ -2,10 +2,11 @@ import copy
 
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin
+from rest_framework import permissions
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 
 from api.core.exceptions import VariableError
 from api.core.simple_serializer_factory import serializer_factory
-from rest_framework.response import Response
 
 
 class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin):
@@ -15,6 +16,8 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateMode
     mutual_exclusion = []
     variable_error_message = ""
     queryset_method = None
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
 
     def variable_check(self, the_get):
 
