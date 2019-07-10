@@ -4,7 +4,6 @@ import json
 import datetime
 
 from api.specs import specs
-from api.core import qs_getter
 from api.core.qs_getter import (
     # get_instrument_by_platform,
     # get_instruments_by_deployment,
@@ -27,7 +26,6 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAuthenticated
 from api import specs
 from api.core import serializer
-
 from api.core.qs_getter import GetQuerySetMethod
 
 

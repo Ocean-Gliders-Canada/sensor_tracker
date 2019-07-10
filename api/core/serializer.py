@@ -3,8 +3,10 @@ from instruments.models import Instrument, InstrumentComment, InstrumentOnPlatfo
 from platforms.models import PlatformType, Platform, PlatformPowerType, PlatformDeployment, PlatformDeploymentComment, \
     PlatformComment
 from rest_framework.serializers import ModelSerializer
-from django.contrib.auth.models import User
+
 from collections import OrderedDict
+
+
 
 
 class ManufacturerSerializer(ModelSerializer):

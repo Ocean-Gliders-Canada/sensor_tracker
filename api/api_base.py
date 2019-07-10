@@ -7,9 +7,10 @@ from rest_framework.authentication import TokenAuthentication, SessionAuthentica
 
 from api.core.exceptions import VariableError
 from api.core.simple_serializer_factory import serializer_factory
+from api.core.mixin import CustomCreateModelMixin
 
 
-class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin):
+class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCreateModelMixin, UpdateModelMixin):
     # either accept accept_option or use default get_method and post method
     accept = []
     accept_option = []
