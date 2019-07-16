@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from rest_framework import routers
 from . import views
-from rest_framework.authtoken import views as r_views
+from api.core.token_view import obtain_auth_token
 from django.conf.urls import include
 
 urlpatterns = [
@@ -43,7 +43,7 @@ urlpatterns = [
 
 # 3rd Party Urls
 urlpatterns += [
-    url(r'^get_token/', r_views.obtain_auth_token)
+    url(r'^get_token/', obtain_auth_token)
 ]
 
 router = routers.DefaultRouter()

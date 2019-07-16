@@ -1,7 +1,7 @@
 import copy
 
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework import permissions
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 

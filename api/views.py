@@ -27,7 +27,7 @@ from rest_framework.permissions import IsAuthenticated
 from api import specs
 from api.core import serializer
 from api.core.qs_getter import GetQuerySetMethod
-
+from rest_framework.authtoken import views as r_views
 
 # General Models
 
@@ -242,6 +242,12 @@ class GetAllDeployments(ApiBaseView):
     def get_all_deployments(cls, request):
         return cls.api_get(request, get_instrument_by_platform)
 
+
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# @authentication_classes([TokenAuthentication, SessionAuthentication])
+# def get_token(request):
+#     ...
 
 #
 # class GetInstrument(ApiBase):
@@ -475,3 +481,6 @@ def clean_model_dict(models, no_foreign=['wmo_id']):
 
 def format_time(t):
     return datetime.datetime.strptime(t, '%Y-%m-%d %H:%M:%S')
+
+
+
