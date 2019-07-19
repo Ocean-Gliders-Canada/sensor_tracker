@@ -4,7 +4,8 @@ PROJECT=sensor_tracker
 SETTINGS_PARENT=sensor_tracker.configs.
 PENV_TYPE=virtualenv
 
-. app_common/deploy/run_common.sh
+my_dir="$(dirname "$0")"
+source ${my_dir}/app_common/deploy/run_common.sh
 
 DB_NAME="sensor_tracker$SUFFIX"
 UWSGI_CONFIG="$REPO/uwsgi$SUFFIX.ini"
