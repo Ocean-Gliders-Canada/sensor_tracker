@@ -5,20 +5,56 @@ from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateMode
 from rest_framework import permissions
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 
-from api.core.exceptions import VariableError
-from api.core.simple_serializer_factory import serializer_factory
-from api.core.mixin import CustomCreateModelMixin
+from .exceptions import VariableError
+from .simple_factories import serializer_factory, filterset_class_factory
+from .mixin import CustomCreateModelMixin
+from .metadata import CustomSimpleMetadata
 
 
-class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCreateModelMixin, UpdateModelMixin):
+def generate_description_for_mutual_exclusion(basic_doc, mutual_exculde):
+    c = mutual_exculde
+    if not mutual_exculde:
+        return ""
+    ret_str = basic_doc + "\nYou can use parameter either come from"
+    for index, x in enumerate(c):
+        if index == 0:
+            ret_str = ret_str + " (" + ", ".join(x) + ")"
+        else:
+            ret_str += " or "
+            ret_str = ret_str + " (" + ", ".join(x) + ")"
+    return ret_str
+
+
+class ApiBaseViewMeta(type):
+    def __new__(cls, *args, **kwargs):
+        if args[0] != "ApiBaseView":
+            basic_doc = args[2]["__doc__"]
+            args[2]["__doc__"] = generate_description_for_mutual_exclusion(basic_doc,
+                                                                           args[2].get("mutual_exclusion", []))
+        return super().__new__(cls, *args, **kwargs)
+
+
+class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCreateModelMixin, UpdateModelMixin,
+                  metaclass=ApiBaseViewMeta):
     # either accept accept_option or use default get_method and post method
+    """
+
+    Some explanation
+    """
     accept = []
+    accept_basic = []
+    accept_default = ["format", "depth", "limit", "offset"]
     accept_option = []
     mutual_exclusion = []
     variable_error_message = ""
     queryset_method = None
+    metadata_class = CustomSimpleMetadata
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     authentication_classes = (TokenAuthentication, SessionAuthentication)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.filterset_class = filterset_class_factory(self)
 
     def variable_check(self, the_get):
 

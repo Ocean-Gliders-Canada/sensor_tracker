@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.forms import ModelForm, CharField
+from django.forms import ModelForm
 from suit.widgets import SuitSplitDateTimeWidget
 from django_admin_listfilter_dropdown.filters import DropdownFilter
 
@@ -8,8 +8,8 @@ from .models import (
     InstrumentOnPlatform,
     Sensor,
     InstrumentCommentBox,
-    InstrumentComment
-
+    InstrumentComment,
+    SensorOnInstrument,
 )
 
 from platforms.models import PlatformType, Platform
@@ -139,25 +139,11 @@ admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
 
 @admin.register(Sensor)
 class SensorAdmin(admin.ModelAdmin):
-    search_fields = ['identifier', 'long_name', 'standard_name', 'instrument__short_name', 'instrument__long_name',
-                     'instrument__serial']
+    search_fields = ['identifier', 'long_name', 'standard_name']
     readonly_fields = ('created_date', 'modified_date')
-    list_display = ('identifier', 'long_name', 'standard_name', 'instrument', 'include_in_output', 'created_date',
+    list_display = ('identifier', 'long_name', 'standard_name', 'include_in_output', 'created_date',
                     'modified_date')
     list_filter = ('include_in_output',)
-
-
-class SensorInline(admin.StackedInline):
-    readonly_fields = ('created_date', 'modified_date')
-    model = Sensor
-    extra = 0
-
-    def get_queryset(self, request):
-        queryset = super(SensorInline, self).get_queryset(request)
-        queryset = queryset.prefetch_related('instrument')
-        if not self.has_change_permission(request):
-            queryset = queryset.none()
-        return queryset
 
 
 class InstrumentPlatformTypeFilter(admin.SimpleListFilter):
@@ -282,11 +268,22 @@ class InstrumentForm(ModelForm):
         fields = '__all__'
 
 
+class PlatformForm(ModelForm):
+    class Meta:
+        model = Platform
+        fields = '__all__'
+
+
 class PlatformInline(admin.StackedInline):
     model = InstrumentOnPlatform
 
     exclude = ["comment"]
     readonly_fields = ["platform", "start_time", "end_time"]
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.prefetch_related('instrument').prefetch_related('platform')
+        return qs
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -295,21 +292,76 @@ class PlatformInline(admin.StackedInline):
         return False
 
 
+class InstrumentOnPlatformDisplayItem:
+    def __init__(self, instance):
+        self.instrument_on_platform_instance = instance
+
+
+class SensorOnInstrumentInline(admin.StackedInline):
+    model = Sensor
+    min_num = 0
+
+
 @admin.register(Instrument)
 class InstrumentAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date')
-    inlines = [PlatformInline,
-               SensorInline,
-               ]
-    list_filter = (InstrumentPlatformTypeFilter, InstrumentIdentifierFilter)
+
+    list_filter = (InstrumentPlatformTypeFilter,
+                   ('identifier', DropdownFilter))
+
     search_fields = ['identifier', 'short_name', 'long_name', 'serial', 'manufacturer__name']
     list_display = ('identifier', 'short_name', 'long_name', 'serial', 'manufacturer', 'created_date', 'modified_date')
     form = InstrumentForm
+    change_form_template = 'admin/custom_change_form.html'
+    list_per_page = 40
 
     def get_queryset(self, request):
         qs = super(InstrumentAdmin, self).get_queryset(request)
         qs = qs.prefetch_related('manufacturer')
         return qs
+
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        instrument_obj = Instrument.objects.get(id=int(object_id))
+        instrument_on_platform_qs = InstrumentOnPlatform.objects.filter(instrument=instrument_obj).order_by(
+            'start_time').prefetch_related('platform')
+        objs = list(instrument_on_platform_qs)
+        for obj in objs:
+            obj.url_edit_link = make_edit_link(obj)
+
+        sensor_on_instrument = SensorOnInstrument.objects.filter(instrument=instrument_obj)
+        sensor_on_instrument = sensor_on_instrument.prefetch_related('sensor').prefetch_related('instrument')
+
+        sensor_obj_set = []
+        for soi in sensor_on_instrument:
+            soi.url_edit_link = make_edit_link(soi)
+            sensor_obj_set.append(soi)
+
+        extra_context = {
+            "extra_content": objs,
+            "inline_content": sensor_obj_set
+        }
+        return super().change_view(request, object_id, form_url='', extra_context=extra_context)
+
+
+def make_edit_link(instance):
+    opt = instance._meta
+    link_format = "/admin/{app}/{model}/{instance_id}/change"
+    link = link_format.format(app=opt.app_label, model=opt.model_name, instance_id=instance.id)
+    return link
+
+
+@admin.register(SensorOnInstrument)
+class SensorOnInstrumentAdmin(admin.ModelAdmin):
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        return qs
+
+    def has_module_permission(self, request):
+        return False
+
 
 
 class InstrumentCommentBoxInline(admin.TabularInline):
@@ -332,7 +384,8 @@ class InstrumentCommentBoxAdmin(admin.ModelAdmin):
         InstrumentCommentBoxInline
     ]
     list_display = ('instrument_identifier', 'instrument_short_name', 'instrument_serial', 'on_platform')
-    search_fields = ['instrument__identifier', 'instrument__short_name', 'instrument__long_name', 'instrument__serial']
+    search_fields = ['instrument__identifier', 'instrument__short_name', 'instrument__long_name',
+                     'instrument__serial']
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
@@ -357,9 +410,10 @@ class InstrumentCommentBoxAdmin(admin.ModelAdmin):
         return instance.instrument.serial
 
     def on_platform(self, instance):
-        platform_obj_queryset = InstrumentOnPlatform.objects.filter(instrument=instance.instrument)
+        platform_obj_queryset = InstrumentOnPlatform.objects.filter(instrument=instance.instrument).select_related(
+            'platform')
         platform_names = []
-        for o in list(platform_obj_queryset):
+        for o in platform_obj_queryset:
             if not o.end_time:
                 platform_names.append(o.platform.name)
         if not platform_names:

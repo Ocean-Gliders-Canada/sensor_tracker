@@ -3,4 +3,4 @@ djangorestframework==3.9.4
 psycopg2==2.7.6.1
 django-suit
 django-debug-toolbar
-
+drf-yasg

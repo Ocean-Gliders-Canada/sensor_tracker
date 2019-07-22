@@ -1,108 +1,76 @@
 import re
 
+from django.db.models import Q
+
+from .util import (time_format_identifier,
+                   INVALID_TIME_FORMAT,
+                   YEAR_DAY,
+                   YEAR_SEC,
+                   time_to_time_range,
+                   no_none_dict,
+                   filter_objs)
+from .exceptions import ImproperInput
+from .decorator import query_optimize_decorator
+
 from platforms.models import *
 from instruments.models import *
 from general.models import *
-from django.core.exceptions import ObjectDoesNotExist
-from api.core.exceptions import ImproperInput
-from api.core.decorator import query_optimize_decorator
-from django.db.models import Q
-from api.core.util import *
 
-
-def get_platform_by_name(platform_name=None):
-    platform_obj = Platform.objects.filter(name=platform_name)
-
-    return platform_obj
-
-
-def get_sensors_by_platform(platform_name=None, output=True):
-    sensor_list = []
-    try:
-        platform_obj = Platform.objects.get(name=platform_name)
-    except ObjectDoesNotExist:
-        raise ObjectDoesNotExist("No platform name match {}".format(platform_name))
-
-    instrument_on_platform_qs = InstrumentOnPlatform.objects.filter(platform=platform_obj)
-    instrument_list = []
-    for obj in instrument_on_platform_qs:
-        instrument_list.append(obj.instrument)
-
-    for obj in instrument_list:
-        sensor_list.extend(list(Sensor.objects.filter(instrument=obj, include_in_output=output)))
-
-    return sensor_list
-
-
-def get_deployment_by_platform_name_start_time(platform_name=None, start_time=None):
-    platform_obj = get_platform_by_name(
-        platform_name
-    )
-
-    deployment_queryset = PlatformDeployment.objects.filter(platform=platform_obj, start_time=start_time)
-
-    return deployment_queryset
-
-
-def get_deployments_by_platform_name(platform_name=None):
-    platform_obj = get_platform_by_name(
-        platform_name
-    )
-
-    deployment_objs = PlatformDeployment.objects.filter(platform=platform_obj)
-
-    return list(deployment_objs)
-
-
-def get_sensors_by_deployment(platform_name=None, start_time=None, output=True):
-    instrument_on_platforms = get_instrument_on_platform_by_platform(platform_name)
-    filter_instrument_on_platforms = []
-    deployment_obj = get_deployment_by_platform_name_start_time(platform_name, start_time)
-    start_time = deployment_obj.start_time
-    end_time = deployment_obj.end_time
-    for i in instrument_on_platforms:
-        if start_time >= i.start_time:
-            if end_time:
-                if i.end_time >= end_time:
-                    filter_instrument_on_platforms.append(i)
-            else:
-                filter_instrument_on_platforms.append(i)
-    sensor_list = []
-    instruments = []
-    for obj in filter_instrument_on_platforms:
-        instruments.append(obj.instrument)
-
-    for obj in instruments:
-        sensor_list.extend(list(Sensor.objects.filter(instrument=obj, include_in_output=output)))
-
-    return sensor_list
-
-
-def get_deployments_by_platform(platform_name=None):
-    deployment_objs = []
-    platform_obj = get_platform_by_name(platform_name)
-
-    if platform_obj:
-        deployment_objs = list(PlatformDeployment.objects.filter(platform=platform_obj))
-    return deployment_objs
+INCLUDE_ALL_SENSOR = 'ALL'
 
 
 class GetQuerySetMethod:
 
     @staticmethod
+    @query_optimize_decorator()
+    def get_sensors_by_deployment(identifier=None, serial=None,
+                                  platform_name=None, start_time=None, output=None):
+        instrument_qs = GetQuerySetMethod.get_instruments(None, identifier=identifier,
+                                                          serial=serial,
+                                                          platform_name=platform_name,
+                                                          start_time=start_time)
+        instruments = list(instrument_qs)
+
+        sensor_on_instrument_qs = SensorOnInstrument.objects.filter(instrument__in=instruments)
+        sensor_pk_list = []
+        for i in sensor_on_instrument_qs:
+            sensor_pk_list.append(i.sensor_id)
+        if output == INCLUDE_ALL_SENSOR.lower() or output == INCLUDE_ALL_SENSOR or not output:
+            return Sensor.objects.filter(pk__in=sensor_pk_list)
+        else:
+            return Sensor.objects.filter(pk__in=sensor_pk_list, include_in_output=output)
+
+    @staticmethod
     @query_optimize_decorator(['instrument'])
-    def get_sensors(identifier=None, standard_name=None, long_name=None):
+    def _get_sensors(identifier=None, standard_name=None, long_name=None, output=None):
         if not any([identifier, standard_name, long_name]):
             qs = Sensor.objects.all()
         else:
             the_dict = {
                 "identifier": identifier,
                 "short_name": standard_name,
-                "long_name": long_name
+                "long_name": long_name,
+                "include_in_output": output
             }
+            if output == INCLUDE_ALL_SENSOR.lower() or output == INCLUDE_ALL_SENSOR:
+                the_dict.pop("include_in_output")
             the_dict = no_none_dict(the_dict)
+
             qs = Sensor.objects.filter(**the_dict)
         return qs
+
+    @staticmethod
+    def get_sensors(_, identifier=None, standard_name=None, long_name=None, platform_name=None, start_time=None,
+                    instrument_identifier=None, instrument_serial=None,
+                    output=None, **kwargs):
+        if platform_name or instrument_identifier:
+            return GetQuerySetMethod.get_sensors_by_deployment(identifier=instrument_identifier,
+                                                               serial=instrument_serial, platform_name=platform_name,
+                                                               start_time=start_time, output=output, **kwargs
+                                                               )
+        else:
+            return GetQuerySetMethod._get_sensors(identifier=identifier, standard_name=standard_name,
+                                                  long_name=long_name, output=output, **kwargs)
 
     @staticmethod
     @query_optimize_decorator(['platform_type', 'institution'])
@@ -136,7 +104,7 @@ class GetQuerySetMethod:
         if model is None:
             qs = Platform.objects.all()
         else:
-            platform_type_qs = GetQuerySetMethod.get_platform_type(model, how)
+            platform_type_qs = GetQuerySetMethod.get_platform_type(model=model, how=how)
             platform_types = list(platform_type_qs)
             if platform_types:
                 q_obj = Q(platform_type=platform_types[0])
@@ -212,9 +180,20 @@ class GetQuerySetMethod:
         if not any(the_dict.values()):
             qs = PlatformDeployment.objects.all()
         else:
-            # create for day range search when not providing full date detail
+            qs = None
+            if start_time:
+                time_format_type = time_format_identifier(start_time)
+                # create for day range search when not providing full date detail
+                if time_format_type == YEAR_DAY:
+                    the_dict.pop("start_time")
+                    begin, end = time_to_time_range(start_time)
+                    qs = PlatformDeployment.objects.filter(start_time__gte=begin, start_time__lte=end)
+
             the_dict = no_none_dict(the_dict)
-            qs = PlatformDeployment.objects.filter(**the_dict)
+            if qs is None:
+                qs = PlatformDeployment.objects.filter(**the_dict)
+            else:
+                qs = qs.filter(**the_dict)
         return qs
 
     @staticmethod
@@ -237,12 +216,12 @@ class GetQuerySetMethod:
 
     @staticmethod
     @query_optimize_decorator(['user', 'platform_deployment_comment_box'])
-    def get_deployment_comment(platform=None, start_time=None):
+    def get_deployment_comment(platform_name=None, start_time=None):
         # query optimize problem
-        if not any([platform, start_time]):
+        if not any([platform_name, start_time]):
             qs = PlatformDeploymentComment.objects.all()
         else:
-            deployment_qs = GetQuerySetMethod.get_deployment(platform_name=platform, start_time=start_time)
+            deployment_qs = GetQuerySetMethod.get_deployment(None, platform_name=platform_name, start_time=start_time)
             deployment_objs = list(deployment_qs)
             if deployment_objs:
                 deployment_obj = deployment_objs[0]
@@ -260,7 +239,7 @@ class GetQuerySetMethod:
         instrument_on_platform_objs = list(qs)
         pk_list = []
         for o in instrument_on_platform_objs:
-            pk_list.append(o.instrument.id)
+            pk_list.append(o.instrument_id)
 
         qs = Instrument.objects.filter(pk__in=pk_list)
 
@@ -280,45 +259,47 @@ class GetQuerySetMethod:
                 "manufacturer__name": manufacturer
             }
             the_dict = no_none_dict(the_dict)
-            res = Instrument.objects.filter(**the_dict)
-            qs = res
+            qs = Instrument.objects.filter(**the_dict)
+
         return qs
 
     @staticmethod
     @query_optimize_decorator()
     def get_instruments_by_deployment(platform_name=None, start_time=None):
-        # todo :check if this function correct
         pk_list = []
-        instrument_on_platform_objs = GetQuerySetMethod.get_instrument_on_platform_by_platform(platform_name)
-        if instrument_on_platform_objs:
-            deployment_obj = get_deployment_by_platform_name_start_time(platform_name, start_time)
-            start_t = deployment_obj.start_time
-            end_t = deployment_obj.end_time
-            for o in instrument_on_platform_objs:
-                if start_t >= o.start_time:
-                    if end_t and o.end_time:
-                        if end_t <= o.end_time:
-                            pk_list.append(o.instrument.id)
-                    else:
-                        pk_list.append(o.instrument.id)
-
+        instrument_on_platform_qs = GetQuerySetMethod.get_instrument_on_platform_by_platform(
+            platform_name=platform_name)
+        if instrument_on_platform_qs:
+            deployment_qs = GetQuerySetMethod.get_deployments(platform_name=platform_name, start_time=start_time)
+            if deployment_qs:
+                deployment_objs = list(deployment_qs)
+                deployment_obj = deployment_objs[0]
+                start_t = deployment_obj.start_time
+                end_t = deployment_obj.end_time
+                instrument_on_platform_qs.prefetch_related("instrument").filter(
+                    Q(start_time__gte=start_t) & Q(end_time__lte=end_t) | Q(start_time__gte=start_t) & Q(
+                        end_time=None))
+                for o in instrument_on_platform_qs:
+                    pk_list.append(o.instrument_id)
         return Instrument.objects.filter(pk__in=pk_list)
 
     @staticmethod
     def get_instruments(_, identifier=None, short_name=None, long_name=None, manufacturer=None, serial=None,
-                        platform_name=None, start_time=None, **kwargs):
+                        platform_name=None, deployment_start_time=None, **kwargs):
 
         if platform_name:
-            if start_time:
-                qs = GetQuerySetMethod.get_instruments_by_deployment(platform_name=platform_name, start_time=start_time,
+            if deployment_start_time:
+                qs = GetQuerySetMethod.get_instruments_by_deployment(platform_name=platform_name,
+                                                                     start_time=deployment_start_time,
                                                                      **kwargs)
             else:
                 qs = GetQuerySetMethod.get_instrument_by_platform(platform_name=platform_name, **kwargs)
         else:
-            qs = GetQuerySetMethod.get_instrument(identifier=identifier, short_name=short_name, long_name=long_name,
-                                                  manufacturer=manufacturer,
-                                                  serial=serial, **kwargs)
+            # qs = GetQuerySetMethod.get_instrument(identifier=identifier, short_name=short_name, long_name=long_name,
+            #                                       manufacturer=manufacturer,
+            #                                       serial=serial, **kwargs)
 
+            qs = Instrument.objects.all()
         return qs
 
     @staticmethod
@@ -419,4 +400,16 @@ class GetQuerySetMethod:
             qs = PlatformComment.objects.filter(pk__in=box_pk_list)
         else:
             qs = PlatformComment.objects.all()
+        return qs
+
+    @staticmethod
+    @query_optimize_decorator(['instrument', "sensor"])
+    def get_sensor_on_instrument(platform_name=None, start_time=None):
+        if any([platform_name, start_time]):
+            instruments_qs = GetQuerySetMethod.get_instruments_by_deployment(platform_name=platform_name,
+                                                                             start_time=start_time)
+            sensor_on_instrument_list = list(instruments_qs)
+            qs = SensorOnInstrument.objects.filter(instrument__in=sensor_on_instrument_list)
+        else:
+            qs = SensorOnInstrument.objects.all()
         return qs

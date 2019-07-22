@@ -41,3 +41,5 @@ def time_format_identifier(time):
 
 def time_to_time_range(time):
     return time + " 00:00:00", time + " 23:59:59"
+
+

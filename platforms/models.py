@@ -1,8 +1,6 @@
 import os
 from django.db import models
 from django.contrib.auth.admin import User
-from django.conf import settings
-from django.utils.safestring import mark_safe
 
 
 class PlatformType(models.Model):

@@ -1,5 +1,6 @@
 from rest_framework.mixins import CreateModelMixin
-from api.core.decorator import log_entry_create_decorator
+
+from .decorator import log_entry_create_decorator
 
 
 class CustomCreateModelMixin(CreateModelMixin):
@@ -10,3 +11,5 @@ class CustomCreateModelMixin(CreateModelMixin):
     @log_entry_create_decorator
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
+
+

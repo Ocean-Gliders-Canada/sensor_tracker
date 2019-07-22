@@ -1,68 +1,69 @@
-from general.models import Manufacturer, Institution, Project
-from instruments.models import Instrument, InstrumentComment, InstrumentOnPlatform, Sensor
-from platforms.models import PlatformType, Platform, PlatformPowerType, PlatformDeployment, PlatformDeploymentComment, \
-    PlatformComment
-from rest_framework import serializers
-
 from collections import OrderedDict
+
+from rest_framework import serializers
+from rest_framework.authtoken.models import Token
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate
 from django.utils.translation import ugettext_lazy as _
-from rest_framework.authtoken.models import Token
+
+from general import models as general
+from instruments import models as instruments
+from platforms import models as platforms
 
 
 class ManufacturerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Manufacturer
+        model = general.Manufacturer
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 
 
 class InstitutionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Institution
+        model = general.Institution
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 
 
 class InstrumentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Instrument
+        model = instruments.Instrument
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Project
+        model = general.Project
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 
 
 class InstrumentCommentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = InstrumentComment
+        model = instruments.InstrumentComment
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 
 
 class InstrumentOnPlatformSerializer(serializers.ModelSerializer):
     class Meta:
-        model = InstrumentOnPlatform
+        model = instruments.InstrumentOnPlatform
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 
 
 class SensorSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Sensor
+        model = instruments.Sensor
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 
 
 class PlatformCommentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PlatformComment
+        model = platforms.PlatformComment
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 
@@ -77,30 +78,37 @@ class PlatformCommentSerializer(serializers.ModelSerializer):
         return ret
 
 
+class SensorOnInstrumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = instruments.SensorOnInstrument
+        fields = '__all__'
+        read_only = ('created_date', 'modified_date')
+
+
 class PlatformTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PlatformType
+        model = platforms.PlatformType
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 
 
 class PlatformSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Platform
+        model = platforms.Platform
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 
 
 class PlatformPowerTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PlatformPowerType
+        model = platforms.PlatformPowerType
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 
 
 class PlatformDeploymentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PlatformDeployment
+        model = platforms.PlatformDeployment
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 
@@ -108,7 +116,7 @@ class PlatformDeploymentSerializer(serializers.ModelSerializer):
 class PlatformDeploymentCommentSerializer(serializers.ModelSerializer):
     # Todo: overwrite the deserilizer
     class Meta:
-        model = PlatformDeploymentComment
+        model = platforms.PlatformDeploymentComment
         fields = '__all__'
         read_only = ('created_date', 'modified_date')
 

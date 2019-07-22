@@ -64,7 +64,8 @@ class PlatformActiveFilter(admin.SimpleListFilter):
             return queryset.filter(active=True)
         if self.value() == '2':
             return queryset.filter(active=False)
-        return queryset.filter(active=True)
+        queryset = queryset.filter(active=True)
+        return queryset
 
 
 class PlatformListFilter(admin.SimpleListFilter):
@@ -126,7 +127,7 @@ class PlatformDeploymentCommentBoxListFilter(PlatformListFilter):
 class PlatformAdmin(admin.ModelAdmin):
     form = PlatformForm
     list_filter = (
-        "platform_type",)
+        "platform_type", PlatformActiveFilter,)
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['name', 'serial_number']
     list_display = ('name', 'wmo_id', 'serial_number', 'platform_type', 'institution', 'purchase_date')
@@ -298,7 +299,6 @@ class PlatformDeploymentCommentBoxInline(admin.TabularInline):
 
     def get_queryset(self, request):
         queryset = super(PlatformDeploymentCommentBoxInline, self).get_queryset(request)
-        queryset = queryset.prefetch_related("user")
         if not self.has_change_permission(request):
             queryset = queryset.none()
         return queryset

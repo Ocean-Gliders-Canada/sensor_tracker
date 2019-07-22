@@ -5,9 +5,6 @@ def query_optimize_decorator(prefetch_related_variables=None):
     # Todo: maybe develop different prefetch_related for different depth level
     def decorator(func):
         def wrapper(*args, **kwargs):
-            assert (not args and kwargs) or (not args and not kwargs), (
-                "must given argument in mapping way"
-            )
             depth = kwargs.pop("depth", 0)
             qs = func(**kwargs)
             if depth and prefetch_related_variables:
