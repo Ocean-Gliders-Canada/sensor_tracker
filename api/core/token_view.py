@@ -1,3 +1,7 @@
+"""
+Added verify token function base on the default ObtainAuthToken class
+"""
+
 from rest_framework import parsers, renderers
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response

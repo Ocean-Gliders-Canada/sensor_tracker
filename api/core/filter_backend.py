@@ -9,16 +9,17 @@ class CustomFilterBackend(DjangoFilterBackend):
     def get_special_fields(self, view):
         res_fileds = []
         accept_option = view.accept_option
-        for option, value in accept_option.items():
-            res_fileds.append(coreapi.Field(
-                name=option,
-                required=False,
-                location='query',
-                schema=coreschema.String(
-                    title=option,
-                    description=value
-                )
-            ))
+        if accept_option:
+            for option, value in accept_option.items():
+                res_fileds.append(coreapi.Field(
+                    name=option,
+                    required=False,
+                    location='query',
+                    schema=coreschema.String(
+                        title=option,
+                        description=value
+                    )
+                ))
         return res_fileds
 
     def get_schema_fields(self, view):
@@ -38,6 +39,15 @@ def generate_default_field():
                 title='depth',
                 description="The depth option should be set to an integer value that indicates the"
                             " depth of relationships that should be traversed before reverting to a flat representation. "
+            )
+        ),
+        coreapi.Field(
+            name="format",
+            required=False,
+            location='query',
+            schema=coreschema.String(
+                title='format',
+                description="The format of API output"
             )
         )
     ]

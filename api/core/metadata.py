@@ -1,3 +1,6 @@
+"""
+Custom Meta class decide the the content display on API options page
+"""
 from collections import OrderedDict
 
 from rest_framework.metadata import SimpleMetadata

@@ -40,6 +40,11 @@ def filterset_field_attributes_dict_generator(model, attrs):
                 if not help_text:
                     help_text = attrs.get(x, "")
                 attrs_dict[x] = filters.CharFilter(field_name=x, help_text=help_text)
+            elif simplified_fields[x][FIELD_TYPE_INDEX] == models.IntegerField:
+                help_text = simplified_fields[x][HELP_TEXT_INDEX]
+                if not help_text:
+                    help_text = attrs.get(x, "")
+                attrs_dict[x] = filters.NumberFilter(field_name=x, help_text=help_text)
     return attrs_dict
 
 

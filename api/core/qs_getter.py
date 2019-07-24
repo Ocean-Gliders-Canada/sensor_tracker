@@ -24,11 +24,11 @@ class GetQuerySetMethod:
     @staticmethod
     @query_optimize_decorator()
     def get_sensors_by_deployment(identifier=None, serial=None,
-                                  platform_name=None, start_time=None, output=None):
+                                  platform_name=None, deployment_start_time=None, output=None):
         instrument_qs = GetQuerySetMethod.get_instruments(None, identifier=identifier,
                                                           serial=serial,
                                                           platform_name=platform_name,
-                                                          start_time=start_time)
+                                                          deployment_start_time=deployment_start_time)
         instruments = list(instrument_qs)
 
         sensor_on_instrument_qs = SensorOnInstrument.objects.filter(instrument__in=instruments)
@@ -60,13 +60,15 @@ class GetQuerySetMethod:
         return qs
 
     @staticmethod
-    def get_sensors(_, identifier=None, standard_name=None, long_name=None, platform_name=None, start_time=None,
+    def get_sensors(_, identifier=None, standard_name=None, long_name=None, platform_name=None,
+                    deployment_start_time=None,
                     instrument_identifier=None, instrument_serial=None,
                     output=None, **kwargs):
         if platform_name or instrument_identifier:
             return GetQuerySetMethod.get_sensors_by_deployment(identifier=instrument_identifier,
                                                                serial=instrument_serial, platform_name=platform_name,
-                                                               start_time=start_time, output=output, **kwargs
+                                                               deployment_start_time=deployment_start_time,
+                                                               output=output, **kwargs
                                                                )
         else:
             return GetQuerySetMethod._get_sensors(identifier=identifier, standard_name=standard_name,
@@ -265,12 +267,13 @@ class GetQuerySetMethod:
 
     @staticmethod
     @query_optimize_decorator()
-    def get_instruments_by_deployment(platform_name=None, start_time=None):
+    def get_instruments_by_deployment(platform_name=None, deployment_start_time=None):
         pk_list = []
         instrument_on_platform_qs = GetQuerySetMethod.get_instrument_on_platform_by_platform(
             platform_name=platform_name)
         if instrument_on_platform_qs:
-            deployment_qs = GetQuerySetMethod.get_deployments(platform_name=platform_name, start_time=start_time)
+            deployment_qs = GetQuerySetMethod.get_deployments(platform_name=platform_name,
+                                                              start_time=deployment_start_time)
             if deployment_qs:
                 deployment_objs = list(deployment_qs)
                 deployment_obj = deployment_objs[0]
@@ -290,16 +293,14 @@ class GetQuerySetMethod:
         if platform_name:
             if deployment_start_time:
                 qs = GetQuerySetMethod.get_instruments_by_deployment(platform_name=platform_name,
-                                                                     start_time=deployment_start_time,
+                                                                     deployment_start_time=deployment_start_time,
                                                                      **kwargs)
             else:
                 qs = GetQuerySetMethod.get_instrument_by_platform(platform_name=platform_name, **kwargs)
         else:
-            # qs = GetQuerySetMethod.get_instrument(identifier=identifier, short_name=short_name, long_name=long_name,
-            #                                       manufacturer=manufacturer,
-            #                                       serial=serial, **kwargs)
-
-            qs = Instrument.objects.all()
+            qs = GetQuerySetMethod.get_instrument(identifier=identifier, short_name=short_name, long_name=long_name,
+                                                  manufacturer=manufacturer,
+                                                  serial=serial, **kwargs)
         return qs
 
     @staticmethod

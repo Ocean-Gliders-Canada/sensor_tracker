@@ -4,11 +4,13 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework import permissions
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.response import Response
 
-from .exceptions import VariableError
+from .exceptions import VariableError, InvalidParameterError
 from .simple_factories import serializer_factory, filterset_class_factory
 from .mixin import CustomCreateModelMixin
 from .metadata import CustomSimpleMetadata
+from .filter_backend import CustomFilterBackend
 
 
 def generate_description_for_mutual_exclusion(basic_doc, mutual_exculde):
@@ -37,10 +39,6 @@ class ApiBaseViewMeta(type):
 class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCreateModelMixin, UpdateModelMixin,
                   metaclass=ApiBaseViewMeta):
     # either accept accept_option or use default get_method and post method
-    """
-
-    Some explanation
-    """
     accept = []
     accept_basic = []
     accept_default = ["format", "depth", "limit", "offset"]
@@ -49,6 +47,7 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
     variable_error_message = ""
     queryset_method = None
     metadata_class = CustomSimpleMetadata
+    filter_backends = [CustomFilterBackend]
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     authentication_classes = (TokenAuthentication, SessionAuthentication)
 
@@ -62,6 +61,17 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
         for v in self.accept:
             if v not in the_get:
                 raise VariableError(self.variable_error_message)
+
+        # check if receving any unwelcome parameters
+        all_accept_variable = self.accept_default + list(self.accept_option) + list(self.accept_basic)
+        unexpected_variable = []
+        for v in the_get:
+            if v not in all_accept_variable:
+                unexpected_variable.append(v)
+        if unexpected_variable:
+            content = "The sensor tracker api doesn't accept following parameter: {}".format(
+                ", ".join(unexpected_variable))
+            raise InvalidParameterError(content)
 
         # to check no given value that should be here
         assign_list = []
@@ -136,3 +146,10 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
                 "or override the `get_serializer_class()` method."
                 % self.__class__.__name__
         )
+
+    def handle_exception(self, exc):
+        if isinstance(exc, InvalidParameterError):
+            data = {'detail': exc.detail}
+            headers = {}
+            return Response(data, status=exc.status_code, headers=headers)
+        return super().handle_exception(exc)

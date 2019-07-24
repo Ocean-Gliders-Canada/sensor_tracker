@@ -1,30 +1,33 @@
 # -*- coding: utf-8 -*-
-from api.core.api_base import ApiBaseView
+import copy
 
-from api.core import serializer
-from api.core.qs_getter import GetQuerySetMethod
-from django_filters.rest_framework import DjangoFilterBackend
-from .core.filter_backend import CustomFilterBackend
-from .core.filterset_class import InstrumentFilter
+from collections import OrderedDict
 
+from rest_framework import views
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
+
+from django.urls import NoReverseMatch
+
+from .core.api_base import ApiBaseView
+from .core import serializer
+from .core.qs_getter import GetQuerySetMethod
 
 
 # General Models
 
 class GetManufacturer(ApiBaseView):
     """Get manufacturer data"""
-    accept_option = {
-        # "name": "The name of manufactures"
+    accept_basic = {
+        "name": "The name of manufactures",
     }
     serializer_class = serializer.ManufacturerSerializer
     queryset_method = GetQuerySetMethod.get_manufacturer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['name']
 
 
 class GetInstitutions(ApiBaseView):
     """Get institution data"""
-    accept_option = {
+    accept_basic = {
         "name": "The name of the institution."
     }
     queryset_method = GetQuerySetMethod.get_institutions
@@ -33,7 +36,7 @@ class GetInstitutions(ApiBaseView):
 
 class GetProject(ApiBaseView):
     """Get project data"""
-    accept_option = {
+    accept_basic = {
         "name": "The name of the project."
     }
     queryset_method = GetQuerySetMethod.get_project
@@ -42,16 +45,13 @@ class GetProject(ApiBaseView):
 
 # Instrument models
 class GetInstrument(ApiBaseView):
-    __doc__ = """Get instrument data"""
-    accept_basic = {"identifier": "",
-                    "short_name": "",
-                    "long_name": "",
+    """Get instrument data list"""
+    accept_basic = {"identifier": "The name used to identify this instrument in the raw data.",
+                    "short_name": "The short, general name for the instrument.",
+                    "long_name": "The full name for the instrument",
                     "serial": "The serial number of Instrument"}
+
     accept_option = {
-        # "identifier": "The name used to identify this instrument in the raw data.",
-        # "short_name": "The short, general name for the instrument.",
-        # "long_name": "The full name for the instrument",
-        # "serial": "Serial number of instrument",
         "platform_name": "The name of platform that the instrument attach to",
         "deployment_start_time": "The start time of the deployment"
     }
@@ -60,24 +60,25 @@ class GetInstrument(ApiBaseView):
     variable_error_message = 'No variable accept'
     serializer_class = serializer.InstrumentSerializer
     queryset_method = GetQuerySetMethod.get_instruments
-    filter_backends = [CustomFilterBackend]
 
 
 class GetSensor(ApiBaseView):
     """Get sensor data"""
-    accept_option = {
+    accept_basic = {
         "identifier": "The identifier of the sensor",
         "short_name": "The short name of the sensor",
         "long_name": "The long name of the sensor",
+    }
+    accept_option = {
         "platform_name": "The name of the platform with sensor attach to",
-        "start_time": "The start time of deployment",
+        "deployment_start_time": "The start time of deployment",
         "instrument_identifier": "The name of the instrument that sensor attach to",
         "instrument_serial": "The serial number of the instrument that sensor attach to",
         "output": "if the include in output option checked"
     }
     mutual_exclusion = (
         ["identifier", "short_name", "long_name"],
-        ["platform_name", "start_time"],
+        ["platform_name", "deployment_start_time"],
         ["instrument_identifier", "instrument_serial"])
     serializer_class = serializer.SensorSerializer
     queryset_method = GetQuerySetMethod.get_sensors
@@ -126,7 +127,7 @@ class GetInstrumentOnPlatform(ApiBaseView):
 # platform model
 class GetPower(ApiBaseView):
     """Get power data"""
-    accept_option = {
+    accept_basic = {
         "name": "The name of the battery."
     }
     serializer_class = serializer.PlatformPowerTypeSerializer
@@ -135,9 +136,11 @@ class GetPower(ApiBaseView):
 
 class GetPlatform(ApiBaseView):
     """Get platform data"""
-    accept_option = {
+    accept_basic = {
         "platform_name": "The name used to identify this instrument in the raw data.",
         "serial_number": "The serial number of the platform",
+    }
+    accept_option = {
         "model": "The model of the platform",
         "how": "The way how to filter the platform"
     }
@@ -160,14 +163,15 @@ class GetPlatformType(ApiBaseView):
 
 class GetDeployment(ApiBaseView):
     """Get deployment data"""
-    accept_option = {
+    accept_basic = {
         "wmo_id": "The WMO ID of the deployment",
         "platform_name": "The name of the platform",
-        "institution_name": "The name of institution",
-        "project_name": "The name of the project",
         "testing_mission": "The name of the testing mission",
-        "start_time": "The start time of the deployment",
         "deployment_number": "The deployment number of the mission",
+    }
+    accept_option = {
+        "start_time": "The start time of the deployment",
+        "institution_name": "The name of institution",
         "model": "The model of the platform",
         "how": "The way how to filter the platform"
     }
@@ -196,3 +200,36 @@ class GetPlatformComment(ApiBaseView):
     }
     serializer_class = serializer.PlatformCommentSerializer
     queryset_method = GetQuerySetMethod.get_platform_comment
+
+
+class APIRootView(views.APIView):
+    """
+    The default basic root view for DefaultRouter
+    """
+    _ignore_model_permissions = True
+    schema = None  # exclude from schema
+    api_root_dict = None
+
+    def get(self, request, *args, **kwargs):
+        # Return a plain {"name": "hyperlink"} response.
+        ret = OrderedDict()
+        namespace = request.resolver_match.namespace
+        for key, url_name in self.api_root_dict.items():
+            if namespace:
+                url_name = namespace + ':' + url_name
+            try:
+                ret[key] = reverse(
+                    url_name,
+                    args=args,
+                    kwargs=kwargs,
+                    request=request,
+                    format=kwargs.get('format', None)
+                )
+            except NoReverseMatch:
+                # Don't bail out if eg. no list routes exist, only detail routes.
+                continue
+
+        the_request = request._request
+        ret["swagger"] = the_request._current_scheme_host + the_request.path + "swagger/"
+        ret["redoc"] = the_request._current_scheme_host + the_request.path + "redoc/"
+        return Response(ret)
