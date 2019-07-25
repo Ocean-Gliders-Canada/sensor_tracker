@@ -1,7 +1,10 @@
 django==2.2
 djangorestframework==3.9.4
 psycopg2==2.7.6.1
+django-suit
 django-debug-toolbar
 django-admin-list-filter-dropdown==1.0.2
-django-suit==0.2.26
 Pillow==6.0.0
+drf-yasg
+django_filters
+packaging

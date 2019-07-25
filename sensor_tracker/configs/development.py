@@ -22,6 +22,7 @@ DATABASES = {
 
 DEVELOPMENT_APPS = [
     'debug_toolbar',
+    'django_filters'
 ]
 
 INSTALLED_APPS = INSTALLED_APPS + DEVELOPMENT_APPS
@@ -32,3 +33,11 @@ DEVELOPMENT_MIDDLEWAARE = [
 MIDDLEWARE = MIDDLEWARE + DEVELOPMENT_MIDDLEWAARE
 
 INTERNAL_IPS = ['127.0.0.1']
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
+}
+

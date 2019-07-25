@@ -79,8 +79,6 @@ class InstrumentOnPlatformTypeListFilter(admin.SimpleListFilter):
 
 
 class InstrumentOnPlatformSortFilter(admin.SimpleListFilter):
-    """
-    """
     title = 'Sort By'
 
     parameter_name = 'sort_by'
@@ -307,8 +305,10 @@ class SensorOnInstrumentInline(admin.StackedInline):
 @admin.register(Instrument)
 class InstrumentAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date')
+
     list_filter = (InstrumentPlatformTypeFilter,
                    ('identifier', DropdownFilter))
+
     search_fields = ['identifier', 'short_name', 'long_name', 'serial', 'manufacturer__name']
     list_display = ('identifier', 'short_name', 'long_name', 'serial', 'manufacturer', 'created_date', 'modified_date')
     form = InstrumentForm

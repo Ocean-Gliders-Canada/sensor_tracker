@@ -1,10 +1,8 @@
 from django.db import models
-from django.template.defaultfilters import truncatechars
 from django.contrib.auth.admin import User
 
 
 class Instrument(models.Model):
-    # TODO: make manufacturer a foreign key
     identifier = models.CharField(
         max_length=300,
         help_text="The name used to identify this instrument in the raw data. IE: SATCTD7229, sci_water"

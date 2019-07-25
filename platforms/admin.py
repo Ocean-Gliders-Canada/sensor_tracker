@@ -274,11 +274,14 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['title', 'deployment_number']
     exclude = ('platform_name',)
+
+    list_display = ('title', 'deployment_number', 'platform', 'start_time', 'end_time', 'sea_name', 'testing_mission')
+    save_on_top = True
+
     list_filter = ('platform__platform_type',
                    ('platform__name', DropdownFilter),
                    PlatformDeploymentHasNumber)
 
-    list_display = ('title', 'deployment_number', 'platform', 'start_time', 'end_time', 'sea_name', 'testing_mission')
     inlines = [
         ImageInline,
     ]

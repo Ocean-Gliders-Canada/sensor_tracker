@@ -15,9 +15,7 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-
 PROJECT_NAME = "sensor_tracker"
-
 
 LOCAL_APPS = [
     'general',
@@ -25,6 +23,7 @@ LOCAL_APPS = [
     'instruments',
     'api',
     'log',
+    'drf_yasg',
 ]
 
 DJANGO_APPS = [
@@ -59,6 +58,7 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR, 'api/html/'),
             os.path.join(BASE_DIR, 'sensor_tracker/templates/'),
+            os.path.join(BASE_DIR, 'api/templates/'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -116,7 +116,8 @@ SUIT_CONFIG = {
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-    )
+    ),
+
 }
 
 
@@ -130,3 +131,4 @@ RESOURCE_DIR = check_create_dir(os.path.join(os.path.expanduser("~"), "resource"
 PROJECT_RESOURCE_DIR = check_create_dir(os.path.join(RESOURCE_DIR, PROJECT_NAME))
 MEDIA_ROOT = PROJECT_RESOURCE_DIR
 MEDIA_URL = '/media/'
+
