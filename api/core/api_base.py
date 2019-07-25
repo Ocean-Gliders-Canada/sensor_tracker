@@ -13,9 +13,10 @@ from .metadata import CustomSimpleMetadata
 from .filter_backend import CustomFilterBackend
 
 
-def generate_description_for_mutual_exclusion(basic_doc, mutual_exculde):
-    c = mutual_exculde
-    if not mutual_exculde:
+def generate_description_for_mutual_exclusion(basic_doc, mutual_excluded):
+
+    c = mutual_excluded
+    if not mutual_excluded:
         return ""
     ret_str = basic_doc + "\nYou can use parameter either come from"
     for index, x in enumerate(c):

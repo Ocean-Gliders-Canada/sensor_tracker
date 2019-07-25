@@ -1,0 +1,32 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "name": "Halifax Line Monitoring"
+    },
+    {
+      "id": 2,
+      "name": "HFX"
+    },
+    {
+      "id": 3,
+      "name": "ASF"
+    },
+    {
+      "id": 4,
+      "name": "ANT"
+    },
+    {
+      "id": 5,
+      "name": "BBASIN"
+    },
+    {
+      "id": 6,
+      "name": "WHaLE"
+    },
+    {
+      "id": 7,
+      "name": "Cabot Strait Acoustic Offload"
+    }
+  ]
+}

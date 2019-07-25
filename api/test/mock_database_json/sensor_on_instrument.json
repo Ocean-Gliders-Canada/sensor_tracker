@@ -1,0 +1,374 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "start_time": "2017-11-15T16:25:32.770282Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 19,
+      "sensor": 268309
+    },
+    {
+      "id": 2,
+      "start_time": "2019-01-22T14:41:10.520623Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 41,
+      "sensor": 287851
+    },
+    {
+      "id": 3,
+      "start_time": "2019-04-30T18:59:58.946445Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 58,
+      "sensor": 288246
+    },
+    {
+      "id": 4,
+      "start_time": "2017-07-07T12:15:38.520672Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 57,
+      "sensor": 552
+    },
+    {
+      "id": 5,
+      "start_time": "2017-07-07T12:18:50.251278Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 57,
+      "sensor": 553
+    },
+    {
+      "id": 6,
+      "start_time": "2017-07-19T13:13:00.645289Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 20,
+      "sensor": 558
+    },
+    {
+      "id": 7,
+      "start_time": "2017-07-19T13:18:50.524510Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 20,
+      "sensor": 559
+    },
+    {
+      "id": 8,
+      "start_time": "2017-07-19T13:18:50.551134Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 20,
+      "sensor": 560
+    },
+    {
+      "id": 9,
+      "start_time": "2017-11-20T14:17:28.023674Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 16,
+      "sensor": 276857
+    },
+    {
+      "id": 10,
+      "start_time": "2019-01-22T14:41:10.640667Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 41,
+      "sensor": 287852
+    },
+    {
+      "id": 11,
+      "start_time": "2017-11-15T16:25:33.008072Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 19,
+      "sensor": 268312
+    },
+    {
+      "id": 12,
+      "start_time": "2019-05-10T16:25:59.673491Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 15,
+      "sensor": 288247
+    },
+    {
+      "id": 13,
+      "start_time": "2017-11-15T16:25:33.093097Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 19,
+      "sensor": 268314
+    },
+    {
+      "id": 14,
+      "start_time": "2017-11-15T16:25:33.176635Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 19,
+      "sensor": 268316
+    },
+    {
+      "id": 15,
+      "start_time": "2017-11-15T16:25:33.217605Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 19,
+      "sensor": 268317
+    },
+    {
+      "id": 16,
+      "start_time": "2017-11-20T14:17:28.173001Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 16,
+      "sensor": 276865
+    },
+    {
+      "id": 17,
+      "start_time": "2017-11-20T14:17:28.192611Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 16,
+      "sensor": 276866
+    },
+    {
+      "id": 18,
+      "start_time": "2019-01-22T14:41:10.753011Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 41,
+      "sensor": 287853
+    },
+    {
+      "id": 19,
+      "start_time": "2019-05-10T16:33:56.460281Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 15,
+      "sensor": 288248
+    },
+    {
+      "id": 20,
+      "start_time": "2019-01-22T14:41:10.865043Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 41,
+      "sensor": 287854
+    },
+    {
+      "id": 21,
+      "start_time": "2019-05-10T16:36:41.376709Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 15,
+      "sensor": 288249
+    },
+    {
+      "id": 22,
+      "start_time": "2019-01-22T14:41:10.978286Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 41,
+      "sensor": 287855
+    },
+    {
+      "id": 23,
+      "start_time": "2019-05-10T17:38:04.377714Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 15,
+      "sensor": 288250
+    },
+    {
+      "id": 24,
+      "start_time": "2017-12-14T14:18:51.923799Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277003
+    },
+    {
+      "id": 25,
+      "start_time": "2017-12-14T14:18:52.267187Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277004
+    },
+    {
+      "id": 26,
+      "start_time": "2017-12-14T14:18:52.616215Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277005
+    },
+    {
+      "id": 27,
+      "start_time": "2017-12-14T14:18:52.964681Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277006
+    },
+    {
+      "id": 28,
+      "start_time": "2017-12-14T14:18:53.313752Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277007
+    },
+    {
+      "id": 29,
+      "start_time": "2017-12-14T14:18:53.666393Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277008
+    },
+    {
+      "id": 30,
+      "start_time": "2017-12-14T14:18:54.023993Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277009
+    },
+    {
+      "id": 31,
+      "start_time": "2017-12-14T14:18:54.380392Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277010
+    },
+    {
+      "id": 32,
+      "start_time": "2017-12-14T14:18:54.749156Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277011
+    },
+    {
+      "id": 33,
+      "start_time": "2017-12-14T14:18:55.116670Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277012
+    },
+    {
+      "id": 34,
+      "start_time": "2017-12-14T14:18:55.483404Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277013
+    },
+    {
+      "id": 35,
+      "start_time": "2017-12-14T14:18:55.857663Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277014
+    },
+    {
+      "id": 36,
+      "start_time": "2017-12-14T14:18:56.236786Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277015
+    },
+    {
+      "id": 37,
+      "start_time": "2017-12-14T14:18:56.616465Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 14,
+      "sensor": 277016
+    }
+  ]
+}

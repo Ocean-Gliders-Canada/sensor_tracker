@@ -137,15 +137,17 @@ class GetPower(ApiBaseView):
 class GetPlatform(ApiBaseView):
     """Get platform data"""
     accept_basic = {
-        "platform_name": "The name used to identify this instrument in the raw data.",
+        "name": "The name used to identify this instrument in the raw data.",
         "serial_number": "The serial number of the platform",
+        "active": "",
+        "wmo_id": "",
     }
     accept_option = {
         "model": "The model of the platform",
         "how": "The way how to filter the platform"
     }
     mutual_exclusion = (
-        ["platform_name", "serial_number"],
+        ["platform_name", "serial_number", "active", "wmo_id"],
         ["model", "how"])
     serializer_class = serializer.PlatformSerializer
     queryset_method = GetQuerySetMethod.get_platform
@@ -165,19 +167,20 @@ class GetDeployment(ApiBaseView):
     """Get deployment data"""
     accept_basic = {
         "wmo_id": "The WMO ID of the deployment",
-        "platform_name": "The name of the platform",
         "testing_mission": "The name of the testing mission",
         "deployment_number": "The deployment number of the mission",
+        "sea_name": "",
     }
     accept_option = {
         "start_time": "The start time of the deployment",
+        "platform_name": "The name of the platform",
         "institution_name": "The name of institution",
         "model": "The model of the platform",
         "how": "The way how to filter the platform"
     }
     mutual_exclusion = (
         ["wmo_id", "platform_name", "institution_name", "project_name", "testing_mission", "start_time",
-         "deployment_number"],
+         "deployment_number", "sea_name"],
         ["model", "how"])
     serializer_class = serializer.PlatformDeploymentSerializer
     queryset_method = GetQuerySetMethod.get_deployment

@@ -1,0 +1,136 @@
+{
+  "results": [
+    {
+      "id": 12,
+      "identifier": "sci_m",
+      "short_name": "science measured",
+      "long_name": "science computer measured",
+      "serial": "200",
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "manufacturer": 2,
+      "master_instrument": null
+    },
+    {
+      "id": 13,
+      "identifier": "c",
+      "short_name": "flight commanded",
+      "long_name": "flight computer commanded",
+      "serial": "200",
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "manufacturer": 1,
+      "master_instrument": null
+    },
+    {
+      "id": 14,
+      "identifier": "m",
+      "short_name": "flight measured",
+      "long_name": "flight computer measured",
+      "serial": "200",
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "manufacturer": 3,
+      "master_instrument": null
+    },
+    {
+      "id": 15,
+      "identifier": "sci_m",
+      "short_name": "science measured",
+      "long_name": "science computer measured",
+      "serial": "556",
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "manufacturer": 2,
+      "master_instrument": null
+    },
+    {
+      "id": 16,
+      "identifier": "c",
+      "short_name": "flight commanded",
+      "long_name": "flight computer commanded",
+      "serial": "556",
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "manufacturer": 1,
+      "master_instrument": null
+    },
+    {
+      "id": 18,
+      "identifier": "c",
+      "short_name": "flight commanded",
+      "long_name": "flight computer commanded",
+      "serial": "007",
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "manufacturer": 3,
+      "master_instrument": null
+    },
+    {
+      "id": 20,
+      "identifier": "sci_m",
+      "short_name": "science measured",
+      "long_name": "science computer measured",
+      "serial": "007",
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "manufacturer": 2,
+      "master_instrument": null
+    },
+    {
+      "id": 57,
+      "identifier": "SATHED0159",
+      "short_name": "SATHED0159",
+      "long_name": null,
+      "serial": null,
+      "comment": "auto-generated",
+      "created_date": null,
+      "modified_date": null,
+      "manufacturer": 3,
+      "master_instrument": null
+    },
+    {
+      "id": 58,
+      "identifier": "SATPED0395",
+      "short_name": "SATPED0395",
+      "long_name": null,
+      "serial": null,
+      "comment": "auto-generated",
+      "created_date": null,
+      "modified_date": null,
+      "manufacturer": 1,
+      "master_instrument": null
+    },
+    {
+      "id": 19,
+      "identifier": "m",
+      "short_name": "flight measured",
+      "long_name": "flight computer measured",
+      "serial": "007",
+      "comment": "",
+      "created_date": null,
+      "modified_date": "2017-06-22T18:47:00.954152Z",
+      "manufacturer": 2,
+      "master_instrument": null
+    },
+    {
+      "id": 41,
+      "identifier": "SATHSE0211",
+      "short_name": "SATHSE0211",
+      "long_name": null,
+      "serial": null,
+      "comment": "auto-generated",
+      "created_date": null,
+      "modified_date": null,
+      "manufacturer": 1,
+      "master_instrument": null
+    }
+  ]
+}
