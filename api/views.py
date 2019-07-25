@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import copy
 
 from collections import OrderedDict
 
@@ -105,7 +104,7 @@ class GetSensorOnInstrument(ApiBaseView):
     """Get sensor on instrument data"""
     accept_option = {
         "platform_name": "The name of the platform",
-        "start_time": "The start time of the deployment"
+        "deployment_start_time": "The start time of the deployment"
     }
     serializer_class = serializer.SensorOnInstrumentSerializer
     queryset_method = GetQuerySetMethod.get_sensor_on_instrument

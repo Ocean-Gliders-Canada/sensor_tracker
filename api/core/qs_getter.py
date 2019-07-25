@@ -405,10 +405,10 @@ class GetQuerySetMethod:
 
     @staticmethod
     @query_optimize_decorator(['instrument', "sensor"])
-    def get_sensor_on_instrument(platform_name=None, start_time=None):
-        if any([platform_name, start_time]):
+    def get_sensor_on_instrument(platform_name=None, deployment_start_time=None):
+        if any([platform_name, deployment_start_time]):
             instruments_qs = GetQuerySetMethod.get_instruments_by_deployment(platform_name=platform_name,
-                                                                             start_time=start_time)
+                                                                             deployment_start_time=deployment_start_time)
             sensor_on_instrument_list = list(instruments_qs)
             qs = SensorOnInstrument.objects.filter(instrument__in=sensor_on_instrument_list)
         else:
