@@ -2,6 +2,7 @@ from rest_framework.routers import DefaultRouter
 from collections import OrderedDict
 from ..views import APIRootView
 
+
 class CustomRouter(DefaultRouter):
 
     def get_api_root_view(self, api_urls=None):
