@@ -516,6 +516,14 @@ def spec(request):
     return HttpResponse(template.render(context, request))
 
 
+@permission_classes([IsAuthenticated])
+def validate_token(request):
+    res = {
+        'success': True
+    }
+    return HttpResponse(json.dumps(res), content_type='application/json')
+
+
 # Helpers
 def create_object_from_request(request, object, time_columns=None, value_type=None):
     if time_columns is None:
