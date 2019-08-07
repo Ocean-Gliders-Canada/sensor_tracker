@@ -26,8 +26,6 @@ Setup:
   * `./run.sh dev init`
 * Run server locally
   * `./run.sh dev start`
-* Run server in production
-  * `./run.sh master start`
 * Debug in PyCharm: 
   * Additional options: --settings=sensor_tracker.configs.development --noreload
   * Port: 8010
