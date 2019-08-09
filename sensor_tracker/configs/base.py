@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+from app_common.utilities.file_prepare import check_create_dir
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -28,6 +29,7 @@ LOCAL_APPS = [
 
 DJANGO_APPS = [
     'django.contrib.admin',
+    'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
     'django.contrib.auth',
@@ -113,22 +115,13 @@ SUIT_CONFIG = {
     'SEARCH_URL': ''
 }
 
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
-
-}
-
-
-def check_create_dir(file_dir):
-    if not os.path.isdir(file_dir):
-        os.mkdir(file_dir)
-    return file_dir
-
-
 RESOURCE_DIR = check_create_dir(os.path.join(os.path.expanduser("~"), "resource"))
 PROJECT_RESOURCE_DIR = check_create_dir(os.path.join(RESOURCE_DIR, PROJECT_NAME))
 MEDIA_ROOT = PROJECT_RESOURCE_DIR
 MEDIA_URL = '/media/'
 
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
+}

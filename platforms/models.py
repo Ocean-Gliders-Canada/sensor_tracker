@@ -1,4 +1,5 @@
 import os
+
 from django.db import models
 from django.contrib.auth.admin import User
 
@@ -49,12 +50,6 @@ class PlatformPowerType(models.Model):
 
     def __str__(self):
         return "%s" % (self.name)
-
-
-def check_create_dir(file_dir):
-    if not os.path.isdir(file_dir):
-        os.mkdir(file_dir)
-    return file_dir
 
 
 class PlatformDeployment(models.Model):

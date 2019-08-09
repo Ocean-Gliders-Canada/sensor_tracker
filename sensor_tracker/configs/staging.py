@@ -5,7 +5,7 @@ SECRET_KEY = ''  # refer to ceotr-admin
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['bugs.ocean.dal.ca']
+ALLOWED_HOSTS = ['bugs.ocean.dal.ca', 'glidertest.ocean.dal.ca:8001']
 
 STATIC_ROOT = '/etc/nginx/html/sensor_tracker_stg/'
 
@@ -33,9 +33,4 @@ MIDDLEWARE = MIDDLEWARE + DEVELOPMENT_MIDDLEWAARE
 
 FORCE_SCRIPT_NAME = '/sensor_tracker_stg'
 
-REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100
-}
-
+INTERNAL_IPS = ['*']
