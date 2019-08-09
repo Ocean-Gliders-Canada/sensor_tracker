@@ -1,0 +1,34 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "name": "OTN",
+      "url": "oceantrackingnetwork.org",
+      "street": "1355 Oxford Street\r\nSteele Ocean Sciences Building",
+      "city": "Halifax",
+      "province": "NS",
+      "postal_code": "B3H 4R2",
+      "country": "Canada",
+      "contact_name": "",
+      "contact_phone": "",
+      "contact_email": "",
+      "created_date": "2019-07-03T16:43:26.856983Z",
+      "modified_date": "2019-07-03T16:43:26.868253Z"
+    },
+    {
+      "id": 2,
+      "name": "MEOPAR",
+      "url": "meopar.ca",
+      "street": "1355 Oxford Street",
+      "city": "Halifax",
+      "province": "Nova Scotia",
+      "postal_code": "B3H 4J1",
+      "country": "Canada",
+      "contact_name": "",
+      "contact_phone": "",
+      "contact_email": "",
+      "created_date": "2019-07-03T16:43:26.856983Z",
+      "modified_date": "2019-07-03T16:43:26.868253Z"
+    }
+  ]
+}
