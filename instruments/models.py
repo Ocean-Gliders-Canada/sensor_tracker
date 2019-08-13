@@ -43,7 +43,7 @@ class Instrument(models.Model):
     def __str__(self):
         return_string = '%s - %s' % (self.identifier, self.short_name)
         if self.long_name:
-            return_string += '- %s' % self.long_name
+            return_string += ' - %s' % self.long_name
         if self.serial:
             return_string += ' - %s' % self.serial
 
