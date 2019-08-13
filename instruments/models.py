@@ -41,9 +41,9 @@ class Instrument(models.Model):
     modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
-        return_string = '%s ' % self.short_name
+        return_string = '%s - %s' % (self.identifier, self.short_name)
         if self.long_name:
-            return_string += '- %s' % self.long_name
+            return_string += ' - %s' % self.long_name
         if self.serial:
             return_string += ' - %s' % self.serial
 
