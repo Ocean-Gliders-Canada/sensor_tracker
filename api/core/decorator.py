@@ -1,3 +1,4 @@
+from .util import get_all_model_name
 from django.contrib.admin.models import LogEntry, ADDITION, ContentType
 
 
@@ -27,8 +28,18 @@ def log_entry_create_decorator(func):
         data = serializer.data
         data_repr = data.__repr__()
         obj_dict = serializer._data
+        all_model_name = get_all_model_name()
+
         obj_id = data["id"]
-        obj = model(**obj_dict)
+        new_obj_dict = {}
+        for key in obj_dict:
+            tmp_key = key.replace("_", "")
+            if tmp_key in all_model_name:
+                new_obj_dict[key + "_id"] = obj_dict[key]
+            else:
+                new_obj_dict[key] = obj_dict[key]
+        obj = model(**new_obj_dict)
+
         log_obj = LogEntry.objects.log_action(user_id=request.user.id,
                                               content_type_id=ContentType.objects.get_for_model(model).pk,
                                               object_id=obj_id,
@@ -40,4 +51,3 @@ def log_entry_create_decorator(func):
         return res
 
     return wrapper
-
