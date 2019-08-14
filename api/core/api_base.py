@@ -1,20 +1,19 @@
 import copy
 
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework import permissions
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.response import Response
 
 from .exceptions import VariableError, InvalidParameterError
 from .simple_factories import serializer_factory, filterset_class_factory
-from .mixin import CustomCreateModelMixin
+from .mixin import CustomCreateModelMixin, CustomUpdateModelMixin
 from .metadata import CustomSimpleMetadata
 from .filter_backend import CustomFilterBackend
 
 
 def generate_description_for_mutual_exclusion(basic_doc, mutual_excluded):
-
     c = mutual_excluded
     if not mutual_excluded:
         return ""
@@ -37,7 +36,7 @@ class ApiBaseViewMeta(type):
         return super().__new__(cls, *args, **kwargs)
 
 
-class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCreateModelMixin, UpdateModelMixin,
+class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCreateModelMixin, CustomUpdateModelMixin,
                   metaclass=ApiBaseViewMeta):
     # either accept accept_option or use default get_method and post method
     accept = []
