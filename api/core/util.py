@@ -1,4 +1,7 @@
+from functools import lru_cache
 from datetime import datetime
+from django.apps import apps
+from django.conf import settings
 
 
 def filter_objs(objs, way_to_filter):
@@ -41,3 +44,15 @@ def time_format_identifier(time):
 
 def time_to_time_range(time):
     return time + " 00:00:00", time + " 23:59:59"
+
+
+def get_model_name(app_names):
+    all_model_name = []
+    for name in app_names:
+        all_model_name.extend(apps.all_models[name])
+    return all_model_name
+
+
+@lru_cache(maxsize=None)
+def get_all_model_name():
+    return get_model_name(settings.LOCAL_APPS)
