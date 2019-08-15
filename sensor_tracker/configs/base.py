@@ -28,6 +28,7 @@ LOCAL_APPS = [
 ]
 
 DJANGO_APPS = [
+    'jet',
     'django.contrib.admin',
     'django_filters',
     'rest_framework',
@@ -125,3 +126,5 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100
 }
+
+JET_DEFAULT_THEME = 'light-gray'
