@@ -198,7 +198,7 @@ class GetPlatformDeploymentComment(ApiBaseView):
 class GetPlatformComment(ApiBaseView):
     """Get platform comment data"""
     accept_option = {
-        "platform": "The name of deployment's platform",
+        "platform_name": "The name of deployment's platform",
     }
     serializer_class = serializer.PlatformCommentSerializer
     queryset_method = GetQuerySetMethod.get_platform_comment

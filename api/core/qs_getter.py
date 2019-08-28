@@ -1,7 +1,7 @@
 import re
 
 from django.db.models import Q
-
+from django.core.exceptions import ObjectDoesNotExist
 from .util import (time_format_identifier,
                    INVALID_TIME_FORMAT,
                    YEAR_DAY,
@@ -227,9 +227,13 @@ class GetQuerySetMethod:
             deployment_objs = list(deployment_qs)
             if deployment_objs:
                 deployment_obj = deployment_objs[0]
-                deployment_comment_box = PlatformDeploymentCommentBox.objects.get(platform_deployment=deployment_obj)
-                qs = PlatformDeploymentComment.objects.filter(
-                    platform_deployment_comment_box=deployment_comment_box)
+                try:
+                    deployment_comment_box = PlatformDeploymentCommentBox.objects.get(platform_deployment=deployment_obj)
+                except ObjectDoesNotExist:
+                    qs = PlatformDeploymentComment.objects.none()
+                else:
+                    qs = PlatformDeploymentComment.objects.filter(
+                        platform_deployment_comment_box=deployment_comment_box)
             else:
                 qs = PlatformDeploymentComment.objects.none()
         return qs
