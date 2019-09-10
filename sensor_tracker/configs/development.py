@@ -7,12 +7,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-STATIC_ROOT = '/usr/local/etc/nginx/html/sensor_tracker_dev/'
+STATIC_ROOT = '/usr/local/etc/nginx/html/sensor_tracker/'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'sensor_tracker_dev',
+        'NAME': 'sensor_tracker',
         'USER': 'sensor_tracker',
         'PASSWORD': '12345',
         'HOST': 'localhost',

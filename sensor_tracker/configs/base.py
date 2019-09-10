@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 from app_common.utilities.file_prepare import check_create_dir
+from django.contrib.admin import AdminSite
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -128,3 +129,5 @@ REST_FRAMEWORK = {
 }
 
 JET_DEFAULT_THEME = 'light-gray'
+
+AdminSite.site_header = 'Sensor Tracker'

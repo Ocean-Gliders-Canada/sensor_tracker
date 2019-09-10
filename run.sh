@@ -2,7 +2,7 @@
 
 PROJECT=sensor_tracker
 SETTINGS_PARENT=sensor_tracker.configs.
-PENV_TYPE=virtualenv
+PENV_TYPE=conda
 
 my_dir="$(dirname "$0")"
 source ${my_dir}/app_common/deploy/run_common.sh
