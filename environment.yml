@@ -19,3 +19,4 @@ dependencies:
   - drf-yasg
   - packaging
   - git+https://github.com/mrts/django-admin-list-filter-dropdown.git
+  - django-jet
