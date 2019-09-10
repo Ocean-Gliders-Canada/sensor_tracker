@@ -20,3 +20,4 @@ dependencies:
   - packaging
   - git+https://github.com/mrts/django-admin-list-filter-dropdown.git
   - django-jet
+  - git+ssh://git@gitlab.oceantrack.org/ceotr/app_common.git

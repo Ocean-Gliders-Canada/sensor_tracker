@@ -4,8 +4,11 @@ PROJECT=sensor_tracker
 SETTINGS_PARENT=sensor_tracker.configs.
 PENV_TYPE=conda
 
-my_dir="$(dirname "$0")"
-source ${my_dir}/app_common/deploy/run_common.sh
+if [[ ! -d ~/code/deploy_tools ]]; then
+    echo "Missing ceotr-public/deploy_tools repo, clone to ~/code first"
+    exit 1
+fi
+source ~/code/deploy_tools/run_common.sh
 
 DB_NAME="sensor_tracker$SUFFIX"
 UWSGI_CONFIG="$REPO/uwsgi$SUFFIX.ini"
