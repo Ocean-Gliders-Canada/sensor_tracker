@@ -15,6 +15,7 @@ dependencies:
 - django-debug-toolbar
 - django-filter
 - django-suit
+- pyyaml
 - pip:
   - drf-yasg
   - packaging

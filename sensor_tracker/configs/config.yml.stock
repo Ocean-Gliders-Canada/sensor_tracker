@@ -1,0 +1,7 @@
+environment: null
+allowed_hosts: null
+secret_key: null
+database:
+    name: 'sensor_tracker'
+    user: 'sensor_tracker'
+    password: null

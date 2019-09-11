@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import shutil
+import yaml
 from app_common.utilities.file_prepare import check_create_dir
 from django.contrib.admin import AdminSite
 
@@ -118,6 +120,15 @@ SUIT_CONFIG = {
 
 RESOURCE_DIR = check_create_dir(os.path.join(os.path.expanduser("~"), "resource"))
 PROJECT_RESOURCE_DIR = check_create_dir(os.path.join(RESOURCE_DIR, PROJECT_NAME))
+
+YAML_PATH = os.path.join(PROJECT_RESOURCE_DIR, "config.yml")
+
+if not os.path.exists(YAML_PATH):
+    shutil.copy(os.path.join(os.path.dirname(__file__), "config.yml.stock"), YAML_PATH)
+
+yaml_file = open(YAML_PATH, 'r')
+yaml_config = yaml.load(yaml_file)
+
 MEDIA_ROOT = PROJECT_RESOURCE_DIR
 MEDIA_URL = '/media/'
 
@@ -129,3 +140,19 @@ REST_FRAMEWORK = {
 
 
 AdminSite.site_header = 'Sensor Tracker'
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = yaml_config['secret_key']
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': yaml_config['database']['name'],
+        'USER': yaml_config['database']['user'],
+        'PASSWORD': yaml_config['database']['password'],
+        'HOST': 'localhost',
+        'PORT': '5432'
+    }
+}
+
+ALLOWED_HOSTS = yaml_config['allowed_hosts']
