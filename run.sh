@@ -10,13 +10,12 @@ if [[ ! -d ~/code/deploy_tools ]]; then
 fi
 source ~/code/deploy_tools/run_common.sh
 
-DB_NAME="sensor_tracker$SUFFIX"
-UWSGI_CONFIG="$REPO/uwsgi$SUFFIX.ini"
+DB_NAME="sensor_tracker"
+UWSGI_CONFIG="$REPO/uwsgi.ini"
 DB_ROLE=sensor_tracker
 
 init()
 {
-    install_virtualenv
     init_py_env
     init_database
 }
@@ -53,8 +52,11 @@ start()
     start_nginx
     if ! status; then
         echo "-> Starting django server"
-        gzip $LOGS/*.log
-        nohup uwsgi UWSGI_CONFIG >> "$LOGS/server$SUFFIX.$(date "+%Y_%m_%d_%I_%M_%p").log" 2>&1 &
+        LOG_FILE="${LOGS}/server.$(date "+%Y_%m_%d").log"
+        nohup uwsgi ${UWSGI_CONFIG} >> ${LOG_FILE} 2>&1 &
+        sleep 5
+        echo "tail -n 200 ${LOG_FILE}\n======================="
+        tail -n 200 ${LOG_FILE}
     fi
 }
 
