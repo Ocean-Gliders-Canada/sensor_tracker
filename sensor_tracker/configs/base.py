@@ -27,7 +27,6 @@ LOCAL_APPS = [
 ]
 
 DJANGO_APPS = [
-    'jet',
     'django.contrib.admin',
     'django_filters',
     'rest_framework',
@@ -128,6 +127,5 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 100
 }
 
-JET_DEFAULT_THEME = 'light-gray'
 
 AdminSite.site_header = 'Sensor Tracker'
