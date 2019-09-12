@@ -35,7 +35,7 @@ stop()
 {
     if status; then
         echo "-> Stopping django server"
-        pgrep -f "$UWSGI_CONFIG " | sudo xargs kill -9
+        pgrep -f "$UWSGI_CONFIG" | xargs kill -9
     fi
 }
 
@@ -55,7 +55,7 @@ start()
         LOG_FILE="${LOGS}/server.$(date "+%Y_%m_%d").log"
         nohup uwsgi ${UWSGI_CONFIG} >> ${LOG_FILE} 2>&1 &
         sleep 5
-        echo "tail -n 200 ${LOG_FILE}\n======================="
+        echo -e "tail -n 200 ${LOG_FILE}\n======================="
         tail -n 200 ${LOG_FILE}
     fi
 }
