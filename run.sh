@@ -22,7 +22,7 @@ init()
 
 status()
 {
-    if [[ "$(pgrep -f "$UWSGI_CONFIG ")" != "" ]]; then
+    if [[ "$(pgrep -f "$UWSGI_CONFIG")" != "" ]]; then
         echo "-  web server status: Running"
         return 0
     else
