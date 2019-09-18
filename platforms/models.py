@@ -93,8 +93,7 @@ class PlatformDeployment(models.Model):
                                help_text="The general comments for the deployment."
                                )
 
-    acknowledgement = models.CharField(
-        max_length=900,
+    acknowledgement = models.TextField(
         help_text="<b>Example:</b> This deployment is supported by funding from NOAA",
         null=True,
         blank=True

@@ -218,22 +218,32 @@ class GetQuerySetMethod:
 
     @staticmethod
     @query_optimize_decorator(['user', 'platform_deployment_comment_box'])
-    def get_deployment_comment(platform_name=None, start_time=None):
+    def get_deployment_comment(platform_name=None, start_time=None, modified_date=None):
         # query optimize problem
-        if not any([platform_name, start_time]):
+        if not any([platform_name, start_time, modified_date]):
             qs = PlatformDeploymentComment.objects.all()
         else:
-            deployment_qs = GetQuerySetMethod.get_deployment(None, platform_name=platform_name, start_time=start_time)
-            deployment_objs = list(deployment_qs)
-            if deployment_objs:
-                deployment_obj = deployment_objs[0]
-                try:
-                    deployment_comment_box = PlatformDeploymentCommentBox.objects.get(platform_deployment=deployment_obj)
-                except ObjectDoesNotExist:
-                    qs = PlatformDeploymentComment.objects.none()
+            if any([platform_name, start_time]):
+                deployment_qs = GetQuerySetMethod.get_deployment(None, platform_name=platform_name,
+                                                                 start_time=start_time)
+                deployment_objs = list(deployment_qs)
+                if deployment_objs:
+                    deployment_obj = deployment_objs[0]
+                    try:
+                        deployment_comment_box = PlatformDeploymentCommentBox.objects.get(
+                            platform_deployment=deployment_obj)
+                    except ObjectDoesNotExist:
+                        qs = PlatformDeploymentComment.objects.none()
+                    else:
+                        qs = PlatformDeploymentComment.objects.filter(
+                            platform_deployment_comment_box=deployment_comment_box)
+                        if modified_date:
+                            qs.filter(modified_date__gt=modified_date)
                 else:
-                    qs = PlatformDeploymentComment.objects.filter(
-                        platform_deployment_comment_box=deployment_comment_box)
+                    qs = PlatformDeploymentComment.objects.none()
+
+            elif modified_date:
+                qs = PlatformDeploymentComment.objects.filter(modified_date__gt=modified_date)
             else:
                 qs = PlatformDeploymentComment.objects.none()
         return qs
@@ -409,10 +419,17 @@ class GetQuerySetMethod:
 
     @staticmethod
     @query_optimize_decorator(['instrument', "sensor"])
-    def get_sensor_on_instrument(platform_name=None, deployment_start_time=None):
-        if any([platform_name, deployment_start_time]):
-            instruments_qs = GetQuerySetMethod.get_instruments_by_deployment(platform_name=platform_name,
-                                                                             deployment_start_time=deployment_start_time)
+    def get_sensor_on_instrument(platform_name=None, deployment_start_time=None, instrument_identifier=None):
+        if any([platform_name, deployment_start_time, instrument_identifier]):
+            instruments_qs = None
+            if any([platform_name, deployment_start_time]):
+                instruments_qs = GetQuerySetMethod.get_instruments_by_deployment(platform_name=platform_name,
+                                                                                 deployment_start_time=deployment_start_time)
+
+            if instruments_qs is None:
+                instruments_qs = Instrument.objects.filter(identifier=instrument_identifier)
+            else:
+                instruments_qs = instruments_qs.filter(identifier=instrument_identifier)
             sensor_on_instrument_list = list(instruments_qs)
             qs = SensorOnInstrument.objects.filter(instrument__in=sensor_on_instrument_list)
         else:
