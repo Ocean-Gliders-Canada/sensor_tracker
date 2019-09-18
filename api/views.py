@@ -104,7 +104,8 @@ class GetSensorOnInstrument(ApiBaseView):
     """Get sensor on instrument data"""
     accept_option = {
         "platform_name": "The name of the platform",
-        "deployment_start_time": "The start time of the deployment"
+        "deployment_start_time": "The start time of the deployment",
+        "instrument_identifier": "The identifier of instrument"
     }
     serializer_class = serializer.SensorOnInstrumentSerializer
     queryset_method = GetQuerySetMethod.get_sensor_on_instrument
@@ -189,7 +190,8 @@ class GetPlatformDeploymentComment(ApiBaseView):
     """Get platform deployment data"""
     accept_option = {
         "platform_name": "The name of deployment's platform",
-        "start_time": "The start time of deployment"
+        "start_time": "The start time of deployment",
+        "modified_date": "The time of comment modified"
     }
     serializer_class = serializer.PlatformDeploymentCommentSerializer
     queryset_method = GetQuerySetMethod.get_deployment_comment
