@@ -427,9 +427,14 @@ class GetQuerySetMethod:
                                                                                  deployment_start_time=deployment_start_time)
 
             if instruments_qs is None:
-                instruments_qs = Instrument.objects.filter(identifier=instrument_identifier)
+                if instrument_identifier:
+                    instruments_qs = Instrument.objects.filter(identifier=instrument_identifier)
+                else:
+                    instruments_qs = SensorOnInstrument.objects.none()
             else:
-                instruments_qs = instruments_qs.filter(identifier=instrument_identifier)
+                if instrument_identifier:
+                    instruments_qs = instruments_qs.filter(identifier=instrument_identifier)
+
             sensor_on_instrument_list = list(instruments_qs)
             qs = SensorOnInstrument.objects.filter(instrument__in=sensor_on_instrument_list)
         else:
