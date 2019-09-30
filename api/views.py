@@ -237,4 +237,7 @@ class APIRootView(views.APIView):
         ret["swagger"] = the_request._current_scheme_host + the_request.path + "swagger/"
         ret["redoc"] = the_request._current_scheme_host + the_request.path + "redoc/"
         ret["sensor_tracker_api_library"] = "https://gitlab.oceantrack.org/ceotr/metadata-tracker/tracker_api"
+        ret.move_to_end("sensor_tracker_api_library", last=False)
+        ret.move_to_end("redoc", last=False)
+        ret.move_to_end("swagger", last=False)
         return Response(ret)

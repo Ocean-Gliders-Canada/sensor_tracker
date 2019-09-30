@@ -175,15 +175,6 @@ class PlatformCommentAdmin(admin.ModelAdmin):
 admin.site.register(PlatformCommentBox, PlatformCommentAdmin)
 
 
-class PlatformDeploymentForm(ModelForm):
-    class Meta:
-        fields = '__all__'
-        widgets = {
-            'start_time': SuitSplitDateTimeWidget,
-            'end_time': SuitSplitDateTimeWidget
-        }
-
-
 class PlatformDeploymentHasNumber(admin.SimpleListFilter):
     """
     """
@@ -267,6 +258,19 @@ class ImageInline(admin.StackedInline):
             url=obj.picture.url))
 
         return u
+
+
+class PlatformDeploymentForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(PlatformDeploymentForm, self).__init__(*args, **kwargs)
+        self.fields['platform'].queryset = Platform.objects.all().order_by('-active')
+
+    class Meta:
+        fields = '__all__'
+        widgets = {
+            'start_time': SuitSplitDateTimeWidget,
+            'end_time': SuitSplitDateTimeWidget
+        }
 
 
 class PlatformDeploymentAdmin(admin.ModelAdmin):

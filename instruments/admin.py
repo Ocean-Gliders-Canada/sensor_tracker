@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.forms import ModelForm
 from suit.widgets import SuitSplitDateTimeWidget
 from django_admin_listfilter_dropdown.filters import DropdownFilter
+from django import forms
 
 from .models import (
     Instrument,
@@ -137,8 +138,27 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
 admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
 
 
+class SensorForm(ModelForm):
+    class Meta:
+        model = Sensor
+        fields = '__all__'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        include_in_output = cleaned_data.get("include_in_output")
+        long_name = cleaned_data.get("long_name")
+
+        if include_in_output and not long_name:
+            # Only do something if both fields are valid so far.
+
+            raise forms.ValidationError(
+                "Long name must be given when included in output checked"
+            )
+
+
 @admin.register(Sensor)
 class SensorAdmin(admin.ModelAdmin):
+    form = SensorForm
     search_fields = ['identifier', 'long_name', 'standard_name']
     readonly_fields = ('created_date', 'modified_date')
     list_display = ('identifier', 'long_name', 'standard_name', 'include_in_output', 'created_date',
@@ -162,7 +182,7 @@ class InstrumentPlatformTypeFilter(admin.SimpleListFilter):
         queryset = PlatformType.objects.all()
         for platform_type in queryset:
             list_of_platform_types.append(
-                (str(platform_type.id), platform_type.model)
+                (str(platform_type.id), platform_type.model + "-" + platform_type.manufacturer.name)
             )
         return sorted(list_of_platform_types, key=lambda tp: tp[1])
 
