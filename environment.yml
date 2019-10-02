@@ -1,4 +1,4 @@
-name: sensor_tracker
+name: sensor_tracker5
 channels:
   - conda-forge
   - anaconda
@@ -11,7 +11,6 @@ dependencies:
 - djangorestframework=3.9.4
 - psycopg2=2.7.6.1
 - Pillow=6.0.0
-- pip
 - django-debug-toolbar
 - django-filter
 - django-suit
@@ -20,5 +19,4 @@ dependencies:
   - drf-yasg
   - packaging
   - git+https://github.com/mrts/django-admin-list-filter-dropdown.git
-  - django-jet
   - git+ssh://git@gitlab.oceantrack.org/ceotr/app_common.git
