@@ -161,7 +161,6 @@ class PlatformDeployment(models.Model):
     sea_name = models.CharField(
         max_length=300,
         help_text="The sea in which the study is being conducted: <a href='https://www.nodc.noaa.gov/General/NODC-Archive/seanamelist.txt'>Sea Names</a>",
-        default="North Atlantic Ocean"
     )
 
     latitude = models.FloatField(
