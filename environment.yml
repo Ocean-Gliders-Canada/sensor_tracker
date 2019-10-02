@@ -1,4 +1,4 @@
-name: sensor_tracker5
+name: sensor_tracker
 channels:
   - conda-forge
   - anaconda

@@ -22,7 +22,7 @@ Setup:
 **Setup**
 
 * Refer to run.sh for most setup operations 
-* Setup virtualenv and create database locally
+* Setup virtualenv and create database(PostgreSQL v10) locally
   * `./run.sh dev init`
 * Run server locally
   * `./run.sh dev start`
