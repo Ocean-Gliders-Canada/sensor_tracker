@@ -138,7 +138,6 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 100
 }
 
-
 AdminSite.site_header = 'Sensor Tracker'
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -156,3 +155,5 @@ DATABASES = {
 }
 
 ALLOWED_HOSTS = yaml_config['allowed_hosts']
+
+FORCE_SCRIPT_NAME = '/sensor_tracker'
