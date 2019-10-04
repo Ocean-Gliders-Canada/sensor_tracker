@@ -293,9 +293,13 @@ class GetQuerySetMethod:
                 deployment_obj = deployment_objs[0]
                 start_t = deployment_obj.start_time
                 end_t = deployment_obj.end_time
-                instrument_on_platform_qs.prefetch_related("instrument").filter(
-                    Q(start_time__gte=start_t) & Q(end_time__lte=end_t) | Q(start_time__gte=start_t) & Q(
-                        end_time=None))
+                if end_t:
+                    instrument_on_platform_qs.prefetch_related("instrument").filter(
+                        Q(start_time__gte=start_t) & Q(end_time__lte=end_t) | Q(start_time__gte=start_t) & Q(
+                            end_time=None))
+                else:
+                    instrument_on_platform_qs.prefetch_related("instrument").filter(
+                        Q(start_time__gte=start_t))
                 for o in instrument_on_platform_qs:
                     pk_list.append(o.instrument_id)
         return Instrument.objects.filter(pk__in=pk_list)
