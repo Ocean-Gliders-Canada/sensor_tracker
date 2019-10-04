@@ -1,0 +1,24 @@
+{% load i18n static %}
+<div class="results">
+    <table id="result_list">
+        <thead>
+        <tr>
+            <th scope="col" {{ header.class_attrib }}>platform name</th>
+            <th scope="col" {{ header.class_attrib }}>start time</th>
+            <th scope="col" {{ header.class_attrib }}>end time</th>
+            <th scope="col" {{ header.class_attrib }}>edit</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in extra_content %}
+            <tr>
+                <td>{{ c.platform.name }}</td>
+                <td>{{ c.start_time }}</td>
+                <td>{{ c.end_time }}</td>
+                <td><a href="{{ c.url_edit_link }}">edit</a></td>
+            </tr>
+        {% endfor %}
+
+    </table>
+    <a href="/admin/instruments/instrumentonplatform/add/">add instrument on platform table</a>
+</div>

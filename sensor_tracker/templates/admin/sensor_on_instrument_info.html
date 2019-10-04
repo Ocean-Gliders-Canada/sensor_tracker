@@ -1,0 +1,32 @@
+{% load i18n static %}
+<div class="results">
+    <table id="result_list">
+        <thead>
+        <tr>
+            <th scope="col" {{ header.class_attrib }}>Sensor Identifier</th>
+            <th scope="col" {{ header.class_attrib }}>Sensor Long Name</th>
+            <th scope="col" {{ header.class_attrib }}>Sensor Standard Name</th>
+            <th scope="col" {{ header.class_attrib }}>Instrument identifier</th>
+            <th scope="col" {{ header.class_attrib }}>Instrument Serial Number</th>
+            <th scope="col" {{ header.class_attrib }}>Start Time</th>
+            <th scope="col" {{ header.class_attrib }}>End Time</th>
+            <th scope="col" {{ header.class_attrib }}>Edit</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in inline_content %}
+            <tr>
+                <td>{{ c.sensor.identifier }}</td>
+                <td>{{ c.sensor.long_name }}</td>
+                <td>{{ c.sensor.standard_name }}</td>
+                <td>{{ c.instrument.identifier }}</td>
+                <td>{{ c.instrument.serial }}</td>
+                <td>{{ c.start_time }}</td>
+                <td>{{ c.end_time }}</td>
+                <td><a href="{{ c.url_edit_link }}">edit</a></td>
+            </tr>
+        {% endfor %}
+
+    </table>
+    <a href="/admin/instruments/sensoroninstrument/add/">add sensor on instrument table</a>
+</div>

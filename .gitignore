@@ -12,3 +12,5 @@ uwsgi.ini.bak
 
 bin/*
 */bin/*
+
+.development.py

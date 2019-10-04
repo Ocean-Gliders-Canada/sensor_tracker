@@ -12,6 +12,7 @@ class InstitutionAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'street', 'city', 'province', 'postal_code', 'country', 'contact_name', 'contact_phone',
         'contact_email',
+
         'url', 'created_date', 'modified_date',)
     readonly_fields = ('created_date', 'modified_date',)
 
@@ -25,6 +26,7 @@ class ProjectAdmin(admin.ModelAdmin):
 class ManufacturerAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'street', 'city', 'province', 'postal_code', 'country', 'contact_name', 'contact_phone',
+
         'contact_email',
         'created_date', 'modified_date')
     readonly_fields = ('created_date', 'modified_date',)

@@ -1,5 +1,0 @@
-django==1.11
-django-suit==0.2.23
-djangorestframework==3.7.1
-psycopg2==2.7.4
-uWSGI==2.0.14

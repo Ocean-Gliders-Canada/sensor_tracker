@@ -1,0 +1,54 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "model": "Slocum Glider G2",
+      "manufacturer": 1
+    },
+    {
+      "id": 3,
+      "model": "VR4-UWM",
+      "manufacturer": 2
+    },
+    {
+      "id": 4,
+      "model": "VR3-UWM",
+      "manufacturer": 3
+    },
+    {
+      "id": 5,
+      "model": "VM4-WG",
+      "manufacturer": 1
+    },
+    {
+      "id": 6,
+      "model": "Slocum Glider G1",
+      "manufacturer": 1
+    },
+    {
+      "id": 2,
+      "model": "Wave Glider SV2",
+      "manufacturer": 2
+    },
+    {
+      "id": 7,
+      "model": "Profiler",
+      "manufacturer": 1
+    },
+    {
+      "id": 8,
+      "model": "VOS",
+      "manufacturer": 2
+    },
+    {
+      "id": 9,
+      "model": "Slocum Glider G3",
+      "manufacturer": 1
+    },
+    {
+      "id": 10,
+      "model": "Mooring",
+      "manufacturer": 3
+    }
+  ]
+}
