@@ -6,6 +6,7 @@ PENV_TYPE=conda
 
 if [[ ! -d ~/code/deploy_tools ]]; then
     echo "Missing ceotr-public/deploy_tools repo, clone to ~/code first"
+    echo "git clone git@gitlab.oceantrack.org:ceotr/deploy_tools.git"
     exit 1
 fi
 source ~/code/deploy_tools/run_common.sh
