@@ -327,6 +327,7 @@ class SensorAttachedToInstrumentFilter(admin.SimpleListFilter):
             (self.NO_ATTACHED, u'No attached on a instrument')
         )
 
+
     def queryset(self, request, queryset):
 
         the_value = self.value()
