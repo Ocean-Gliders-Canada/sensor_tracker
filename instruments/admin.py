@@ -5,13 +5,14 @@ from django_admin_listfilter_dropdown.filters import DropdownFilter
 from django import forms
 
 from instruments.admin_filter import (
-    InstrumentIdentifierFilter,
     InstrumentOnPlatformSortFilter,
     InstrumentOnPlatformTypeListFilter,
     InstrumentPlatformTypeFilter,
-    SensorAttachedToInstrumentFilter,
+    InstrumentOnPlatformInstrumentIdentifierFilter,
+    InstrumentOnPlatformPlatformNameFilter,
     SensorInstrumentIdentifierFilter,
-    SensorPlatformNameFilter
+    SensorPlatformNameFilter,
+    InstrumentAttachOnPlatformFilter
 )
 
 from .models import (
@@ -40,8 +41,8 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
     form = InstrumentOnPlatformForm
     list_filter = (
         InstrumentOnPlatformTypeListFilter,
-        ('platform__name', DropdownFilter),
-        ('instrument__identifier', DropdownFilter),
+        InstrumentOnPlatformPlatformNameFilter,
+        InstrumentOnPlatformInstrumentIdentifierFilter,
         InstrumentOnPlatformSortFilter)
 
     list_display = ('instrument', 'platform', 'start_time', 'end_time', 'comment')
@@ -128,7 +129,8 @@ class InstrumentAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date')
 
     list_filter = (InstrumentPlatformTypeFilter,
-                   ('identifier', DropdownFilter))
+                   ('identifier', DropdownFilter),
+                   InstrumentAttachOnPlatformFilter)
 
     search_fields = ['identifier', 'short_name', 'long_name', 'serial', 'manufacturer__name']
     list_display = ('identifier', 'short_name', 'long_name', 'serial', 'manufacturer', 'created_date', 'modified_date')
