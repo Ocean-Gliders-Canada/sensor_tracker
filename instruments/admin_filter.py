@@ -324,8 +324,9 @@ class SensorAttachedToInstrumentFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         return (
             (self.ATTACHED, u'Attached on a instrument'),
-            (self.NO_ATTACHED, u'No attached on instrument')
+            (self.NO_ATTACHED, u'No attached on a instrument')
         )
+
 
     def queryset(self, request, queryset):
 

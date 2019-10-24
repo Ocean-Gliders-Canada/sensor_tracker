@@ -78,7 +78,6 @@ class SensorAdmin(admin.ModelAdmin):
                     'modified_date')
     list_filter = (
         'include_in_output',
-        SensorAttachedToInstrumentFilter,
         SensorPlatformNameFilter,
         SensorInstrumentIdentifierFilter,
     )
