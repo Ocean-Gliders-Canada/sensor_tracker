@@ -206,10 +206,7 @@ class InstrumentOnPlatformPlatformNameFilter(admin.SimpleListFilter):
 
 # Sensor filters
 
-
 class SensorPlatformNameFilter(admin.SimpleListFilter):
-    """
-    """
     title = 'Platform Name'
 
     parameter_name = 'platform_name'
@@ -220,19 +217,14 @@ class SensorPlatformNameFilter(admin.SimpleListFilter):
         return platform_list_order_by_active()
 
     def queryset(self, request, queryset):
-        """Filter the queryset being returned based on the PlatformType that was selected
-        """
+
         if self.value() is None:
             return queryset
         else:
-            queryset = GetQuerySetMethod.get_sensors(..., platform_name=self.value())
-
-            return queryset
+            return GetQuerySetMethod.get_sensors(..., platform_name=self.value())
 
 
 class SensorInstrumentIdentifierFilter(admin.SimpleListFilter):
-    """
-    """
     title = 'Instrument Identifier'
 
     parameter_name = 'instrument_identifier'

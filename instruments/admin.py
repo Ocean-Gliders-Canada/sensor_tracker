@@ -1,11 +1,11 @@
 from django.contrib import admin
 from django.forms import ModelForm
 from suit.widgets import SuitSplitDateTimeWidget
-from django_admin_listfilter_dropdown.filters import DropdownFilter
 from django import forms
 
 from instruments.admin_filter import (
     InstrumentPlatformNameFilter,
+
     InstrumentOnPlatformSortFilter,
     InstrumentOnPlatformTypeListFilter,
     InstrumentPlatformTypeFilter,
