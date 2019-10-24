@@ -156,4 +156,4 @@ DATABASES = {
 
 ALLOWED_HOSTS = yaml_config['allowed_hosts']
 
-FORCE_SCRIPT_NAME = '/sensor_tracker'
+
