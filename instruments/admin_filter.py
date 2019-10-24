@@ -32,6 +32,21 @@ def platform_type_list_ordered():
     return sorted(list_of_platform_types, key=lambda tp: tp[1])
 
 
+def decode_instrument_identifier_serial(the_str):
+    import re
+    pattern = '^(.+)\+-\+(.+)$'
+    res = re.match(pattern, the_str)
+    identifier = res.group(1)
+    serial = res.group(2)
+    if serial == 'None':
+        serial = None
+    return identifier, serial
+
+
+def encode_instrument_identifier_serial(instrument_obj):
+    return str(instrument_obj.identifier) + '+-+' + str(instrument_obj.serial)
+
+
 def instrument_list():
     list_of_instruments = []
     queryset = Instrument.objects.all()
@@ -39,7 +54,7 @@ def instrument_list():
         join_list = [x for x in [instrument_obj.identifier, instrument_obj.short_name, instrument_obj.serial] if
                      x is not None]
         list_of_instruments.append(
-            (instrument_obj.identifier,
+            (encode_instrument_identifier_serial(instrument_obj),
              "-".join(join_list))
         )
     return list_of_instruments
@@ -105,8 +120,6 @@ class InstrumentPlatformNameFilter(admin.SimpleListFilter):
 # Instrument On Platform filters
 
 class InstrumentOnPlatformTypeListFilter(admin.SimpleListFilter):
-    """
-    """
     title = 'Platform Type'
 
     parameter_name = 'platform_type'
@@ -163,9 +176,9 @@ class InstrumentOnPlatformSortFilter(admin.SimpleListFilter):
 class InstrumentOnPlatformInstrumentIdentifierFilter(admin.SimpleListFilter):
     """
     """
-    title = 'Instrument Identifier'
+    title = 'Instrument Identifier and Serial'
 
-    parameter_name = 'instrument_identifier'
+    parameter_name = 'instrument_identifier_serial'
 
     template = 'django_admin_listfilter_dropdown/dropdown_filter.html'
 
@@ -176,10 +189,13 @@ class InstrumentOnPlatformInstrumentIdentifierFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
 
-        if self.value() is None:
+        the_value = self.value()
+        if the_value is None:
             return queryset
         else:
-            return GetQuerySetMethod._get_instrument_on_platform(identifier=self.value())
+            identifier, serial = decode_instrument_identifier_serial(the_value)
+            return GetQuerySetMethod.get_instrument_on_platform_by_instrument(identifier=identifier,
+                                                                              serial=serial)
 
 
 class InstrumentOnPlatformPlatformNameFilter(admin.SimpleListFilter):
@@ -240,6 +256,7 @@ class SensorInstrumentIdentifierFilter(admin.SimpleListFilter):
         if self.value() is None:
             return queryset
         else:
-            queryset = GetQuerySetMethod.get_sensors(..., instrument_identifier=self.value())
+            identifier, serial = decode_instrument_identifier_serial(self.value())
+            queryset = GetQuerySetMethod.get_sensors(..., instrument_identifier=identifier)
 
             return queryset

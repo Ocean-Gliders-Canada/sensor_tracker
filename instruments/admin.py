@@ -43,7 +43,8 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
         InstrumentOnPlatformTypeListFilter,
         InstrumentOnPlatformPlatformNameFilter,
         InstrumentOnPlatformInstrumentIdentifierFilter,
-        InstrumentOnPlatformSortFilter)
+        InstrumentOnPlatformSortFilter
+         )
 
     list_display = ('instrument', 'platform', 'start_time', 'end_time', 'comment')
     readonly_fields = ('created_date', 'modified_date',)

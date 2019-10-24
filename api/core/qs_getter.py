@@ -353,6 +353,15 @@ class GetQuerySetMethod:
         return qs
 
     @staticmethod
+    def get_instrument_on_platform_by_instrument(identifier=None, serial=None):
+        qs = InstrumentOnPlatform.objects.all()
+        if identifier:
+            qs = qs.filter(instrument__identifier=identifier)
+        if serial:
+            qs = qs.filter(instrument__serial=serial)
+        return qs
+
+    @staticmethod
     @query_optimize_decorator(["manufacturer"])
     def get_platform_type(model=None, how="match"):
         # ["match", "contains", "regex"]
