@@ -1,118 +1,51 @@
-from django.db.models import Q
 from django.contrib import admin
 from platforms.models import PlatformType, Platform
 
 from .models import (
     Instrument,
     InstrumentOnPlatform,
-    SensorOnInstrument,
 )
-from django.contrib.admin.filters import (
-    AllValuesFieldListFilter,
-    ChoicesFieldListFilter,
-    RelatedFieldListFilter, RelatedOnlyFieldListFilter
-)
+
 from api.core.qs_getter import GetQuerySetMethod
 
 
-# Admin Instrument
-
-class InstrumentOnPlatformTypeListFilter(admin.SimpleListFilter):
-    """
-    """
-    title = 'Platform Type'
-
-    parameter_name = 'platform_type'
-
-    default_value = 'All'
-
-    def lookups(self, request, model_admin):
-        """Return a list of possible platform types and their respuctive PlatformType.id values
-        """
-        list_of_platform_types = []
-        queryset = PlatformType.objects.all()
-        for platform_type in queryset:
-            list_of_platform_types.append(
-                (str(platform_type.id), platform_type.model)
-            )
-        return sorted(list_of_platform_types, key=lambda tp: tp[1])
-
-    def queryset(self, request, queryset):
-        """Filter the queryset being returned based on the PlatformType that was selected
-        """
-        if self.value():
-            if self.value() == 'All':
-                return queryset
-            else:
-                all_relevant_instruments = InstrumentOnPlatform.objects.filter(
-                    platform__platform_type=self.value()
-                ).values()
-
-                relevant_instruments_on_platforms = []
-
-                for r in all_relevant_instruments:
-                    relevant_instruments_on_platforms.append(r['id'])
-
-                return queryset.filter(pk__in=relevant_instruments_on_platforms)
-
-    def value(self):
-        """Return a default value, or the selected platform type
-        """
-        value = super(InstrumentOnPlatformTypeListFilter, self).value()
-        if value is None:
-            if self.default_value is None:
-                # If there is at least one platform type, return the first by name. Otherwise, None.
-                first_platform_type = PlatformType.objects.first()
-                value = None if first_platform_type is None else first_platform_type.id
-                self.default_value = value
-            else:
-                value = self.default_value
-        return str(value)
+def platform_list_order_by_active():
+    list_of_platform_name = []
+    queryset = Platform.objects.all().order_by('-active')
+    for platform_obj in queryset:
+        join_list = [x for x in [platform_obj.name, platform_obj.serial_number] if
+                     x is not None]
+        list_of_platform_name.append(
+            (platform_obj.name,
+             "-".join(join_list))
+        )
+    return list_of_platform_name
 
 
-class InstrumentOnPlatformSortFilter(admin.SimpleListFilter):
-    title = 'Sort By'
+def platform_type_list_ordered():
+    list_of_platform_types = []
+    queryset = PlatformType.objects.all().prefetch_related('manufacturer')
+    for platform_type in queryset:
+        list_of_platform_types.append(
+            (str(platform_type.id), platform_type.model + "-" + platform_type.manufacturer.name)
+        )
+    return sorted(list_of_platform_types, key=lambda tp: tp[1])
 
-    parameter_name = 'sort_by'
 
-    default_value = 'All'
+def instrument_list():
+    list_of_instruments = []
+    queryset = Instrument.objects.all()
+    for instrument_obj in queryset:
+        join_list = [x for x in [instrument_obj.identifier, instrument_obj.short_name, instrument_obj.serial] if
+                     x is not None]
+        list_of_instruments.append(
+            (instrument_obj.identifier,
+             "-".join(join_list))
+        )
+    return list_of_instruments
 
-    def lookups(self, request, model_admin):
-        """Return a list of possible platform types and their respuctive PlatformType.id values
-        """
-        sort_ops = [
-            ('instrument__identifier', 'Instrument Identifier'),
-            ('instrument__short_name', 'Instrument Short Name'),
-            ('instrument__long_name', 'Instrument Long Name'),
-            ('instrument__modified_date', 'Instrument Date Modified'),
-            ('platform__name', 'Platform Name'),
-            ('platform__purchase_date', 'Platform Purchase Date'),
-        ]
-        return sort_ops
 
-    def queryset(self, request, queryset):
-        """Filter the queryset being returned based on the PlatformType that was selected
-        """
-        if self.value():
-            if self.value() == 'All':
-                return queryset
-            else:
-                return queryset.order_by(self.value())
-
-    def value(self):
-        """Return a default value, or the selected platform type
-        """
-        value = super(InstrumentOnPlatformSortFilter, self).value()
-        if value is None:
-            if self.default_value is None:
-                # If there is at least one platform type, return the first by name. Otherwise, None.
-                first_platform_type = PlatformType.objects.first()
-                value = None if first_platform_type is None else first_platform_type.id
-                self.default_value = value
-            else:
-                value = self.default_value
-        return str(value)
-
+# Admin Instrument filters
 
 class InstrumentPlatformTypeFilter(admin.SimpleListFilter):
     """
@@ -172,88 +105,71 @@ class InstrumentPlatformTypeFilter(admin.SimpleListFilter):
         return str(value)
 
 
-class InstrumentIdentifierFilter(admin.SimpleListFilter):
-    """
-    """
-    title = 'Identifier'
-
-    parameter_name = 'identifier'
-
-    default_value = 'All'
+class InstrumentAttachOnPlatformFilter(admin.SimpleListFilter):
+    title = 'Platform'
+    parameter_name = 'platform'
+    template = 'django_admin_listfilter_dropdown/dropdown_filter.html'
 
     def lookups(self, request, model_admin):
-        """Return a list of possible platform types and their respuctive PlatformType.id values
-        """
-        list_of_platform_types = []
-        queryset = Instrument.objects.all()
-        for instrument in queryset:
-            temp = (instrument.identifier, instrument.identifier)
-            if temp not in list_of_platform_types:
-                list_of_platform_types.append(
-                    temp
-                )
-        return sorted(list_of_platform_types, key=lambda tp: tp[1])
+        return platform_list_order_by_active()
+
+    def queryset(self, request, queryset):
+        the_value = self.value()
+        if the_value is None:
+            return queryset
+        return GetQuerySetMethod.get_instrument_by_platform(platform_name=the_value)
+
+
+# Instrument On Platform filters
+
+class InstrumentOnPlatformTypeListFilter(admin.SimpleListFilter):
+    """
+    """
+    title = 'Platform Type'
+
+    parameter_name = 'platform_type'
+
+    def lookups(self, request, model_admin):
+        return platform_type_list_ordered()
 
     def queryset(self, request, queryset):
         """Filter the queryset being returned based on the PlatformType that was selected
         """
-        if self.value():
-            if self.value() == 'All':
-                return queryset
-            else:
-                all_relevant_instruments = Instrument.objects.filter(
-                    identifier=self.value()
-                ).values()
-                relevant_instruments = {}
-                for i in all_relevant_instruments:
-                    if i['id'] not in relevant_instruments:
-                        relevant_instruments[i['id']] = i
-                    elif i['modified_date'] > relevant_instruments[i['id']]['modified_date']:
-                        relevant_instruments[i['instrument_id']] = i
-                        # elif i['end_time'] is None:
-                        #     relevant_instruments[i['instrument_id']] = i
 
-                return queryset.filter(pk__in=relevant_instruments.keys())
+        if self.value() is None:
+            return queryset
+        else:
+            all_relevant_instruments = InstrumentOnPlatform.objects.filter(
+                platform__platform_type=self.value()
+            ).values()
 
-    def value(self):
-        """Return a default value, or the selected platform type
-        """
-        value = super(InstrumentIdentifierFilter, self).value()
-        if value is None:
-            if self.default_value is None:
-                # If there is at least one platform type, return the first by name. Otherwise, None.
-                first_platform_type = PlatformType.objects.first()
-                value = None if first_platform_type is None else first_platform_type.id
-                self.default_value = value
-            else:
-                value = self.default_value
-        return str(value)
+            relevant_instruments_on_platforms = []
+
+            for r in all_relevant_instruments:
+                relevant_instruments_on_platforms.append(r['id'])
+
+            return queryset.filter(pk__in=relevant_instruments_on_platforms)
 
 
-# Sensor filters
-class SensorInstrumentIdentifierFilter(admin.SimpleListFilter):
-    """
-    """
-    title = 'Instrument'
+class InstrumentOnPlatformSortFilter(admin.SimpleListFilter):
+    title = 'Sort By'
 
-    parameter_name = 'instrument_identifier'
+    parameter_name = 'sort_by'
 
     default_value = 'All'
-    template = 'django_admin_listfilter_dropdown/dropdown_filter.html'
 
     def lookups(self, request, model_admin):
         """Return a list of possible platform types and their respuctive PlatformType.id values
         """
-        list_of_platform_types = []
-        queryset = Instrument.objects.all()
-        for instrument_obj in queryset:
-            join_list = [x for x in [instrument_obj.identifier, instrument_obj.short_name, instrument_obj.serial] if
-                         x is not None]
-            list_of_platform_types.append(
-                (instrument_obj.identifier,
-                 "-".join(join_list))
-            )
-        return list_of_platform_types
+        sort_ops = [
+            ('instrument__identifier', 'Instrument Identifier'),
+            ('instrument__short_name', 'Instrument Short Name'),
+            ('instrument__long_name', 'Instrument Long Name'),
+            ('instrument__modified_date', 'Instrument Date Modified'),
+            ('platform__name', 'Platform Name'),
+            ('platform__purchase_date', 'Platform Purchase Date'),
+        ]
+        return sort_ops
 
     def queryset(self, request, queryset):
         """Filter the queryset being returned based on the PlatformType that was selected
@@ -261,20 +177,60 @@ class SensorInstrumentIdentifierFilter(admin.SimpleListFilter):
         if self.value() is None:
             return queryset
         else:
-            all_relevant_instruments = SensorOnInstrument.objects.filter(
-                instrument__identifier=self.value()
-            ).values()
-            relevant_instrument_ids = []
-            for i in all_relevant_instruments:
-                relevant_instrument_ids.append(i['id'])
+            return queryset.order_by(self.value())
 
-            return queryset.filter(pk__in=relevant_instrument_ids)
+
+class InstrumentOnPlatformInstrumentIdentifierFilter(admin.SimpleListFilter):
+    """
+    """
+    title = 'Instrument Identifier'
+
+    parameter_name = 'instrument_identifier'
+
+    template = 'django_admin_listfilter_dropdown/dropdown_filter.html'
+
+    def lookups(self, request, model_admin):
+        """Return a list of possible platform types and their respuctive PlatformType.id values
+        """
+        return instrument_list()
+
+    def queryset(self, request, queryset):
+
+        if self.value() is None:
+            return queryset
+        else:
+            return GetQuerySetMethod._get_instrument_on_platform(identifier=self.value())
+
+
+class InstrumentOnPlatformPlatformNameFilter(admin.SimpleListFilter):
+    """
+    """
+    title = 'Platform Name'
+
+    parameter_name = 'platform_name'
+
+    template = 'django_admin_listfilter_dropdown/dropdown_filter.html'
+
+    def lookups(self, request, model_admin):
+        """Return a list of possible platform types and their respuctive PlatformType.id values
+        """
+        return platform_list_order_by_active()
+
+    def queryset(self, request, queryset):
+
+        if self.value() is None:
+            return queryset
+        else:
+            return GetQuerySetMethod.get_instrument_on_platform_by_platform(platform_name=self.value())
+
+
+# Sensor filters
 
 
 class SensorPlatformNameFilter(admin.SimpleListFilter):
     """
     """
-    title = 'platform_name'
+    title = 'Platform Name'
 
     parameter_name = 'platform_name'
 
@@ -282,18 +238,7 @@ class SensorPlatformNameFilter(admin.SimpleListFilter):
     template = 'django_admin_listfilter_dropdown/dropdown_filter.html'
 
     def lookups(self, request, model_admin):
-        """Return a list of possible platform types and their respuctive PlatformType.id values
-        """
-        list_of_platform_name = []
-        queryset = Platform.objects.all().order_by('-active')
-        for platform_obj in queryset:
-            join_list = [x for x in [platform_obj.name, platform_obj.serial_number] if
-                         x is not None]
-            list_of_platform_name.append(
-                (platform_obj.name,
-                 "-".join(join_list))
-            )
-        return list_of_platform_name
+        return platform_list_order_by_active()
 
     def queryset(self, request, queryset):
         """Filter the queryset being returned based on the PlatformType that was selected
@@ -305,44 +250,25 @@ class SensorPlatformNameFilter(admin.SimpleListFilter):
 
             return queryset
 
-    def value(self):
-        """
-        Return the value (in string format) provided in the request's
-        query string for this filter, if any, or None if the value wasn't
-        provided.
-        """
-        return self.used_parameters.get(self.parameter_name)
 
+class SensorInstrumentIdentifierFilter(admin.SimpleListFilter):
+    """
+    """
+    title = 'Instrument Identifier'
 
-class SensorAttachedToInstrumentFilter(admin.SimpleListFilter):
-    title = 'attached on instrument'
-    parameter_name = 'sensor_attached_to_instrument'
-    default_value = '0'
-    ATTACHED = '1'
-    NO_ATTACHED = '2'
+    parameter_name = 'instrument_identifier'
+
+    template = 'django_admin_listfilter_dropdown/dropdown_filter.html'
 
     def lookups(self, request, model_admin):
-        return (
-            (self.ATTACHED, u'Attached on a instrument'),
-            (self.NO_ATTACHED, u'No attached on a instrument')
-        )
-
+        return instrument_list()
 
     def queryset(self, request, queryset):
-
-        the_value = self.value()
-        if the_value is None:
+        """Filter the queryset being returned based on the PlatformType that was selected
+        """
+        if self.value() is None:
             return queryset
+        else:
+            queryset = GetQuerySetMethod.get_sensors(..., instrument_identifier=self.value())
 
-        all_sensor_on_instrument_qs = SensorOnInstrument.objects.filter(end_time=None).prefetch_related('instrument')
-        no_repeat_set = {}
-        for obj in all_sensor_on_instrument_qs:
-            no_repeat_set[obj.instrument.id] = None
-        the_keys = no_repeat_set.keys()
-        if the_value == self.ATTACHED:
-            queryset = queryset.filter(pk__in=the_keys)
-
-        if the_value == self.NO_ATTACHED:
-            queryset = queryset.filter(~Q(id__in=the_keys))
-
-        return queryset
+            return queryset
