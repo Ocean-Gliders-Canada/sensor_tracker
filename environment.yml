@@ -15,8 +15,8 @@ dependencies:
 - django-debug-toolbar
 - django-filter
 - pyyaml
-- uwsgi==2.0.18
 - pip:
+  - uwsgi==2.0.18
   - drf-yasg
   - packaging
   - django-suit
