@@ -7,7 +7,6 @@ channels:
   - hargup/label/pypi
 dependencies:
 - python=3.7
-- uwsgi=2.0.18
 - django=2.2
 - pip
 - djangorestframework=3.9.4
@@ -18,6 +17,7 @@ dependencies:
 - django-suit
 - pyyaml
 - pip:
+  - uwsgi==2.0.17
   - drf-yasg
   - packaging
   - git+https://github.com/mrts/django-admin-list-filter-dropdown.git
