@@ -46,8 +46,22 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
         InstrumentOnPlatformSortFilter
     )
 
-    list_display = ('instrument', 'platform', 'start_time', 'end_time', 'comment')
+    list_display = (
+        'instrument_identifier', 'instrument_serial', 'instrument_short_name', 'instrument_long_name', 'platform',
+        'start_time', 'end_time', 'comment')
     readonly_fields = ('created_date', 'modified_date',)
+
+    def instrument_identifier(self, instance):
+        return instance.instrument.identifier
+
+    def instrument_long_name(self, instance):
+        return instance.instrument.long_name
+
+    def instrument_short_name(self, instance):
+        return instance.instrument.short_name
+
+    def instrument_serial(self, instance):
+        return instance.instrument.serial
 
 
 admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
