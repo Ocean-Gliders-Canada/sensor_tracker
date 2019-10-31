@@ -11,10 +11,11 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
-import shutil
-import yaml
-from app_common.utilities.file_prepare import check_create_dir
+
 from django.contrib.admin import AdminSite
+
+from app_common.utilities.file_prepare import check_create_dir
+from app_common.ceotr_django.conf import ConfigAgent
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -120,14 +121,9 @@ SUIT_CONFIG = {
 
 RESOURCE_DIR = check_create_dir(os.path.join(os.path.expanduser("~"), "resource"))
 PROJECT_RESOURCE_DIR = check_create_dir(os.path.join(RESOURCE_DIR, PROJECT_NAME))
-
-YAML_PATH = os.path.join(PROJECT_RESOURCE_DIR, "config.yml")
-
-if not os.path.exists(YAML_PATH):
-    shutil.copy(os.path.join(os.path.dirname(__file__), "config.yml.stock"), YAML_PATH)
-
-yaml_file = open(YAML_PATH, 'r')
-yaml_config = yaml.load(yaml_file)
+config_agent = ConfigAgent()
+config_agent.load(setting_dir=PROJECT_RESOURCE_DIR,
+                  setting_template=os.path.join(os.path.dirname(__file__), 'config.yml.stock'))
 
 MEDIA_ROOT = PROJECT_RESOURCE_DIR
 MEDIA_URL = '/media/'
@@ -141,19 +137,38 @@ REST_FRAMEWORK = {
 AdminSite.site_header = 'Sensor Tracker'
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = yaml_config['secret_key']
+SECRET_KEY = config_agent.general_info['SECRET_KEY']
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': yaml_config['database']['name'],
-        'USER': yaml_config['database']['user'],
-        'PASSWORD': yaml_config['database']['password'],
+        'NAME': config_agent.database['NAME'],
+        'USER': config_agent.database['USER'],
+        'PASSWORD': config_agent.database['PASSWORD'],
         'HOST': 'localhost',
         'PORT': '5432'
     }
 }
 
-ALLOWED_HOSTS = yaml_config['allowed_hosts']
+ALLOWED_HOSTS = config_agent.general_info['ALLOWED_HOSTS']
 
-FORCE_SCRIPT_NAME = '/sensor_tracker'
+DEBUG = config_agent.DEBUG
+
+STATIC_ROOT = '/etc/nginx/html/sensor_tracker/'
+
+if config_agent.general_info['STATIC_ROOT']:
+    STATIC_ROOT = config_agent.general_info['STATIC_ROOT']
+
+if DEBUG:
+    DEVELOPMENT_APPS = [
+        'debug_toolbar',
+    ]
+
+    INSTALLED_APPS = INSTALLED_APPS + DEVELOPMENT_APPS
+
+    DEVELOPMENT_MIDDLEWAARE = [
+        'debug_toolbar.middleware.DebugToolbarMiddleware'
+    ]
+    MIDDLEWARE = MIDDLEWARE + DEVELOPMENT_MIDDLEWAARE
+
+    INTERNAL_IPS = ['127.0.0.1']

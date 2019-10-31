@@ -8,7 +8,6 @@ from django.db.models import F
 from django.utils.safestring import mark_safe
 from django.forms.widgets import ClearableFileInput
 from cgi import escape
-# from django.utils.encoding import force_unicode
 
 from django_admin_listfilter_dropdown.filters import DropdownFilter
 
@@ -23,6 +22,8 @@ from .models import (
     PlatformCommentBox,
     DeploymentImage
 )
+
+from instruments.admin_filter import platform_type_list_ordered
 
 
 @admin.register(PlatformType)
@@ -50,7 +51,6 @@ class PlatformActiveFilter(admin.SimpleListFilter):
         """Return a list of possible platform types and their respuctive PlatformType.id values
         """
         return (
-            ('0', (u'All')),
             ('1', (u'Yes')),
             ('2', (u'No')),
         )
@@ -58,19 +58,15 @@ class PlatformActiveFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         """Filter the queryset being returned based on the PlatformType that was selected
         """
-        if self.value() == '0':
+        if self.value() is None:
             return queryset
         if self.value() == '1':
             return queryset.filter(active=True)
         if self.value() == '2':
             return queryset.filter(active=False)
-        queryset = queryset.filter(active=True)
-        return queryset
 
 
 class PlatformListFilter(admin.SimpleListFilter):
-    """
-    """
     title = 'Platform Type'
 
     parameter_name = 'platform_type'
@@ -80,22 +76,15 @@ class PlatformListFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         """Return a list of possible platform types and their respuctive PlatformType.id values
         """
-        list_of_platform_types = []
-        queryset = PlatformType.objects.all()
-        for platform_type in queryset:
-            list_of_platform_types.append(
-                (str(platform_type.id), platform_type.model)
-            )
-        return sorted(list_of_platform_types, key=lambda tp: tp[1])
+        return platform_type_list_ordered()
 
     def queryset(self, request, queryset):
         """Filter the queryset being returned based on the PlatformType that was selected
         """
-        if self.value():
-            if self.value() == 'All':
-                return queryset
-            else:
-                return queryset.filter(platform_type__id=self.value())
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(platform_type__id=self.value())
 
     def value(self):
         """Return a default value, or the selected platform type
