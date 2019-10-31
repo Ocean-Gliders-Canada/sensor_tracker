@@ -6,7 +6,7 @@ channels:
   - pypi
   - hargup/label/pypi
 dependencies:
-- python=3.7
+- python=3.6
 - django=2.2
 - pip
 - djangorestframework=3.9.4
