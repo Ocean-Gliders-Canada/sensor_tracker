@@ -1,7 +1,10 @@
-environment: null
-allowed_hosts: null
-secret_key: null
+general_info:
+    SECRET_KEY: ''
+    ALLOWED_HOSTS: ''
+    STATIC_ROOT: ''
+
+
 database:
-    name: 'sensor_tracker'
-    user: 'sensor_tracker'
-    password: null
+    NAME: ''
+    USER: ''
+    PASSWORD: ''
