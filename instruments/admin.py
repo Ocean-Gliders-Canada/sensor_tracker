@@ -1,11 +1,11 @@
 from django.contrib import admin
 from django.forms import ModelForm
-from suit.widgets import SuitSplitDateTimeWidget
 from django import forms
+
+from suit.widgets import SuitSplitDateTimeWidget
 
 from instruments.admin_filter import (
     InstrumentPlatformNameFilter,
-
     InstrumentOnPlatformSortFilter,
     InstrumentOnPlatformTypeListFilter,
     InstrumentPlatformTypeFilter,
@@ -24,7 +24,7 @@ from .models import (
     SensorOnInstrument,
 )
 
-from platforms.models import PlatformType, Platform
+from platforms.models import Platform
 
 
 class InstrumentOnPlatformForm(ModelForm):
@@ -44,7 +44,7 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
         InstrumentOnPlatformPlatformNameFilter,
         InstrumentOnPlatformInstrumentIdentifierFilter,
         InstrumentOnPlatformSortFilter
-         )
+    )
 
     list_display = ('instrument', 'platform', 'start_time', 'end_time', 'comment')
     readonly_fields = ('created_date', 'modified_date',)
