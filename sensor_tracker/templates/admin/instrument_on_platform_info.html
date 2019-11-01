@@ -12,10 +12,10 @@
         <tbody>
         {% for c in extra_content %}
             <tr>
-                <td>{{ c.platform.name }}</td>
+                <td><a href="{{ c.url_platform_change }}">{{ c.platform.name }}</a></td>
                 <td>{{ c.start_time }}</td>
                 <td>{{ c.end_time }}</td>
-                <td><a href="{{ c.url_edit_link }}">edit</a></td>
+                <td><a href="{{ c.url_edit_link }}">edit instrument on platform</a></td>
             </tr>
         {% endfor %}
 

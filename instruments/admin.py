@@ -164,13 +164,14 @@ class InstrumentAdmin(admin.ModelAdmin):
         objs = list(instrument_on_platform_qs)
         for obj in objs:
             obj.url_edit_link = make_edit_link(obj)
-
+            obj.url_platform_change = make_platform_change_link(obj)
         sensor_on_instrument = SensorOnInstrument.objects.filter(instrument=instrument_obj)
         sensor_on_instrument = sensor_on_instrument.prefetch_related('sensor').prefetch_related('instrument')
 
         sensor_obj_set = []
         for soi in sensor_on_instrument:
             soi.url_edit_link = make_edit_link(soi)
+            soi.url_sensor_cahnge = make_sensor_change_link(soi)
             sensor_obj_set.append(soi)
 
         extra_context = {
@@ -187,16 +188,33 @@ def make_edit_link(instance):
     return link
 
 
+def make_sensor_change_link(instance):
+    sensor_obj = instance.sensor
+    sensor_obj_meta = sensor_obj._meta
+    link_format = "/admin/{app}/{model}/{instance_id}/change"
+    link = link_format.format(app=sensor_obj_meta.app_label, model=sensor_obj_meta.model_name,
+                              instance_id=sensor_obj.id)
+    return link
+
+
+def make_platform_change_link(instance):
+    platform_obj = instance.platform
+    platform_obj_meta = platform_obj._meta
+    link_format = "/admin/{app}/{model}/{instance_id}/change"
+    link = link_format.format(app=platform_obj_meta.app_label, model=platform_obj_meta.model_name,
+                              instance_id=platform_obj.id)
+    return link
+
+
 @admin.register(SensorOnInstrument)
 class SensorOnInstrumentAdmin(admin.ModelAdmin):
+    list_display = ('sensor', 'instrument', 'start_time', 'end_time')
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
+        qs = super().get_queryset(request).prefetch_related('instrument').prefetch_related('sensor')
 
         return qs
 
-    def has_module_permission(self, request):
-        return False
 
 
 class InstrumentCommentBoxInline(admin.TabularInline):
