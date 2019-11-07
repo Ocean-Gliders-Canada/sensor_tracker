@@ -260,3 +260,24 @@ class SensorInstrumentIdentifierFilter(admin.SimpleListFilter):
             queryset = GetQuerySetMethod.get_sensors(..., instrument_identifier=identifier)
 
             return queryset
+
+
+class SensorOnInstrumentPlatformFilter(admin.SimpleListFilter):
+    title = 'Platform name'
+
+    parameter_name = 'platform_name'
+
+    template = 'django_admin_listfilter_dropdown/dropdown_filter.html'
+
+    def lookups(self, request, model_admin):
+        return platform_list_order_by_active()
+
+    def queryset(self, request, queryset):
+        """Filter the queryset being returned based on the PlatformType that was selected
+        """
+        if self.value() is None:
+            return queryset
+        else:
+            queryset = GetQuerySetMethod.get_sensor_on_instrument(platform_name=self.value())
+
+            return queryset
