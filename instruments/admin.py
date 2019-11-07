@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.forms import ModelForm
 from django import forms
-
+from datetime import datetime
 from suit.widgets import SuitSplitDateTimeWidget
-
+from django.core.exceptions import ObjectDoesNotExist
 from instruments.admin_filter import (
     InstrumentPlatformNameFilter,
     InstrumentOnPlatformSortFilter,
@@ -97,6 +97,37 @@ class SensorAdmin(admin.ModelAdmin):
         SensorPlatformNameFilter,
         SensorInstrumentIdentifierFilter,
     )
+
+    def save_model(self, request, obj, form, change):
+        time = datetime.now()
+        if not change:
+            super().save_model(request, obj, form, change)
+            if obj.instrument:
+                SensorOnInstrument.objects.create(sensor=obj, instrument=obj.instrument, start_time=time)
+        else:
+            current_sensor_obj = Sensor.objects.get(id=obj.id)
+            current_attched_instrument = current_sensor_obj.instrument
+            soi_qs_count = SensorOnInstrument.objects.filter(sensor=obj, instrument=current_attched_instrument).count()
+            if current_attched_instrument != obj.instrument:
+                if soi_qs_count == 0:
+                    if obj.instrument:
+                        SensorOnInstrument.objects.create(sensor=obj, instrument=obj.instrument,
+                                                          start_time=time,
+                                                          end_time=None)
+                else:
+                    try:
+                        the_soi_c = SensorOnInstrument.objects.get(sensor=obj, instrument=current_attched_instrument,
+                                                                   end_time=None)
+                        the_soi_c.end_time = time
+                        the_soi_c.save()
+                    except ObjectDoesNotExist as e:
+                        print("Doesn't make sense")
+                    if obj.instrument is not None:
+                        SensorOnInstrument.objects.create(sensor=obj, instrument=obj.instrument,
+                                                          start_time=time,
+                                                          end_time=None)
+
+            super().save_model(request, obj, form, change)
 
 
 class InstrumentForm(ModelForm):
@@ -214,7 +245,6 @@ class SensorOnInstrumentAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request).prefetch_related('instrument').prefetch_related('sensor')
 
         return qs
-
 
 
 class InstrumentCommentBoxInline(admin.TabularInline):
