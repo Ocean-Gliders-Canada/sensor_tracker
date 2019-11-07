@@ -23,7 +23,7 @@ from .models import (
     InstrumentComment,
     SensorOnInstrument,
 )
-
+from django.urls import reverse
 from platforms.models import Platform
 
 
@@ -195,14 +195,14 @@ class InstrumentAdmin(admin.ModelAdmin):
         objs = list(instrument_on_platform_qs)
         for obj in objs:
             obj.url_edit_link = make_edit_link(obj)
-            obj.url_platform_change = make_platform_change_link(obj)
+            obj.url_platform_change = make_edit_link(obj.platform)
         sensor_on_instrument = SensorOnInstrument.objects.filter(instrument=instrument_obj)
         sensor_on_instrument = sensor_on_instrument.prefetch_related('sensor').prefetch_related('instrument')
 
         sensor_obj_set = []
         for soi in sensor_on_instrument:
             soi.url_edit_link = make_edit_link(soi)
-            soi.url_sensor_cahnge = make_sensor_change_link(soi)
+            soi.url_sensor_cahnge = make_edit_link(soi.sensor)
             sensor_obj_set.append(soi)
 
         extra_context = {
@@ -214,26 +214,7 @@ class InstrumentAdmin(admin.ModelAdmin):
 
 def make_edit_link(instance):
     opt = instance._meta
-    link_format = "/admin/{app}/{model}/{instance_id}/change"
-    link = link_format.format(app=opt.app_label, model=opt.model_name, instance_id=instance.id)
-    return link
-
-
-def make_sensor_change_link(instance):
-    sensor_obj = instance.sensor
-    sensor_obj_meta = sensor_obj._meta
-    link_format = "/admin/{app}/{model}/{instance_id}/change"
-    link = link_format.format(app=sensor_obj_meta.app_label, model=sensor_obj_meta.model_name,
-                              instance_id=sensor_obj.id)
-    return link
-
-
-def make_platform_change_link(instance):
-    platform_obj = instance.platform
-    platform_obj_meta = platform_obj._meta
-    link_format = "/admin/{app}/{model}/{instance_id}/change"
-    link = link_format.format(app=platform_obj_meta.app_label, model=platform_obj_meta.model_name,
-                              instance_id=platform_obj.id)
+    link = reverse('admin:{}_{}_change'.format(opt.app_label, opt.model_name), args=(instance.id,))
     return link
 
 
