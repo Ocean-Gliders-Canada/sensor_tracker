@@ -13,6 +13,7 @@ from instruments.admin_filter import (
     InstrumentOnPlatformPlatformNameFilter,
     SensorInstrumentIdentifierFilter,
     SensorPlatformNameFilter,
+    SensorOnInstrumentPlatformFilter,
 )
 
 from .models import (
@@ -221,7 +222,9 @@ def make_edit_link(instance):
 @admin.register(SensorOnInstrument)
 class SensorOnInstrumentAdmin(admin.ModelAdmin):
     list_display = ('sensor', 'instrument', 'start_time', 'end_time')
-
+    list_filter = (
+        SensorOnInstrumentPlatformFilter,
+    )
     def get_queryset(self, request):
         qs = super().get_queryset(request).prefetch_related('instrument').prefetch_related('sensor')
 
