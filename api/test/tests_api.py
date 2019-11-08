@@ -92,6 +92,7 @@ class ApiTestCase(TestCase):
 
         # Test get Instrument on platform by parameter
         self.instrument_on_platform_test(view)
+        self.instrument_on_platform_test(view)
 
         # Test Instrument API
         view = GetInstrument.as_view({'get': 'list'})
@@ -182,6 +183,14 @@ class ApiTestCase(TestCase):
             if x["instrument_id"] in instrument_id_list:
                 expected_sensor_on_instrument_list.append(x)
         self.data_list_compare(data_list, expected_sensor_on_instrument_list)
+
+    def test_get_istruments_by_deployment(self, view):
+        platform_name = "otn200"
+        request = self.factory.get(url_the_keyword("instrument"),
+                                   {"platform_name": platform_name, "deployment_start_time": "2019-09-25"})
+        data_list = view(request).data["results"]
+        print(data_list)
+
 
     def instrument_on_platform_test(self, view):
         platform_name = "otn200"

@@ -3,10 +3,10 @@
     <table id="result_list">
         <thead>
         <tr>
-            <th scope="col" {{ header.class_attrib }}>platform name</th>
-            <th scope="col" {{ header.class_attrib }}>start time</th>
-            <th scope="col" {{ header.class_attrib }}>end time</th>
-            <th scope="col" {{ header.class_attrib }}>edit</th>
+            <th scope="col" {{ header.class_attrib }}>Platform Name</th>
+            <th scope="col" {{ header.class_attrib }}>Start Time</th>
+            <th scope="col" {{ header.class_attrib }}>End Time</th>
+            <th scope="col" {{ header.class_attrib }}>Edit Instrument on Platform</th>
         </tr>
         </thead>
         <tbody>
@@ -15,7 +15,7 @@
                 <td><a href="{{ c.url_platform_change }}">{{ c.platform.name }}</a></td>
                 <td>{{ c.start_time }}</td>
                 <td>{{ c.end_time }}</td>
-                <td><a href="{{ c.url_edit_link }}">edit instrument on platform</a></td>
+                <td><a href="{{ c.url_edit_link }}"></a>edit</td>
             </tr>
         {% endfor %}
 

@@ -116,7 +116,8 @@ class Sensor(models.Model):
         Instrument,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        help_text="The Instrument which this sensor attach on."
     )
     DATATYPES = (
         ('f4', '32-bit floating point'),
