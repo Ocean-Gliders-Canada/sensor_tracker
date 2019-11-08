@@ -299,9 +299,13 @@ class GetQuerySetMethod:
                             end_time=None))
                 else:
                     instrument_on_platform_qs.prefetch_related("instrument").filter(
-                        Q(start_time__gte=start_t))
+                        Q(start_time__lte=start_t))
                 for o in instrument_on_platform_qs:
-                    pk_list.append(o.instrument_id)
+                    if o.end_time:
+                        if o.end_time > start_t:
+                            pk_list.append(o.instrument_id)
+                    else:
+                        pk_list.append(o.instrument_id)
         return Instrument.objects.filter(pk__in=pk_list)
 
     @staticmethod

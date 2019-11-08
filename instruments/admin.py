@@ -1,3 +1,5 @@
+import warnings
+
 from django.contrib import admin
 from django.forms import ModelForm
 from django import forms
@@ -122,7 +124,7 @@ class SensorAdmin(admin.ModelAdmin):
                         the_soi_c.end_time = time
                         the_soi_c.save()
                     except ObjectDoesNotExist as e:
-                        print("Doesn't make sense")
+                        warnings.warn("Possible data flaw\n{}".format(e))
                     if obj.instrument is not None:
                         SensorOnInstrument.objects.create(sensor=obj, instrument=obj.instrument,
                                                           start_time=time,
@@ -225,6 +227,7 @@ class SensorOnInstrumentAdmin(admin.ModelAdmin):
     list_filter = (
         SensorOnInstrumentPlatformFilter,
     )
+
     def get_queryset(self, request):
         qs = super().get_queryset(request).prefetch_related('instrument').prefetch_related('sensor')
 
