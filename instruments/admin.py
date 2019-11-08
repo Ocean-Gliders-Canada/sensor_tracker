@@ -1,6 +1,22 @@
+import warnings
+
 from django.contrib import admin
 from django.forms import ModelForm
 from django import forms
+from datetime import datetime
+from suit.widgets import SuitSplitDateTimeWidget
+from django.core.exceptions import ObjectDoesNotExist
+from instruments.admin_filter import (
+    InstrumentPlatformNameFilter,
+    InstrumentOnPlatformSortFilter,
+    InstrumentOnPlatformTypeListFilter,
+    InstrumentPlatformTypeFilter,
+    InstrumentOnPlatformInstrumentIdentifierFilter,
+    InstrumentOnPlatformPlatformNameFilter,
+    SensorInstrumentIdentifierFilter,
+    SensorPlatformNameFilter,
+    SensorOnInstrumentPlatformFilter,
+)
 
 from suit.widgets import SuitSplitDateTimeWidget
 
@@ -23,6 +39,8 @@ from .models import (
     InstrumentComment,
     SensorOnInstrument,
 )
+
+from django.urls import reverse
 
 from platforms.models import Platform
 
@@ -98,6 +116,37 @@ class SensorAdmin(admin.ModelAdmin):
         SensorInstrumentIdentifierFilter,
     )
 
+    def save_model(self, request, obj, form, change):
+        time = datetime.now()
+        if not change:
+            super().save_model(request, obj, form, change)
+            if obj.instrument:
+                SensorOnInstrument.objects.create(sensor=obj, instrument=obj.instrument, start_time=time)
+        else:
+            current_sensor_obj = Sensor.objects.get(id=obj.id)
+            current_attched_instrument = current_sensor_obj.instrument
+            soi_qs_count = SensorOnInstrument.objects.filter(sensor=obj, instrument=current_attched_instrument).count()
+            if current_attched_instrument != obj.instrument:
+                if soi_qs_count == 0:
+                    if obj.instrument:
+                        SensorOnInstrument.objects.create(sensor=obj, instrument=obj.instrument,
+                                                          start_time=time,
+                                                          end_time=None)
+                else:
+                    try:
+                        the_soi_c = SensorOnInstrument.objects.get(sensor=obj, instrument=current_attched_instrument,
+                                                                   end_time=None)
+                        the_soi_c.end_time = time
+                        the_soi_c.save()
+                    except ObjectDoesNotExist as e:
+                        warnings.warn("Possible data flaw\n{}".format(e))
+                    if obj.instrument is not None:
+                        SensorOnInstrument.objects.create(sensor=obj, instrument=obj.instrument,
+                                                          start_time=time,
+                                                          end_time=None)
+
+            super().save_model(request, obj, form, change)
+
 
 class InstrumentForm(ModelForm):
     class Meta:
@@ -164,13 +213,14 @@ class InstrumentAdmin(admin.ModelAdmin):
         objs = list(instrument_on_platform_qs)
         for obj in objs:
             obj.url_edit_link = make_edit_link(obj)
-
+            obj.url_platform_change = make_edit_link(obj.platform)
         sensor_on_instrument = SensorOnInstrument.objects.filter(instrument=instrument_obj)
         sensor_on_instrument = sensor_on_instrument.prefetch_related('sensor').prefetch_related('instrument')
 
         sensor_obj_set = []
         for soi in sensor_on_instrument:
             soi.url_edit_link = make_edit_link(soi)
+            soi.url_sensor_cahnge = make_edit_link(soi.sensor)
             sensor_obj_set.append(soi)
 
         extra_context = {
@@ -182,21 +232,21 @@ class InstrumentAdmin(admin.ModelAdmin):
 
 def make_edit_link(instance):
     opt = instance._meta
-    link_format = "/admin/{app}/{model}/{instance_id}/change"
-    link = link_format.format(app=opt.app_label, model=opt.model_name, instance_id=instance.id)
+    link = reverse('admin:{}_{}_change'.format(opt.app_label, opt.model_name), args=(instance.id,))
     return link
 
 
 @admin.register(SensorOnInstrument)
 class SensorOnInstrumentAdmin(admin.ModelAdmin):
+    list_display = ('sensor', 'instrument', 'start_time', 'end_time')
+    list_filter = (
+        SensorOnInstrumentPlatformFilter,
+    )
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
+        qs = super().get_queryset(request).prefetch_related('instrument').prefetch_related('sensor')
 
         return qs
-
-    def has_module_permission(self, request):
-        return False
 
 
 class InstrumentCommentBoxInline(admin.TabularInline):

@@ -6,7 +6,7 @@ channels:
   - pypi
   - hargup/label/pypi
 dependencies:
-- python=3.7
+- python=3.6
 - django=2.2
 - pip
 - djangorestframework=3.9.4
@@ -14,10 +14,11 @@ dependencies:
 - Pillow=6.0.0
 - django-debug-toolbar
 - django-filter
-- django-suit
 - pyyaml
 - pip:
+  - uwsgi==2.0.18
   - drf-yasg
   - packaging
+  - django-suit
   - git+https://github.com/mrts/django-admin-list-filter-dropdown.git
   - git+ssh://git@gitlab.oceantrack.org/ceotr/app_common.git

@@ -112,6 +112,13 @@ class Sensor(models.Model):
         blank=True,
         help_text="The official, standard name for the instrument. IE: sea_water_temperature. See CF naming: <a href='http://cfconventions.org/standard-names.html'>CF Naming Reference</a>"
     )
+    instrument = models.ForeignKey(
+        Instrument,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="The Instrument which this sensor currently attach on. Modified this field will auto change sensor on instrument table."
+    )
     DATATYPES = (
         ('f4', '32-bit floating point'),
         ('f8', '64-bit floating point'),
