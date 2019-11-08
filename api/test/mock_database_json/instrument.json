@@ -131,6 +131,101 @@
       "modified_date": null,
       "manufacturer": 1,
       "master_instrument": null
+    },{
+      "id": 124,
+      "modified_date": "2018-12-17 18:52:29",
+      "created_date": "2018-12-17 18:52:29",
+      "identifier": "ballast_pump",
+      "short_name": "bpump",
+      "long_name": "Slocum Glider G3 150 m piston pump",
+      "serial": "108",
+      "comment": "",
+      "manufacturer": 1,
+      "master_instrument": null
+    },
+    {
+      "id": 100,
+      "modified_date": "2018-07-19 00:33:42",
+      "created_date": "2018-07-19 00:33:42",
+      "identifier": "sci_dmon",
+      "short_name": "dmon",
+      "long_name": "digital acoustic monitoring instrument",
+      "serial": "35",
+      "comment": "",
+      "manufacturer": 2,
+      "master_instrument": null
+    },
+    {
+      "id": 101,
+      "modified_date": "2018-07-19 00:34:50",
+      "created_date": "2018-07-19 00:34:25",
+      "identifier": "sci_vmt",
+      "short_name": "vmt",
+      "long_name": "VEMCO mobile transceiver",
+      "serial": "1272215",
+      "comment": "",
+      "manufacturer": 2,
+      "master_instrument": null
+    },
+    {
+      "id": 119,
+      "modified_date": "2018-11-14 16:55:07",
+      "created_date": "2018-11-14 16:55:07",
+      "identifier": "c",
+      "short_name": "flight commanded",
+      "long_name": "flight computer commanded",
+      "serial": "711",
+      "comment": "",
+      "manufacturer": 1,
+      "master_instrument": null
+    },
+    {
+      "id": 118,
+      "modified_date": "2018-11-14 18:08:14",
+      "created_date": "2018-11-14 02:34:09",
+      "identifier": "m",
+      "short_name": "flight measured",
+      "long_name": "flight computer measured",
+      "serial": "711",
+      "comment": "This is Scotia's flight computer (G3 Glider) .",
+      "manufacturer": 1,
+      "master_instrument": null
+    },
+    {
+      "id": 138,
+      "modified_date": "2019-05-17 16:04:24",
+      "created_date": "2019-05-17 16:04:24",
+      "identifier": "sci_oxy4",
+      "short_name": "oxygen optode",
+      "long_name": "Optode 4831",
+      "serial": "658",
+      "comment": "",
+      "manufacturer": 2,
+      "master_instrument": null
+    },
+    {
+      "id": 142,
+      "modified_date": "2019-05-28 19:06:47",
+      "created_date": "2019-05-28 19:06:47",
+      "identifier": "sci_water",
+      "short_name": "ctd",
+      "long_name": "Glider Payload CTD",
+      "serial": "9508",
+      "comment": "Pumped CTD",
+      "manufacturer": 2,
+      "master_instrument": null
+    },
+    {
+      "id": 143,
+      "modified_date": "2019-05-28 19:10:08",
+      "created_date": "2019-05-28 19:10:08",
+      "identifier": "sci_bay",
+      "short_name": "Science Bay",
+      "long_name": "Slocum Glider Science Payload Bay",
+      "serial": "1314",
+      "comment": "G3 Payload Bay",
+      "manufacturer": 1,
+      "master_instrument": null
     }
   ]
 }

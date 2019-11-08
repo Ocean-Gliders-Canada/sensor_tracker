@@ -10,7 +10,7 @@
             <th scope="col" {{ header.class_attrib }}>Instrument Serial Number</th>
             <th scope="col" {{ header.class_attrib }}>Start Time</th>
             <th scope="col" {{ header.class_attrib }}>End Time</th>
-            <th scope="col" {{ header.class_attrib }}>Edit</th>
+            <th scope="col" {{ header.class_attrib }}>Edit Sensor on Platform</th>
         </tr>
         </thead>
         <tbody>
@@ -23,7 +23,7 @@
                 <td>{{ c.instrument.serial }}</td>
                 <td>{{ c.start_time }}</td>
                 <td>{{ c.end_time }}</td>
-                <td><a href="{{ c.url_edit_link }}">edit sensor on platform</a></td>
+                <td><a href="{{ c.url_edit_link }}">edit</a></td>
             </tr>
         {% endfor %}
 
