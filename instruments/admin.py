@@ -18,6 +18,19 @@ from instruments.admin_filter import (
     SensorOnInstrumentPlatformFilter,
 )
 
+from suit.widgets import SuitSplitDateTimeWidget
+
+from instruments.admin_filter import (
+    InstrumentPlatformNameFilter,
+    InstrumentOnPlatformSortFilter,
+    InstrumentOnPlatformTypeListFilter,
+    InstrumentPlatformTypeFilter,
+    InstrumentOnPlatformInstrumentIdentifierFilter,
+    InstrumentOnPlatformPlatformNameFilter,
+    SensorInstrumentIdentifierFilter,
+    SensorPlatformNameFilter,
+)
+
 from .models import (
     Instrument,
     InstrumentOnPlatform,
@@ -26,7 +39,9 @@ from .models import (
     InstrumentComment,
     SensorOnInstrument,
 )
+
 from django.urls import reverse
+
 from platforms.models import Platform
 
 

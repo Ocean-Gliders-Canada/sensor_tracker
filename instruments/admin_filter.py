@@ -49,7 +49,9 @@ def encode_instrument_identifier_serial(instrument_obj):
 
 def instrument_list():
     list_of_instruments = []
+
     queryset = Instrument.objects.all().order_by('identifier')
+
     for instrument_obj in queryset:
         join_list = [x for x in [instrument_obj.identifier, instrument_obj.short_name, instrument_obj.serial] if
                      x is not None]
