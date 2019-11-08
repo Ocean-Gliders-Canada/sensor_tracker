@@ -117,7 +117,7 @@ class Sensor(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text="The Instrument which this sensor attach on."
+        help_text="The Instrument which this sensor currently attach on. Modified this field will auto change sensor on instrument table."
     )
     DATATYPES = (
         ('f4', '32-bit floating point'),
