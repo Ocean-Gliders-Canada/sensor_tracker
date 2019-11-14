@@ -15,7 +15,7 @@ import os
 from django.contrib.admin import AdminSite
 
 from app_common.utilities.file_prepare import check_create_dir
-from app_common.ceotr_django.conf import ConfigAgent
+from app_common.config import DjangoConfigAgent
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -121,8 +121,9 @@ SUIT_CONFIG = {
 
 RESOURCE_DIR = check_create_dir(os.path.join(os.path.expanduser("~"), "resource"))
 PROJECT_RESOURCE_DIR = check_create_dir(os.path.join(RESOURCE_DIR, PROJECT_NAME))
-config_agent = ConfigAgent()
-config_agent.load(setting_dir=PROJECT_RESOURCE_DIR,
+user_yml_setting = os.path.join(*[PROJECT_RESOURCE_DIR, "passwd", "pw_info.yml"])
+config_agent = DjangoConfigAgent()
+config_agent.load(setting_path=user_yml_setting,
                   setting_template=os.path.join(os.path.dirname(__file__), 'config.yml.stock'))
 
 MEDIA_ROOT = PROJECT_RESOURCE_DIR
@@ -137,7 +138,7 @@ REST_FRAMEWORK = {
 AdminSite.site_header = 'Sensor Tracker'
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config_agent.general_info['SECRET_KEY']
+SECRET_KEY = config_agent.django_settings['SECRET_KEY']
 
 DATABASES = {
     'default': {

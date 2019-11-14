@@ -72,6 +72,8 @@ def filter_out_create_day_modified_day(the_dict):
     the_dict.pop("the_dict", None)
 
     the_dict.pop("created_date", None)
+    the_dict.pop("modified_date", None)
+
     return the_dict
 
 
