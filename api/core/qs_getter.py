@@ -77,7 +77,7 @@ class GetQuerySetMethod:
     @staticmethod
     @query_optimize_decorator(['platform_type', 'institution'])
     def get_platforms(platform_name=None, serial_number=None):
-        # todo: Figure out why when depth = 0, there is some duplicated queries
+        # todo: Figure out why when depth = 0, there are some duplicated queries
         if not any([platform_name, serial_number]):
             qs = Platform.objects.all()
         else:
@@ -124,7 +124,7 @@ class GetQuerySetMethod:
         if not name:
             return Manufacturer.objects.all()
         else:
-            res = Manufacturer.objects.filter(name=name)
+            res = Manufacturer.objects.filter(name__iexact=name)
             return res
 
     @staticmethod
@@ -133,7 +133,7 @@ class GetQuerySetMethod:
         if not name:
             return Institution.objects.all()
         else:
-            res = Institution.objects.filter(name=name)
+            res = Institution.objects.filter(name__iexact=name)
             return res
 
     @staticmethod
@@ -142,7 +142,7 @@ class GetQuerySetMethod:
         if not name:
             return Project.objects.all()
         else:
-            res = Project.objects.filter(name=name)
+            res = Project.objects.filter(name__iexact=name)
             return res
 
     @staticmethod
@@ -151,7 +151,7 @@ class GetQuerySetMethod:
         if not name:
             qs = PlatformPowerType.objects.all()
         else:
-            qs = PlatformPowerType.objects.filter(name=name)
+            qs = PlatformPowerType.objects.filter(name__iexact=name)
         return qs
 
     @staticmethod
@@ -251,20 +251,23 @@ class GetQuerySetMethod:
     @staticmethod
     @query_optimize_decorator(['manufacturer'])
     def get_instrument_by_platform(platform_name=None):
-        qs = InstrumentOnPlatform.objects.filter(platform__name=platform_name).prefetch_related('instrument')
-        instrument_on_platform_objs = list(qs)
-        pk_list = []
-        for o in instrument_on_platform_objs:
-            pk_list.append(o.instrument_id)
+        if platform_name:
+            qs = InstrumentOnPlatform.objects.filter(platform__name=platform_name).prefetch_related('instrument')
+            instrument_on_platform_objs = list(qs)
+            pk_list = []
+            for o in instrument_on_platform_objs:
+                pk_list.append(o.instrument_id)
 
-        qs = Instrument.objects.filter(pk__in=pk_list)
+            qs = Instrument.objects.filter(pk__in=pk_list)
+        else:
+            qs = Instrument.objects.all()
 
         return qs
 
     @staticmethod
     @query_optimize_decorator(['manufacturer'])
     def get_instrument(identifier=None, short_name=None, long_name=None, manufacturer=None, serial=None):
-        if not (identifier or short_name or long_name or serial):
+        if not (identifier or short_name or long_name or serial or manufacturer):
             qs = Instrument.objects.all()
         else:
             the_dict = {
@@ -283,34 +286,39 @@ class GetQuerySetMethod:
     @query_optimize_decorator()
     def get_instruments_by_deployment(platform_name=None, deployment_start_time=None):
         pk_list = []
-        instrument_on_platform_qs = GetQuerySetMethod.get_instrument_on_platform_by_platform(
-            platform_name=platform_name)
-        if instrument_on_platform_qs:
-            deployment_qs = GetQuerySetMethod.get_deployments(platform_name=platform_name,
-                                                              start_time=deployment_start_time)
-            if deployment_qs:
-                deployment_objs = list(deployment_qs)
-                for deployment_obj in deployment_objs:
-                    start_t = deployment_obj.start_time
-                    end_t = deployment_obj.end_time
-                    if end_t:
-                        instrument_on_platform_qs.prefetch_related("instrument").filter(
-                            Q(start_time__lte=start_t) & Q(end_time__gte=end_t) | Q(start_time__lte=start_t) & Q(
-                                end_time=None))
-                    else:
-                        instrument_on_platform_qs.prefetch_related("instrument").filter(
-                            Q(start_time__lte=start_t))
-                    for o in instrument_on_platform_qs:
-                        if o.end_time:
-                            if o.end_time > start_t:
+        if deployment_start_time:
+
+            instrument_on_platform_qs = GetQuerySetMethod.get_instrument_on_platform_by_platform(
+                platform_name=platform_name)
+            if instrument_on_platform_qs:
+
+                deployment_qs = GetQuerySetMethod.get_deployments(platform_name=platform_name,
+                                                                  start_time=deployment_start_time)
+                if deployment_qs:
+                    deployment_objs = list(deployment_qs)
+                    for deployment_obj in deployment_objs:
+                        start_t = deployment_obj.start_time
+                        end_t = deployment_obj.end_time
+                        if end_t:
+                            instrument_on_platform_qs.prefetch_related("instrument").filter(
+                                Q(start_time__lte=start_t) & Q(end_time__gte=end_t) | Q(start_time__lte=start_t) & Q(
+                                    end_time=None))
+                        else:
+                            instrument_on_platform_qs.prefetch_related("instrument").filter(
+                                Q(start_time__lte=start_t))
+                        for o in instrument_on_platform_qs:
+                            if o.end_time:
+                                if o.end_time > start_t:
+                                    the_id = o.instrument_id
+                                    if the_id not in pk_list:
+                                        pk_list.append(the_id)
+                            else:
                                 the_id = o.instrument_id
                                 if the_id not in pk_list:
                                     pk_list.append(the_id)
-                        else:
-                            the_id = o.instrument_id
-                            if the_id not in pk_list:
-                                pk_list.append(the_id)
-        return Instrument.objects.filter(pk__in=pk_list)
+            return Instrument.objects.filter(pk__in=pk_list)
+        else:
+            return GetQuerySetMethod.get_instrument_by_platform(platform_name=platform_name)
 
     @staticmethod
     def get_instruments(_, identifier=None, short_name=None, long_name=None, manufacturer=None, serial=None,
