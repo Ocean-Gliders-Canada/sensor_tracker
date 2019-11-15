@@ -1,0 +1,40 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "identifier": "sci_m",
+      "short_name": "science measured",
+      "long_name": "science computer measured",
+      "serial": "200",
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "manufacturer": 2,
+      "master_instrument": null
+    },
+    {
+      "id": 2,
+      "identifier": "c",
+      "short_name": "flight commanded",
+      "long_name": "flight computer commanded",
+      "serial": "200",
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "manufacturer": 1,
+      "master_instrument": null
+    },
+    {
+      "id": 3,
+      "identifier": "m",
+      "short_name": "flight measured",
+      "long_name": "flight computer measured",
+      "serial": "200",
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "manufacturer": 3,
+      "master_instrument": null
+    }
+  ]
+}

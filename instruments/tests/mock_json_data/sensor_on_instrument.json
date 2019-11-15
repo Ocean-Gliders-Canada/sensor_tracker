@@ -1,0 +1,44 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "start_time": "2017-11-15T16:25:32Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 1,
+      "sensor": 1
+    },
+    {
+      "id": 2,
+      "start_time": "2019-01-22T14:41:10Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 2,
+      "sensor": 2
+    },
+    {
+      "id": 3,
+      "start_time": "2019-04-30T18:59:58Z",
+      "end_time": null,
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 3,
+      "sensor": 3
+    },
+    {
+      "id": 4,
+      "start_time": "2012-07-07T12:15:38Z",
+      "end_time": "2013-07-07T12:15:38Z",
+      "comment": null,
+      "created_date": null,
+      "modified_date": null,
+      "instrument": 1,
+      "sensor": 3
+    }
+  ]
+}
