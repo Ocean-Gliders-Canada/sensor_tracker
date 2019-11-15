@@ -258,6 +258,7 @@ class SensorOnInstrumentAdmin(admin.ModelAdmin):
     form = SensorOnInstrumentForm
     readonly_fields = ('sensor', 'instrument')
 
+
     def get_queryset(self, request):
         qs = super().get_queryset(request).prefetch_related('instrument').prefetch_related('sensor')
 
