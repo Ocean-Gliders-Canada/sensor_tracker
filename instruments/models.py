@@ -67,6 +67,9 @@ class InstrumentComment(models.Model):
 
 
 class InstrumentOnPlatform(models.Model):
+    class Meta:
+        verbose_name = 'Instrument on Platform History'
+        verbose_name_plural = 'Instrument on Platform History'
     instrument = models.ForeignKey(
         Instrument,
         help_text="The instrument that was put on a platform",
@@ -111,6 +114,13 @@ class Sensor(models.Model):
         null=True,
         blank=True,
         help_text="The official, standard name for the instrument. IE: sea_water_temperature. See CF naming: <a href='http://cfconventions.org/standard-names.html'>CF Naming Reference</a>"
+    )
+    instrument = models.ForeignKey(
+        Instrument,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="The Instrument which this sensor currently attach on. Modified this field will auto change sensor on instrument table."
     )
     DATATYPES = (
         ('f4', '32-bit floating point'),
@@ -185,6 +195,9 @@ class Sensor(models.Model):
 
 
 class SensorOnInstrument(models.Model):
+    class Meta:
+        verbose_name = 'Sensor on Instrument History'
+        verbose_name_plural = 'Sensor on Instrument History'
     instrument = models.ForeignKey(
         Instrument,
         help_text="The instrument that was put on a platform",

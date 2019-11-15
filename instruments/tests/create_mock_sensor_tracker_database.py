@@ -1,7 +1,7 @@
 import os
 import json
 
-MOCK_JSON_FILE_NAME = "mock_database_json"
+MOCK_JSON_FILE_NAME = "mock_json_data"
 JSON_DATA_FILES = ["institution", "manufacturer", "project", "platform_type", "platform", "instrument", "power_type",
                    "deployment", "sensor", "instrument_on_platform", "sensor_on_instrument"]
 

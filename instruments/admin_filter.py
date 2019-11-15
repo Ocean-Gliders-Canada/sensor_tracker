@@ -49,7 +49,9 @@ def encode_instrument_identifier_serial(instrument_obj):
 
 def instrument_list():
     list_of_instruments = []
-    queryset = Instrument.objects.all()
+
+    queryset = Instrument.objects.all().order_by('identifier')
+
     for instrument_obj in queryset:
         join_list = [x for x in [instrument_obj.identifier, instrument_obj.short_name, instrument_obj.serial] if
                      x is not None]
@@ -258,5 +260,26 @@ class SensorInstrumentIdentifierFilter(admin.SimpleListFilter):
         else:
             identifier, serial = decode_instrument_identifier_serial(self.value())
             queryset = GetQuerySetMethod.get_sensors(..., instrument_identifier=identifier)
+
+            return queryset
+
+
+class SensorOnInstrumentPlatformFilter(admin.SimpleListFilter):
+    title = 'Platform name'
+
+    parameter_name = 'platform_name'
+
+    template = 'django_admin_listfilter_dropdown/dropdown_filter.html'
+
+    def lookups(self, request, model_admin):
+        return platform_list_order_by_active()
+
+    def queryset(self, request, queryset):
+        """Filter the queryset being returned based on the PlatformType that was selected
+        """
+        if self.value() is None:
+            return queryset
+        else:
+            queryset = GetQuerySetMethod.get_sensor_on_instrument(platform_name=self.value())
 
             return queryset

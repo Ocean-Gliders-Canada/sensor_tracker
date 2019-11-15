@@ -1,0 +1,76 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "name": "pearldiver",
+      "wmo_id": null,
+      "serial_number": "354",
+      "purchase_date": null,
+      "active": true,
+      "created_date": "2019-07-03T16:43:27.191351Z",
+      "modified_date": "2019-07-03T16:43:27.208105Z",
+      "platform_type": 1,
+      "institution": 1
+    },
+    {
+      "id": 2,
+      "name": "otn200",
+      "wmo_id": null,
+      "serial_number": "200",
+      "purchase_date": "2010-10-01T00:00:00Z",
+      "active": true,
+      "created_date": "2019-07-03T16:43:27.191351Z",
+      "modified_date": "2019-07-03T16:43:27.208105Z",
+      "platform_type": 1,
+      "institution": 1
+    },
+    {
+      "id": 3,
+      "name": "otn201",
+      "wmo_id": null,
+      "serial_number": "201",
+      "purchase_date": "2010-10-01T00:00:00Z",
+      "active": true,
+      "created_date": "2019-07-03T16:43:27.191351Z",
+      "modified_date": "2019-07-03T16:43:27.208105Z",
+      "platform_type": 1,
+      "institution": 1
+    },
+    {
+      "id": 4,
+      "name": "dal556",
+      "wmo_id": null,
+      "serial_number": "556",
+      "purchase_date": "2015-09-01T00:00:00Z",
+      "active": true,
+      "created_date": "2019-07-03T16:43:27.191351Z",
+      "modified_date": "2019-07-03T16:43:27.208105Z",
+      "platform_type": 1,
+      "institution": 1
+    },
+    {
+      "id": 5,
+      "name": "we04",
+      "wmo_id": null,
+      "serial_number": "04",
+      "purchase_date": null,
+      "active": true,
+      "created_date": "2019-07-03T16:43:27.191351Z",
+      "modified_date": "2019-07-03T16:43:27.208105Z",
+      "platform_type": 6,
+      "institution": 1
+    },
+    {
+      "id": 6,
+      "name": "otn121",
+      "wmo_id": null,
+      "serial_number": "121",
+      "purchase_date": null,
+      "active": true,
+      "created_date": "2019-07-03T16:43:27.191351Z",
+      "modified_date": "2019-07-03T16:43:27.208105Z",
+      "platform_type": 6,
+      "institution": 1
+    }
+  ]
+}
