@@ -1,0 +1,22 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "name": "Rechargeable lithium",
+      "created_date": "2019-07-03T16:43:27.325037Z",
+      "modified_date": "2019-07-03T16:43:27.334701Z"
+    },
+    {
+      "id": 2,
+      "name": "Alkaline",
+      "created_date": "2019-07-03T16:43:27.325037Z",
+      "modified_date": "2019-07-03T16:43:27.334701Z"
+    },
+    {
+      "id": 3,
+      "name": "Primary lithium",
+      "created_date": "2019-07-03T16:43:27.325037Z",
+      "modified_date": "2019-07-03T16:43:27.334701Z"
+    }
+  ]
+}

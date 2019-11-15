@@ -4,17 +4,10 @@ from django.contrib import admin
 from django.forms import ModelForm
 from django import forms
 from datetime import datetime
-from suit.widgets import SuitSplitDateTimeWidget
+from django.db.models import Q
+
 from django.core.exceptions import ObjectDoesNotExist
 from instruments.admin_filter import (
-    InstrumentPlatformNameFilter,
-    InstrumentOnPlatformSortFilter,
-    InstrumentOnPlatformTypeListFilter,
-    InstrumentPlatformTypeFilter,
-    InstrumentOnPlatformInstrumentIdentifierFilter,
-    InstrumentOnPlatformPlatformNameFilter,
-    SensorInstrumentIdentifierFilter,
-    SensorPlatformNameFilter,
     SensorOnInstrumentPlatformFilter,
 )
 
@@ -236,17 +229,64 @@ def make_edit_link(instance):
     return link
 
 
+class SensorOnInstrumentForm(ModelForm):
+    class Meta:
+        model = SensorOnInstrument
+        fields = '__all__'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        instrument = cleaned_data.get("instrument")
+        sensor = cleaned_data.get("sensor")
+        soi_qs = SensorOnInstrument.objects.filter(instrument=instrument, sensor=sensor, end_time=None)
+        if hasattr(self, 'instrance'):
+            self_id = self.instrument.id
+            soi_qs = soi_qs.filter(~Q(id=self_id))
+        if soi_qs.count() != 0:
+            raise forms.ValidationError(
+                "Must put end time for exist {} {} sensor on instrument table before creating a new one.".format(
+                    instrument.identifier, sensor.identifier)
+            )
+
+
 @admin.register(SensorOnInstrument)
 class SensorOnInstrumentAdmin(admin.ModelAdmin):
     list_display = ('sensor', 'instrument', 'start_time', 'end_time')
     list_filter = (
         SensorOnInstrumentPlatformFilter,
     )
+    form = SensorOnInstrumentForm
+    readonly_fields = ('sensor', 'instrument')
 
     def get_queryset(self, request):
         qs = super().get_queryset(request).prefetch_related('instrument').prefetch_related('sensor')
 
         return qs
+
+    def has_add_permission(self, request):
+        return False
+
+    def save_model(self, request, obj, form, change):
+        if change:
+            current_sensor_on_instrument_obj = SensorOnInstrument.objects.get(id=obj.id)
+            c_end_time = current_sensor_on_instrument_obj.end_time
+
+            end_time = obj.end_time
+            if c_end_time != end_time:
+                if c_end_time is None:
+                    obj.sensor.instrument = None
+                    obj.sensor.save()
+                else:
+                    if obj.sensor.instrument is not None:
+                        raise forms.ValidationError(
+                            "Must put end time for exist {} {} sensor on instrument table before creating a new one.".format(
+                                obj.instrument.identifier, obj.sensor.identifier)
+                        )
+                    else:
+                        obj.sensor.instrument = obj.instrument
+                        obj.sensor.save()
+
+        super().save_model(request, obj, form, change)
 
 
 class InstrumentCommentBoxInline(admin.TabularInline):

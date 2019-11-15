@@ -1,0 +1,61 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "identifier": "COND",
+      "long_name": null,
+      "standard_name": null,
+      "type": "f8",
+      "units": null,
+      "precision": null,
+      "instrument": 1,
+      "accuracy": null,
+      "resolution": null,
+      "valid_min": null,
+      "valid_max": null,
+      "include_in_output": true,
+      "display_in_web_interface": false,
+      "comment": null,
+      "created_date": "2017-11-15T16:25:32.770282Z",
+      "modified_date": "2017-11-15T16:25:32.770343Z"
+    },
+    {
+      "id": 2,
+      "identifier": "Zero A/D",
+      "long_name": "Zero A/D",
+      "standard_name": null,
+      "type": "i4",
+      "units": "counts",
+      "instrument": 2,
+      "precision": null,
+      "accuracy": null,
+      "resolution": null,
+      "valid_min": 0,
+      "valid_max": 65535,
+      "include_in_output": false,
+      "display_in_web_interface": false,
+      "comment": null,
+      "created_date": "2019-01-22T14:41:10.520623Z",
+      "modified_date": "2019-01-22T14:41:10.520676Z"
+    },
+    {
+      "id": 3,
+      "identifier": "CTD_oxygen",
+      "long_name": "Dissolved oxygen concentration",
+      "standard_name": null,
+      "type": "f8",
+      "units": "Hz",
+      "instrument": 3,
+      "precision": null,
+      "accuracy": null,
+      "resolution": null,
+      "valid_min": null,
+      "valid_max": null,
+      "include_in_output": true,
+      "display_in_web_interface": true,
+      "comment": "",
+      "created_date": "2019-04-30T18:59:58.946445Z",
+      "modified_date": "2019-04-30T19:10:00.011913Z"
+    }
+  ]
+}

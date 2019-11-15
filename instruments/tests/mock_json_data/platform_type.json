@@ -1,0 +1,39 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "model": "Slocum Glider G2",
+      "manufacturer": 1
+    },
+    {
+      "id": 2,
+      "model": "Slocum Glider G1",
+      "manufacturer": 1
+    },
+    {
+      "id": 3,
+      "model": "Wave Glider SV2",
+      "manufacturer": 2
+    },
+    {
+      "id": 4,
+      "model": "Profiler",
+      "manufacturer": 1
+    },
+    {
+      "id": 5,
+      "model": "VOS",
+      "manufacturer": 2
+    },
+    {
+      "id": 6,
+      "model": "Slocum Glider G3",
+      "manufacturer": 1
+    },
+    {
+      "id": 7,
+      "model": "Mooring",
+      "manufacturer": 3
+    }
+  ]
+}
