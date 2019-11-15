@@ -67,6 +67,8 @@ class InstrumentComment(models.Model):
 
 
 class InstrumentOnPlatform(models.Model):
+    verbose_name = 'Instrument on Platform History'
+    verbose_name_plural = 'Instrument on Platform History'
     instrument = models.ForeignKey(
         Instrument,
         help_text="The instrument that was put on a platform",
@@ -194,7 +196,7 @@ class Sensor(models.Model):
 class SensorOnInstrument(models.Model):
     class Meta:
         verbose_name = 'Sensor on Instrument History'
-        verbose_name_plural = 'Sensor on Instrument Histories'
+        verbose_name_plural = 'Sensor on Instrument History'
     instrument = models.ForeignKey(
         Instrument,
         help_text="The instrument that was put on a platform",

@@ -230,6 +230,12 @@ def make_edit_link(instance):
 
 
 class SensorOnInstrumentForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+        self.fields['sensor'].disabled = True
+        self.fields['instrument'].disabled = True
+
     class Meta:
         model = SensorOnInstrument
         fields = '__all__'
@@ -256,8 +262,6 @@ class SensorOnInstrumentAdmin(admin.ModelAdmin):
         SensorOnInstrumentPlatformFilter,
     )
     form = SensorOnInstrumentForm
-    readonly_fields = ('sensor', 'instrument')
-
 
     def get_queryset(self, request):
         qs = super().get_queryset(request).prefetch_related('instrument').prefetch_related('sensor')
