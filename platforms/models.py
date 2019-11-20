@@ -59,7 +59,7 @@ class PlatformDeployment(models.Model):
         help_text="The WMO ID for the mission. See: <a href='http://www.jcomm.info/index.php?option=com_oe&task=viewGroupRecord&groupID=155'>WMO Contact Info</a> to acquire"
     )
     deployment_number = models.IntegerField(null=True, blank=True)
-    platform = models.ForeignKey(Platform, on_delete=False)
+    platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
     institution = models.ForeignKey(
         'general.Institution',
         on_delete=models.PROTECT,
