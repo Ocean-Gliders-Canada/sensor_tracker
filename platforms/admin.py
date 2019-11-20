@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.forms import ModelForm
 from suit.widgets import SuitSplitDateTimeWidget
 from django.db.models import F
-
+from django.urls import get_script_prefix
 from django.utils.safestring import mark_safe
 from django.forms.widgets import ClearableFileInput
 from cgi import escape
@@ -12,7 +12,7 @@ from cgi import escape
 from django_admin_listfilter_dropdown.filters import DropdownFilter
 
 from common.admin_common import CommentBoxAdminBase
-
+from common.utilities import make_edit_link
 from .models import (
     PlatformType,
     Platform,
@@ -239,8 +239,9 @@ class ImageInline(admin.StackedInline):
     extra = 0
 
     def image_tag(self, obj):
+        prefix = get_script_prefix()[:-1]
         u = mark_safe('<img src="{url}" width="150" height="150" />'.format(
-            url=obj.picture.url))
+            url=prefix + obj.picture.url))
 
         return u
 
