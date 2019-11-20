@@ -21,7 +21,7 @@ class Instrument(models.Model):
         "general.Manufacturer",
         null=True,
         blank=True,
-        on_delete=False
+        on_delete=models.CASCADE
     )
     serial = models.CharField(max_length=300, null=True, blank=True)
     master_instrument = models.ForeignKey(
@@ -73,12 +73,12 @@ class InstrumentOnPlatform(models.Model):
     instrument = models.ForeignKey(
         Instrument,
         help_text="The instrument that was put on a platform",
-        on_delete=False
+        on_delete=models.CASCADE
     )
     platform = models.ForeignKey(
         'platforms.Platform',
         help_text="The platform that the instrument was put on",
-        on_delete=False
+        on_delete=models.CASCADE
     )
     start_time = models.DateTimeField(
         null=False,
@@ -201,12 +201,12 @@ class SensorOnInstrument(models.Model):
     instrument = models.ForeignKey(
         Instrument,
         help_text="The instrument that was put on a platform",
-        on_delete=False
+        on_delete=models.CASCADE
     )
     sensor = models.ForeignKey(
         'Sensor',
         help_text="The platform that the instrument was put on",
-        on_delete=False
+        on_delete=models.CASCADE
     )
     start_time = models.DateTimeField(
         null=False,

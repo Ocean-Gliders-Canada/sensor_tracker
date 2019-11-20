@@ -11,6 +11,8 @@ from cgi import escape
 
 from django_admin_listfilter_dropdown.filters import DropdownFilter
 
+from common.admin_common import CommentBoxAdminBase
+
 from .models import (
     PlatformType,
     Platform,
@@ -146,19 +148,13 @@ class PlatformCommentForm(ModelForm):
         fields = '__all__'
 
 
-class PlatformCommentAdmin(admin.ModelAdmin):
+class PlatformCommentAdmin(CommentBoxAdminBase):
     form = PlatformCommentForm
     inlines = (
         PlatformCommentBoxInline,
     )
     list_filter = (PlatformCommentBoxListFilter,)
     list_display = ('platform',)
-
-    def save_formset(self, request, form, formset, change):
-        instances = formset.save(commit=True)
-        for instance in instances:
-            instance.user = request.user
-            instance.save()
 
 
 admin.site.register(PlatformCommentBox, PlatformCommentAdmin)
@@ -303,7 +299,7 @@ class PlatformDeploymentCommentBoxForm(ModelForm):
         fields = ('platform_deployment',)
 
     def __init__(self, *args, **kwargs):
-        super(PlatformDeploymentCommentBoxForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         all_deployment_comment_box_value_list = PlatformDeploymentCommentBox.objects.values_list(
             'platform_deployment_id',
             flat=True)
@@ -323,7 +319,7 @@ class PlatformDeploymentCommentBoxForm(ModelForm):
         self.fields['platform_deployment'].queryset = self.commentgroups
 
 
-class PlatformDeploymentCommentBoxAdmin(admin.ModelAdmin):
+class PlatformDeploymentCommentBoxAdmin(CommentBoxAdminBase):
     form = PlatformDeploymentCommentBoxForm
     inlines = (
         PlatformDeploymentCommentBoxInline,
@@ -337,18 +333,10 @@ class PlatformDeploymentCommentBoxAdmin(admin.ModelAdmin):
     ]
 
     def get_queryset(self, request):
-        qs = super(PlatformDeploymentCommentBoxAdmin, self).get_queryset(request)
+        qs = super().get_queryset(request)
         qs = qs.prefetch_related('platform_deployment')
         qs = qs.prefetch_related('platform_deployment__platform')
         return qs
-
-    def save_formset(self, request, form, formset, change):
-        instances = formset.save(commit=False)
-
-        for instance in instances:
-            instance.user = request.user
-
-        formset.save()
 
     def deployment_number(self, instance):
         return instance.platform_deployment.deployment_number

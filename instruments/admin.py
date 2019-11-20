@@ -33,9 +33,11 @@ from .models import (
     SensorOnInstrument,
 )
 
-from django.urls import reverse
-
 from platforms.models import Platform
+from common.admin_common import CommentBoxAdminBase
+from common.utilities import make_edit_link
+from django.utils.safestring import mark_safe
+from common.utilities import qs_time_overlap
 
 
 class InstrumentOnPlatformForm(ModelForm):
@@ -83,6 +85,8 @@ class SensorForm(ModelForm):
         model = Sensor
         fields = '__all__'
 
+
+
     def clean(self):
         cleaned_data = super().clean()
         include_in_output = cleaned_data.get("include_in_output")
@@ -94,6 +98,7 @@ class SensorForm(ModelForm):
             raise forms.ValidationError(
                 "Long name must be given when included in output checked"
             )
+        return self.cleaned_data
 
 
 @admin.register(Sensor)
@@ -108,6 +113,12 @@ class SensorAdmin(admin.ModelAdmin):
         SensorPlatformNameFilter,
         SensorInstrumentIdentifierFilter,
     )
+
+    def delete_queryset(self, request, queryset):
+        super().delete_queryset(request, queryset)
+
+    def delete_model(self, request, queryset):
+        super().delete_model(request, queryset)
 
     def save_model(self, request, obj, form, change):
         time = datetime.now()
@@ -223,18 +234,13 @@ class InstrumentAdmin(admin.ModelAdmin):
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
 
 
-def make_edit_link(instance):
-    opt = instance._meta
-    link = reverse('admin:{}_{}_change'.format(opt.app_label, opt.model_name), args=(instance.id,))
-    return link
-
-
 class SensorOnInstrumentForm(ModelForm):
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
-        self.fields['sensor'].disabled = True
-        self.fields['instrument'].disabled = True
+        if self.initial:
+            self.fields['sensor'].disabled = True
+            self.fields['instrument'].disabled = True
 
     class Meta:
         model = SensorOnInstrument
@@ -244,16 +250,23 @@ class SensorOnInstrumentForm(ModelForm):
         cleaned_data = super().clean()
         instrument = cleaned_data.get("instrument")
         sensor = cleaned_data.get("sensor")
-        soi_qs = SensorOnInstrument.objects.filter(instrument=instrument, sensor=sensor, end_time=None)
-        if hasattr(self, 'instrance'):
-            self_id = self.instrument.id
-            soi_qs = soi_qs.filter(~Q(id=self_id))
-        if soi_qs.count() != 0:
-            raise forms.ValidationError(
-                "Must put end time for exist {} {} sensor on instrument table before creating a new one.".format(
-                    instrument.identifier, sensor.identifier)
-            )
+        start_time = cleaned_data.get("start_time")
+        end_time = cleaned_data.get("end_time")
+        base_soi_qs = SensorOnInstrument.objects.filter(instrument=instrument, sensor=sensor)
 
+        soi_qs_overlap = qs_time_overlap(base_soi_qs, start_time, end_time)
+        soi_qs_overlap_count = soi_qs_overlap.count()
+
+        if soi_qs_overlap_count != 0:
+            msg = "You can't save this table since it overlap with \n"
+            for soi in soi_qs_overlap:
+                msg = msg + "{} {} {}\n".format(soi.instrument.identifier, soi.sensor.identifier,
+                                                "<a href=\"{}\">sensor_on_instrument</a>".format(make_edit_link(soi)))
+
+            raise forms.ValidationError(
+                mark_safe(msg)
+            )
+        return self.cleaned_data
 
 @admin.register(SensorOnInstrument)
 class SensorOnInstrumentAdmin(admin.ModelAdmin):
@@ -267,9 +280,6 @@ class SensorOnInstrumentAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request).prefetch_related('instrument').prefetch_related('sensor')
 
         return qs
-
-    def has_add_permission(self, request):
-        return False
 
     def save_model(self, request, obj, form, change):
         if change:
@@ -308,7 +318,7 @@ class InstrumentCommentBoxForm(ModelForm):
         fields = ('instrument',)
 
 
-class InstrumentCommentBoxAdmin(admin.ModelAdmin):
+class InstrumentCommentBoxAdmin(CommentBoxAdminBase):
     form = InstrumentCommentBoxForm
     inlines = [
         InstrumentCommentBoxInline
@@ -316,14 +326,6 @@ class InstrumentCommentBoxAdmin(admin.ModelAdmin):
     list_display = ('instrument_identifier', 'instrument_short_name', 'instrument_serial', 'on_platform')
     search_fields = ['instrument__identifier', 'instrument__short_name', 'instrument__long_name',
                      'instrument__serial']
-
-    def save_formset(self, request, form, formset, change):
-        instances = formset.save(commit=False)
-
-        for instance in instances:
-            instance.user = request.user
-
-        formset.save()
 
     def get_queryset(self, request):
         qs = super(InstrumentCommentBoxAdmin, self).get_queryset(request)
