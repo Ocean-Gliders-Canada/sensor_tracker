@@ -240,6 +240,8 @@ class ImageInline(admin.StackedInline):
 
     def image_tag(self, obj):
         the_link = get_script_prefix()[:-1] + obj.picture.url
+        print("the link {}".format(the_link))
+        print("the get_script_prefix {}".format(get_script_prefix()))
         u = mark_safe('<img src="{url}" width="150" height="150" />'.format(
             url=the_link))
 
