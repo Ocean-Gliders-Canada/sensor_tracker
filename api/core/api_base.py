@@ -20,10 +20,16 @@ def generate_description_for_mutual_exclusion(basic_doc, mutual_excluded):
     ret_str = basic_doc + "\nYou can use parameter either come from"
     for index, x in enumerate(c):
         if index == 0:
-            ret_str = ret_str + " (" + ", ".join(x) + ")"
+            if type(x) is list:
+                ret_str = ret_str + " (" + ", ".join(x) + ")"
+            else:
+                ret_str = ret_str + " (" + " {},".format(x) + ")"
         else:
             ret_str += " or "
-            ret_str = ret_str + " (" + ", ".join(x) + ")"
+            if type(x) is list:
+                ret_str = ret_str + " (" + ", ".join(x) + ")"
+            else:
+                ret_str = ret_str + " (" + " {},".format(x) + ")"
     return ret_str
 
 
