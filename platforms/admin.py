@@ -239,9 +239,8 @@ class ImageInline(admin.StackedInline):
     extra = 0
 
     def image_tag(self, obj):
-        prefix = get_script_prefix()[:-1]
         u = mark_safe('<img src="{url}" width="150" height="150" />'.format(
-            url=prefix + obj.picture.url))
+            url= obj.picture.url))
 
         return u
 
