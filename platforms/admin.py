@@ -209,9 +209,10 @@ class ImageFileInput(ClearableFileInput):
         if value and hasattr(value, "url"):
             template = self.template_with_initial
             title = value.instance.title
+            the_link = get_script_prefix()[:-1] + value.url
             substitutions['initial'] = (u'<a download="%s" href="%s">%s</a>'
                                         % (escape(title),
-                                           escape(value.url),
+                                           escape(the_link),
                                            escape(
                                                (os.path.basename(value.url))
                                            )
@@ -240,11 +241,8 @@ class ImageInline(admin.StackedInline):
 
     def image_tag(self, obj):
         the_link = get_script_prefix()[:-1] + obj.picture.url
-        print("the link {}".format(the_link))
-        print("the get_script_prefix {}".format(get_script_prefix()))
         u = mark_safe('<img src="{url}" width="150" height="150" />'.format(
             url=the_link))
-
         return u
 
 
