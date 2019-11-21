@@ -271,9 +271,9 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
                    ('platform__name', DropdownFilter),
                    PlatformDeploymentHasNumber)
 
-    inlines = [
-        ImageInline,
-    ]
+    # inlines = [
+    #     ImageInline,
+    # ]
 
 
 admin.site.register(PlatformDeployment, PlatformDeploymentAdmin)
