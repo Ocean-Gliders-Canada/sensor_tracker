@@ -49,6 +49,9 @@ class Instrument(models.Model):
 
 
 class InstrumentCommentBox(models.Model):
+    class Meta:
+        verbose_name = 'Instrument Comment Box'
+        verbose_name_plural = 'Instrument Comment Boxes'
     instrument = models.OneToOneField('Instrument', on_delete=models.PROTECT)
 
     def __str__(self):

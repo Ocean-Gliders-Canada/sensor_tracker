@@ -221,6 +221,9 @@ class DeploymentImage(models.Model):
 
 
 class PlatformDeploymentCommentBox(models.Model):
+    class Meta:
+        verbose_name = 'Platform Deployment Comment Box'
+        verbose_name_plural = 'Platform Deployment Comment Boxes'
     platform_deployment = models.OneToOneField('PlatformDeployment', on_delete=models.PROTECT)
 
     def __str__(self):
@@ -239,6 +242,9 @@ class PlatformDeploymentComment(models.Model):
 
 
 class PlatformCommentBox(models.Model):
+    class Meta:
+        verbose_name = 'Platform Comment Box'
+        verbose_name_plural = 'Platform Comment Boxes'
     platform = models.OneToOneField('Platform', on_delete=models.PROTECT)
 
     def __str__(self):
@@ -246,6 +252,7 @@ class PlatformCommentBox(models.Model):
 
 
 class PlatformComment(models.Model):
+
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     comment = models.TextField(
         help_text="This is a good place to log any problems or changes with a platform"
