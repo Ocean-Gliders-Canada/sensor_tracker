@@ -35,7 +35,7 @@ from .models import (
 
 from platforms.models import Platform
 from common.admin_common import CommentBoxAdminBase
-from common.utilities import make_edit_link,make_add_link
+from common.utilities import make_edit_link, make_add_link
 from django.utils.safestring import mark_safe
 from common.utilities import qs_time_overlap
 
@@ -233,7 +233,6 @@ class InstrumentAdmin(admin.ModelAdmin):
             "sensor_on_instrument_add_link": sensor_on_instrument_add_link,
         }
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
-
 
 
 class SensorOnInstrumentForm(ModelForm):
