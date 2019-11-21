@@ -240,7 +240,7 @@ class ImageInline(admin.StackedInline):
 
     def image_tag(self, obj):
         u = mark_safe('<img src="{url}" width="150" height="150" />'.format(
-            url= obj.picture.url))
+            url=obj.picture.url))
 
         return u
 
@@ -271,9 +271,9 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
                    ('platform__name', DropdownFilter),
                    PlatformDeploymentHasNumber)
 
-    # inlines = [
-    #     ImageInline,
-    # ]
+    inlines = [
+        ImageInline,
+    ]
 
 
 admin.site.register(PlatformDeployment, PlatformDeploymentAdmin)

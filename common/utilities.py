@@ -1,4 +1,4 @@
-from django.urls import reverse
+from django.urls import reverse, get_script_prefix, get_resolver, get_urlconf
 from django.db.models import Q
 
 
@@ -7,9 +7,11 @@ def make_edit_link(instance):
     link = reverse('admin:{}_{}_change'.format(opt.app_label, opt.model_name), args=(instance.id,))
     return link
 
+
 def make_add_link(instance):
     opt = instance._meta
     link = reverse('admin:{}_{}_add'.format(opt.app_label, opt.model_name))
+    print("script_prefix", get_script_prefix())
     return link
 
 
