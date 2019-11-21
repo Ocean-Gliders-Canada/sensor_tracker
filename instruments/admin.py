@@ -35,7 +35,7 @@ from .models import (
 
 from platforms.models import Platform
 from common.admin_common import CommentBoxAdminBase
-from common.utilities import make_edit_link
+from common.utilities import make_edit_link,make_add_link
 from django.utils.safestring import mark_safe
 from common.utilities import qs_time_overlap
 
@@ -84,8 +84,6 @@ class SensorForm(ModelForm):
     class Meta:
         model = Sensor
         fields = '__all__'
-
-
 
     def clean(self):
         cleaned_data = super().clean()
@@ -226,12 +224,16 @@ class InstrumentAdmin(admin.ModelAdmin):
             soi.url_edit_link = make_edit_link(soi)
             soi.url_sensor_cahnge = make_edit_link(soi.sensor)
             sensor_obj_set.append(soi)
-
+        instrument_on_platform_add_link = make_add_link(InstrumentOnPlatform)
+        sensor_on_instrument_add_link = make_add_link(SensorOnInstrument)
         extra_context = {
             "extra_content": objs,
-            "inline_content": sensor_obj_set
+            "inline_content": sensor_obj_set,
+            "instrument_on_platform_add_link": instrument_on_platform_add_link,
+            "sensor_on_instrument_add_link": sensor_on_instrument_add_link,
         }
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
+
 
 
 class SensorOnInstrumentForm(ModelForm):
@@ -267,6 +269,7 @@ class SensorOnInstrumentForm(ModelForm):
                 mark_safe(msg)
             )
         return self.cleaned_data
+
 
 @admin.register(SensorOnInstrument)
 class SensorOnInstrumentAdmin(admin.ModelAdmin):

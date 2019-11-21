@@ -7,6 +7,11 @@ def make_edit_link(instance):
     link = reverse('admin:{}_{}_change'.format(opt.app_label, opt.model_name), args=(instance.id,))
     return link
 
+def make_add_link(instance):
+    opt = instance._meta
+    link = reverse('admin:{}_{}_add'.format(opt.app_label, opt.model_name))
+    return link
+
 
 def qs_time_overlap(base_qs, start_time, end_time):
     if end_time:
