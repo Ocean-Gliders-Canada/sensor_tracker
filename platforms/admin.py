@@ -12,7 +12,7 @@ from cgi import escape
 from django_admin_listfilter_dropdown.filters import DropdownFilter
 
 from common.admin_common import CommentBoxAdminBase
-from common.utilities import make_edit_link
+from django.urls import  get_script_prefix
 from .models import (
     PlatformType,
     Platform,
@@ -239,8 +239,9 @@ class ImageInline(admin.StackedInline):
     extra = 0
 
     def image_tag(self, obj):
+        the_link = get_script_prefix()[:-1] + obj.picture.url
         u = mark_safe('<img src="{url}" width="150" height="150" />'.format(
-            url=obj.picture.url))
+            url=the_link))
 
         return u
 
