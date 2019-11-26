@@ -8,14 +8,14 @@
     {% else %}
         <p>There is no instrument_on_platform data</p>
     {% endif %}
-     <a href="{{ instrument_on_platform_add_link }}">add instrument on platform table</a>
+     <a href="{{ instrument_on_platform_add_link }}" target="_blank">add instrument on platform table</a>
     <h3>Sensor On Instrument</h3>
     {% if inline_content %}
         {% include "admin/sensor_on_instrument_info.html" %}
     {% else %}
     <p>There is no sensor_on_instrument data</p>
     {% endif %}
-    <a href="{{ sensor_on_instrument_add_link }}">add sensor on instrument table</a>
+    <a href="{{ sensor_on_instrument_add_link }}" target="_blank">add sensor on instrument table</a>
 
 {% endblock %}
 {% block inline_field_sets %}

@@ -3,7 +3,7 @@
     <table id="result_list">
         <thead>
         <tr>
-            <th scope="col" {{ header.class_attrib }}>Platform Name</th>
+            <th scope="col" {{ header.class_attrib }}>Instrument Name</th>
             <th scope="col" {{ header.class_attrib }}>Start Time</th>
             <th scope="col" {{ header.class_attrib }}>End Time</th>
             <th scope="col" {{ header.class_attrib }}>Edit Instrument on Platform</th>
@@ -12,7 +12,7 @@
         <tbody>
         {% for c in extra_content %}
             <tr>
-                <td><a href="{{ c.url_platform_change }}" target="_blank">{{ c.platform.name }}</a></td>
+                <td><a href="{{ c.url_sensor_change }}" target="_blank">{{ c.instrument.identifier }}</a></td>
                 <td>{{ c.start_time }}</td>
                 <td>{{ c.end_time }}</td>
                 <td><a href="{{ c.url_edit_link }}" target="_blank">edit</a></td>

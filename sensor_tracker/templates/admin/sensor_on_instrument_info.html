@@ -16,14 +16,14 @@
         <tbody>
         {% for c in inline_content %}
             <tr>
-                <td><a href="{{ c.url_sensor_cahnge }}">{{ c.sensor.identifier }}</a></td>
+                <td><a href="{{ c.url_sensor_cahnge }}" target="_blank">{{ c.sensor.identifier }}</a></td>
                 <td>{{ c.sensor.long_name }}</td>
                 <td>{{ c.sensor.standard_name }}</td>
                 <td>{{ c.instrument.identifier }}</td>
                 <td>{{ c.instrument.serial }}</td>
                 <td>{{ c.start_time }}</td>
                 <td>{{ c.end_time }}</td>
-                <td><a href="{{ c.url_edit_link }}">edit</a></td>
+                <td><a href="{{ c.url_edit_link }}" target="_blank">edit</a></td>
             </tr>
         {% endfor %}
 

@@ -1,17 +1,13 @@
 import warnings
 
 from django.contrib import admin
-from django.forms import ModelForm
 from django import forms
 from datetime import datetime
-from django.db.models import Q
 
 from django.core.exceptions import ObjectDoesNotExist
 from instruments.admin_filter import (
     SensorOnInstrumentPlatformFilter,
 )
-
-from suit.widgets import SuitSplitDateTimeWidget
 
 from instruments.admin_filter import (
     InstrumentPlatformNameFilter,
@@ -33,21 +29,16 @@ from .models import (
     SensorOnInstrument,
 )
 
-from platforms.models import Platform
 from common.admin_common import CommentBoxAdminBase
 from common.utilities import make_edit_link, make_add_link
-from django.utils.safestring import mark_safe
-from common.utilities import qs_time_overlap
-
-
-class InstrumentOnPlatformForm(ModelForm):
-    class Meta:
-        model = InstrumentOnPlatform
-        fields = '__all__'
-        widgets = {
-            'start_time': SuitSplitDateTimeWidget,
-            'end_time': SuitSplitDateTimeWidget
-        }
+from instruments.model_form import (
+    InstrumentOnPlatformForm,
+    SensorForm,
+    InstrumentForm,
+    SensorOnInstrumentForm,
+    InstrumentCommentBoxForm
+)
+from common.admin_common import BaseCommentBoxInline
 
 
 class InstrumentOnPlatformAdmin(admin.ModelAdmin):
@@ -80,25 +71,6 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
 admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
 
 
-class SensorForm(ModelForm):
-    class Meta:
-        model = Sensor
-        fields = '__all__'
-
-    def clean(self):
-        cleaned_data = super().clean()
-        include_in_output = cleaned_data.get("include_in_output")
-        long_name = cleaned_data.get("long_name")
-
-        if include_in_output and not long_name:
-            # Only do something if both fields are valid so far.
-
-            raise forms.ValidationError(
-                "Long name must be given when included in output checked"
-            )
-        return self.cleaned_data
-
-
 @admin.register(Sensor)
 class SensorAdmin(admin.ModelAdmin):
     form = SensorForm
@@ -111,6 +83,23 @@ class SensorAdmin(admin.ModelAdmin):
         SensorPlatformNameFilter,
         SensorInstrumentIdentifierFilter,
     )
+    change_form_template = 'admin/custom_sensor_change_form.html'
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        sensor_obj = Sensor.objects.get(id=int(object_id))
+        instrument_on_platform_qs = SensorOnInstrument.objects.filter(sensor=sensor_obj).order_by(
+            'start_time').prefetch_related('instrument').prefetch_related('sensor')
+        objs = list(instrument_on_platform_qs)
+        for obj in objs:
+            obj.url_edit_link = make_edit_link(obj)
+            obj.url_sensor_change = make_edit_link(obj.sensor)
+
+        sensor_on_instrument_add_link = make_add_link(SensorOnInstrument)
+        extra_context = {
+            "extra_content": objs,
+            "sensor_on_instrument_add_link": sensor_on_instrument_add_link,
+        }
+        return super().change_view(request, object_id, form_url='', extra_context=extra_context)
 
     def delete_queryset(self, request, queryset):
         super().delete_queryset(request, queryset)
@@ -150,46 +139,6 @@ class SensorAdmin(admin.ModelAdmin):
             super().save_model(request, obj, form, change)
 
 
-class InstrumentForm(ModelForm):
-    class Meta:
-        model = Instrument
-        fields = '__all__'
-
-
-class PlatformForm(ModelForm):
-    class Meta:
-        model = Platform
-        fields = '__all__'
-
-
-class PlatformInline(admin.StackedInline):
-    model = InstrumentOnPlatform
-
-    exclude = ["comment"]
-    readonly_fields = ["platform", "start_time", "end_time"]
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        qs = qs.prefetch_related('instrument').prefetch_related('platform')
-        return qs
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-
-class InstrumentOnPlatformDisplayItem:
-    def __init__(self, instance):
-        self.instrument_on_platform_instance = instance
-
-
-class SensorOnInstrumentInline(admin.StackedInline):
-    model = Sensor
-    min_num = 0
-
-
 @admin.register(Instrument)
 class InstrumentAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date')
@@ -200,7 +149,7 @@ class InstrumentAdmin(admin.ModelAdmin):
     search_fields = ['identifier', 'short_name', 'long_name', 'serial', 'manufacturer__name']
     list_display = ('identifier', 'short_name', 'long_name', 'serial', 'manufacturer', 'created_date', 'modified_date')
     form = InstrumentForm
-    change_form_template = 'admin/custom_change_form.html'
+    change_form_template = 'admin/custom_instrument_change_form.html'
     list_per_page = 40
 
     def get_queryset(self, request):
@@ -233,41 +182,6 @@ class InstrumentAdmin(admin.ModelAdmin):
             "sensor_on_instrument_add_link": sensor_on_instrument_add_link,
         }
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
-
-
-class SensorOnInstrumentForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-        if self.initial:
-            self.fields['sensor'].disabled = True
-            self.fields['instrument'].disabled = True
-
-    class Meta:
-        model = SensorOnInstrument
-        fields = '__all__'
-
-    def clean(self):
-        cleaned_data = super().clean()
-        instrument = cleaned_data.get("instrument")
-        sensor = cleaned_data.get("sensor")
-        start_time = cleaned_data.get("start_time")
-        end_time = cleaned_data.get("end_time")
-        base_soi_qs = SensorOnInstrument.objects.filter(instrument=instrument, sensor=sensor)
-
-        soi_qs_overlap = qs_time_overlap(base_soi_qs, start_time, end_time)
-        soi_qs_overlap_count = soi_qs_overlap.count()
-
-        if soi_qs_overlap_count != 0:
-            msg = "You can't save this table since it overlap with \n"
-            for soi in soi_qs_overlap:
-                msg = msg + "{} {} {}\n".format(soi.instrument.identifier, soi.sensor.identifier,
-                                                "<a href=\"{}\">sensor_on_instrument</a>".format(make_edit_link(soi)))
-
-            raise forms.ValidationError(
-                mark_safe(msg)
-            )
-        return self.cleaned_data
 
 
 @admin.register(SensorOnInstrument)
@@ -306,18 +220,8 @@ class SensorOnInstrumentAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-class InstrumentCommentBoxInline(admin.TabularInline):
+class InstrumentCommentBoxInline(BaseCommentBoxInline):
     model = InstrumentComment
-    extra = 0
-    readonly_fields = ('user', 'created_date', 'modified_date')
-
-    fields = ('user', 'created_date', 'modified_date', 'comment')
-
-
-class InstrumentCommentBoxForm(ModelForm):
-    class Meta:
-        model = InstrumentCommentBox
-        fields = ('instrument',)
 
 
 class InstrumentCommentBoxAdmin(CommentBoxAdminBase):

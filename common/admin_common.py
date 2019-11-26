@@ -10,3 +10,10 @@ class CommentBoxAdminBase(admin.ModelAdmin):
             instance.user = request.user
 
         formset.save()
+
+
+class BaseCommentBoxInline(admin.TabularInline):
+    extra = 0
+    readonly_fields = ('user', 'created_date', 'modified_date')
+
+    fields = ('user', 'created_date', 'modified_date', 'event_time', 'comment')
