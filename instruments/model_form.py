@@ -65,11 +65,10 @@ class SensorOnInstrumentForm(ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        instrument = cleaned_data.get("instrument")
         sensor = cleaned_data.get("sensor")
         start_time = cleaned_data.get("start_time")
         end_time = cleaned_data.get("end_time")
-        base_soi_qs = SensorOnInstrument.objects.filter(instrument=instrument, sensor=sensor)
+        base_soi_qs = SensorOnInstrument.objects.filter(sensor=sensor)
         self_instance = self.instance
         soi_qs_overlap = qs_time_overlap(base_soi_qs, start_time, end_time)
         the_id = self_instance.id
@@ -87,7 +86,7 @@ class SensorOnInstrumentForm(ModelForm):
             raise forms.ValidationError(
                 mark_safe(msg)
             )
-        return self.cleaned_data
+
 
 
 class InstrumentCommentBoxForm(ModelForm):
