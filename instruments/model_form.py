@@ -2,7 +2,7 @@ from django.forms import ModelForm
 from django import forms
 from django.db.models import Q
 
-from suit.widgets import SuitSplitDateTimeWidget
+
 
 from .models import (
     Instrument,
@@ -20,10 +20,7 @@ class InstrumentOnPlatformForm(ModelForm):
     class Meta:
         model = InstrumentOnPlatform
         fields = '__all__'
-        widgets = {
-            'start_time': SuitSplitDateTimeWidget,
-            'end_time': SuitSplitDateTimeWidget
-        }
+
 
 
 class SensorForm(ModelForm):

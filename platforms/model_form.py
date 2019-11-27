@@ -1,7 +1,6 @@
 import os
 from django.db.models import F
 from django.forms import ModelForm
-from suit.widgets import SuitSplitDateTimeWidget
 from django.forms.widgets import ClearableFileInput
 from cgi import escape
 
@@ -20,10 +19,6 @@ class PlatformDeploymentForm(ModelForm):
 
     class Meta:
         fields = '__all__'
-        widgets = {
-            'start_time': SuitSplitDateTimeWidget,
-            'end_time': SuitSplitDateTimeWidget
-        }
 
 
 class ImageFileInput(ClearableFileInput):
@@ -67,9 +62,6 @@ class PlatformForm(ModelForm):
     class Meta:
         model = Platform
         fields = '__all__'
-        widgets = {
-            'purchase_date': SuitSplitDateTimeWidget
-        }
 
 
 class PlatformDeploymentCommentBoxForm(ModelForm):
