@@ -92,7 +92,7 @@ class SensorAdmin(admin.ModelAdmin):
         objs = list(instrument_on_platform_qs)
         for obj in objs:
             obj.url_edit_link = make_edit_link(obj)
-            obj.url_sensor_change = make_edit_link(obj.sensor)
+            obj.url_instrument_change = make_edit_link(obj.instrument)
 
         sensor_on_instrument_add_link = make_add_link(SensorOnInstrument)
         extra_context = {
