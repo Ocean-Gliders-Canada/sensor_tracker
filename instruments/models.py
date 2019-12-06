@@ -115,6 +115,7 @@ class Sensor(ModelBase):
         blank=True,
         help_text="The official, standard name for the instrument. IE: sea_water_temperature. See CF naming: <a href='http://cfconventions.org/standard-names.html'>CF Naming Reference</a>"
     )
+    serial = models.CharField(max_length=300, null=True, blank=True)
     instrument = models.ForeignKey(
         Instrument,
         on_delete=models.SET_NULL,
