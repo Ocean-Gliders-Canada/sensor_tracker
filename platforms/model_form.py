@@ -15,7 +15,8 @@ class PlatformCommentForm(ModelForm):
 class PlatformDeploymentForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(PlatformDeploymentForm, self).__init__(*args, **kwargs)
-        self.fields['platform'].queryset = Platform.objects.all().order_by('-active')
+        if 'platform' in self.fields:
+            self.fields['platform'].queryset = Platform.objects.all().order_by('-active')
 
     class Meta:
         fields = '__all__'
@@ -71,20 +72,22 @@ class PlatformDeploymentCommentBoxForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        all_deployment_comment_box_value_list = PlatformDeploymentCommentBox.objects.values_list(
-            'platform_deployment_id',
-            flat=True)
-        if 'instance' in kwargs:
-            current_object = kwargs['instance']
-        else:
-            current_object = None
-        if current_object and hasattr(current_object, 'platform_deployment_id'):
-            current_object_id = current_object.platform_deployment_id
-            query_not_include = all_deployment_comment_box_value_list.exclude(platform_deployment_id=current_object_id)
-        else:
-            query_not_include = all_deployment_comment_box_value_list
-        self.commentgroups = PlatformDeployment.objects.order_by(F('deployment_number').desc(nulls_last=True),
-                                                                 'title', '-end_time',
-                                                                 '-start_time').exclude(id__in=query_not_include)
-        self.commentgroups = self.commentgroups.prefetch_related('platform')
-        self.fields['platform_deployment'].queryset = self.commentgroups
+        if 'platform_deployment' in self.fields:
+            all_deployment_comment_box_value_list = PlatformDeploymentCommentBox.objects.values_list(
+                'platform_deployment_id',
+                flat=True)
+            if 'instance' in kwargs:
+                current_object = kwargs['instance']
+            else:
+                current_object = None
+            if current_object and hasattr(current_object, 'platform_deployment_id'):
+                current_object_id = current_object.platform_deployment_id
+                query_not_include = all_deployment_comment_box_value_list.exclude(platform_deployment_id=current_object_id)
+            else:
+                query_not_include = all_deployment_comment_box_value_list
+
+            commentgroups = PlatformDeployment.objects.order_by(F('deployment_number').desc(nulls_last=True),
+                                                                     'title', '-end_time',
+                                                                     '-start_time').exclude(id__in=query_not_include)
+            commentgroups = commentgroups.prefetch_related('platform')
+            self.fields['platform_deployment'].queryset = commentgroups

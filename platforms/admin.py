@@ -136,12 +136,6 @@ admin.site.register(PlatformCommentBox, PlatformCommentAdmin)
 class PlatformDeploymentCommentBoxInline(BaseCommentBoxInline):
     model = PlatformDeploymentComment
 
-    def get_queryset(self, request):
-        queryset = super(PlatformDeploymentCommentBoxInline, self).get_queryset(request)
-        if not self.has_change_permission(request):
-            queryset = queryset.none()
-        return queryset
-
 
 class PlatformDeploymentCommentBoxAdmin(CommentBoxAdminBase):
     form = PlatformDeploymentCommentBoxForm
