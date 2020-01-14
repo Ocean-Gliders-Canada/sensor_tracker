@@ -241,3 +241,4 @@ class APIRootView(views.APIView):
         ret.move_to_end("redoc", last=False)
         ret.move_to_end("swagger", last=False)
         return Response(ret)
+

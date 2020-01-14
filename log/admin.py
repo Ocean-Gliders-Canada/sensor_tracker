@@ -4,14 +4,14 @@ from django.utils.html import format_html
 
 
 @admin.register(LogEntry)
-class PlatformTypeAdmin(admin.ModelAdmin):
+class LogAdmin(admin.ModelAdmin):
     list_display = ('user', 'action_time', 'message', 'target_obj', 'action',)
 
     list_display_links = None
 
     def get_queryset(self, request):
         user = request.user
-        qs = super(PlatformTypeAdmin, self).get_queryset(request).order_by('action_time')
+        qs = super(LogAdmin, self).get_queryset(request).order_by('action_time')
         if not user.is_superuser:
             qs = qs.filter(user=user)
         qs = qs.prefetch_related('content_type')
