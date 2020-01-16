@@ -2,28 +2,8 @@
 from __future__ import unicode_literals
 
 from rest_framework.authtoken.admin import TokenAdmin
+from rest_framework.authtoken.models import Token
 
-from django.forms import ModelForm
+from custom_admin import admin as custom_admin_site
 
-
-class TokenForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.initial:
-            self.initial["user"] = self.instance.user
-
-
-def get_queryset(self, request):
-    user = request.user
-    qs = self.model._default_manager.get_queryset()
-    ordering = self.get_ordering(request)
-    if ordering:
-        qs = qs.order_by(*ordering)
-
-    if not user.is_superuser:
-        qs = qs.filter(user=user)
-    return qs
-
-
-TokenAdmin.form = TokenForm
-TokenAdmin.get_queryset = get_queryset
+custom_admin_site.site.register(Token, TokenAdmin)

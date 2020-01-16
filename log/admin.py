@@ -1,6 +1,7 @@
 from django.contrib.admin.models import LogEntry
 from django.contrib import admin
 from django.utils.html import format_html
+from custom_admin import admin as custom_admin_site
 
 
 @admin.register(LogEntry)
@@ -46,3 +47,6 @@ class LogAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+custom_admin_site.site.register(LogEntry, LogAdmin)
