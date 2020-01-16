@@ -1,6 +1,7 @@
 import warnings
 
 from django.contrib import admin
+from custom_admin import admin as custom_admin_site
 from django import forms
 from datetime import datetime
 
@@ -68,10 +69,9 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
         return instance.instrument.serial
 
 
-admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
+custom_admin_site.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
 
 
-@admin.register(Sensor)
 class SensorAdmin(admin.ModelAdmin):
     form = SensorForm
     search_fields = ['identifier', 'long_name', 'standard_name']
@@ -139,7 +139,9 @@ class SensorAdmin(admin.ModelAdmin):
             super().save_model(request, obj, form, change)
 
 
-@admin.register(Instrument)
+custom_admin_site.site.register(Sensor, SensorAdmin)
+
+
 class InstrumentAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date')
 
@@ -184,7 +186,9 @@ class InstrumentAdmin(admin.ModelAdmin):
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
 
 
-@admin.register(SensorOnInstrument)
+custom_admin_site.site.register(Instrument, InstrumentAdmin)
+
+
 class SensorOnInstrumentAdmin(admin.ModelAdmin):
     list_display = ('sensor', 'instrument', 'start_time', 'end_time')
     list_filter = (
@@ -218,6 +222,9 @@ class SensorOnInstrumentAdmin(admin.ModelAdmin):
                         obj.sensor.save()
 
         super().save_model(request, obj, form, change)
+
+
+custom_admin_site.site.register(SensorOnInstrument, SensorOnInstrumentAdmin)
 
 
 class InstrumentCommentBoxInline(BaseCommentBoxInline):
@@ -260,4 +267,4 @@ class InstrumentCommentBoxAdmin(CommentBoxAdminBase):
             return " and ".join(platform_names)
 
 
-admin.site.register(InstrumentCommentBox, InstrumentCommentBoxAdmin)
+custom_admin_site.site.register(InstrumentCommentBox, InstrumentCommentBoxAdmin)

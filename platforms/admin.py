@@ -1,3 +1,4 @@
+from custom_admin import admin as custom_admin_site
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
@@ -39,14 +40,15 @@ from platforms.admin_filter import (
 )
 
 
-@admin.register(PlatformType)
 class PlatformTypeAdmin(admin.ModelAdmin):
     list_display = ('model', 'manufacturer')
     list_filter = ('manufacturer',)
     readonly_fields = ('created_date', 'modified_date',)
 
 
-@admin.register(Platform)
+custom_admin_site.site.register(PlatformType, PlatformTypeAdmin)
+
+
 class PlatformAdmin(admin.ModelAdmin):
     form = PlatformForm
     list_filter = (
@@ -75,6 +77,9 @@ class PlatformAdmin(admin.ModelAdmin):
 
         }
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
+
+
+custom_admin_site.site.register(Platform, PlatformAdmin)
 
 
 class ImageInline(admin.StackedInline):
@@ -109,12 +114,14 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
     ]
 
 
-admin.site.register(PlatformDeployment, PlatformDeploymentAdmin)
+custom_admin_site.site.register(PlatformDeployment, PlatformDeploymentAdmin)
 
 
-@admin.register(PlatformPowerType)
 class PlatformPowerTypeAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date',)
+
+
+custom_admin_site.site.register(PlatformPowerType, PlatformPowerTypeAdmin)
 
 
 class PlatformCommentBoxInline(BaseCommentBoxInline):
@@ -130,7 +137,7 @@ class PlatformCommentAdmin(CommentBoxAdminBase):
     list_display = ('platform',)
 
 
-admin.site.register(PlatformCommentBox, PlatformCommentAdmin)
+custom_admin_site.site.register(PlatformCommentBox, PlatformCommentAdmin)
 
 
 class PlatformDeploymentCommentBoxInline(BaseCommentBoxInline):
@@ -180,4 +187,4 @@ class PlatformDeploymentCommentBoxAdmin(CommentBoxAdminBase):
     end_time.admin_order_field = 'platform_deployment__end_time'
 
 
-admin.site.register(PlatformDeploymentCommentBox, PlatformDeploymentCommentBoxAdmin)
+custom_admin_site.site.register(PlatformDeploymentCommentBox, PlatformDeploymentCommentBoxAdmin)

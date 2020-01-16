@@ -94,7 +94,6 @@ class InstrumentPlatformTypeFilter(admin.SimpleListFilter):
                     relevant_instruments[i['instrument_id']] = i
 
             return queryset.filter(pk__in=relevant_instruments.keys())
-
         else:
             return queryset
 
