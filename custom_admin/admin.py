@@ -1,4 +1,4 @@
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group, User, AnonymousUser
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.admin import AdminSite
 from functools import update_wrapper
@@ -19,11 +19,12 @@ class CustomAdminSite(AdminSite):
         script_name = request.META['SCRIPT_NAME']
         site_url = script_name if self.site_url == '/' and script_name else self.site_url
         user = request.user
-        token_qs = Token.objects.filter(user=user)
-        if token_qs.count():
-            token = token_qs[0].key
-        else:
-            token = "You have no token, please contact site manager to request a account token"
+        token = "You have no token, please contact site manager to request a account token"
+        if user and not isinstance(user, AnonymousUser):
+            token_qs = Token.objects.filter(user=user)
+            if token_qs.count():
+                token = token_qs[0].key
+
         return {
             'site_title': self.site_title,
             'site_header': self.site_header,
