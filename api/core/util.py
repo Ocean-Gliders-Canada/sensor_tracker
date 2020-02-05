@@ -61,6 +61,12 @@ def get_all_model_name():
 
 
 def change_to_case_insensitive_parameter(parameter_dictionary, parameter_alter_list=None):
+    """ Covert diction key to key + __iexact
+    if given parameter_alter_list, only alter the variables in list other wise covert all of it
+    :param parameter_dictionary: diction input
+    :param parameter_alter_list: variable list
+    :return: dictionary
+    """
     new_parameter_dictionary = dict()
     if parameter_alter_list is None:
         parameter_alter_list = parameter_dictionary.keys()
