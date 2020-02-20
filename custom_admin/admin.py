@@ -5,6 +5,8 @@ from functools import update_wrapper
 from django.views.generic.base import TemplateView
 from rest_framework.authtoken.models import Token
 
+from users.admin import CustomUserAdmin
+
 
 class TokenView(TemplateView):
     template_name = 'admin/account.html'
@@ -100,4 +102,4 @@ class CustomAdminSite(AdminSite):
 
 site = CustomAdminSite()
 site.register(Group, GroupAdmin)
-site.register(User, UserAdmin)
+site.register(User, CustomUserAdmin)
