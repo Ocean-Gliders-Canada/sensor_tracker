@@ -157,18 +157,52 @@ class PlatformDeployment(ModelBase):
         help_text="The sea in which the study is being conducted: <a href='https://www.nodc.noaa.gov/General/NODC-Archive/seanamelist.txt'>Sea Names</a>",
     )
 
-    latitude = models.FloatField(
+    deployment_latitude = models.FloatField(
         null=True,
         blank=True,
         help_text='The latitude of the deployment'
     )
 
-    longitude = models.FloatField(
+    deployment_longitude = models.FloatField(
         null=True,
         blank=True,
         help_text='The longitude of the deployment'
     )
+    recovery_latitude = models.FloatField(
+        null=True,
+        blank=True,
+        help_text='The latitude of the recovery'
+    )
 
+    recovery_longitude = models.FloatField(
+        null=True,
+        blank=True,
+        help_text='The longitude of the recovery'
+    )
+    deployment_cruise = models.CharField(
+        null=True,
+        blank=True,
+        help_text='The cruise of the deployment',
+        max_length=100
+    )
+    recovery_cruise = models.CharField(
+        null=True,
+        blank=True,
+        help_text='The cruise of the recovery',
+        max_length=100
+    )
+    deployment_personnel = models.CharField(
+        null=True,
+        blank=True,
+        help_text='The personnel of the deployment',
+        max_length=150
+    )
+    recovery_personnel = models.CharField(
+        null=True,
+        blank=True,
+        help_text='The personnel of the recovery',
+        max_length=150
+    )
     depth = models.FloatField(
         null=True,
         blank=True,
