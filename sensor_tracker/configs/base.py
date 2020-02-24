@@ -112,8 +112,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
-STATIC_URL = '/static/sensor_tracker/'
+STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 SUIT_CONFIG = {
     'ADMIN_NAME': 'Sensor Tracker',
     'SEARCH_URL': ''

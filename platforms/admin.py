@@ -97,7 +97,17 @@ class ImageInline(admin.StackedInline):
 
 
 class PlatformDeploymentAdmin(admin.ModelAdmin):
-    form = PlatformDeploymentForm
+    # form = PlatformDeploymentForm
+    fields = (
+        'wmo_id', 'deployment_number', 'platform', 'institution', 'project', 'power_type', 'title',
+        ('start_time', 'end_time'),
+        ('deployment_latitude', 'recovery_latitude', 'deployment_longitude', 'recovery_longitude'),
+        ('deployment_cruise', 'recovery_cruise'), ('deployment_personnel', 'recovery_personnel'), 'testing_mission',
+        'comment', 'acknowledgement', 'contributor_name',
+        'contributor_role', 'creator_email', 'creator_name', 'creator_url', 'data_repository_link',
+        'publisher_email', 'publisher_name', 'publisher_url', 'metadata_link', 'references', 'sea_name',
+        'depth',
+    )
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['title', 'deployment_number']
     exclude = ('platform_name',)
@@ -112,6 +122,11 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
     inlines = [
         ImageInline,
     ]
+
+    class Media:
+        css = {
+            "all": ("custom.css",)
+        }
 
 
 custom_admin_site.site.register(PlatformDeployment, PlatformDeploymentAdmin)
