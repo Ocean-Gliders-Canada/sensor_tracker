@@ -27,7 +27,6 @@ LOCAL_APPS = [
     'platforms',
     'instruments',
     'api',
-    'users',
 ]
 
 DJANGO_APPS = [
