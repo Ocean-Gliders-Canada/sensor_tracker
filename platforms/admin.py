@@ -97,7 +97,6 @@ class ImageInline(admin.StackedInline):
 
 
 class PlatformDeploymentAdmin(admin.ModelAdmin):
-    # form = PlatformDeploymentForm
     fields = (
         'wmo_id', 'deployment_number', 'platform', 'institution', 'project', 'power_type', 'title',
         ('start_time', 'end_time'),
