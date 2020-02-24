@@ -115,7 +115,7 @@ USE_TZ = True
 STATIC_URL = '/static/sensor_tracker/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static/sensor_tracker/"),
+    os.path.join(BASE_DIR, "static/"),
 ]
 SUIT_CONFIG = {
     'ADMIN_NAME': 'Sensor Tracker',
