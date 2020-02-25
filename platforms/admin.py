@@ -100,7 +100,7 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
     fields = (
         'wmo_id', 'deployment_number', 'platform', 'institution', 'project', 'power_type', 'title',
         ('start_time', 'end_time'),
-        ('deployment_latitude', 'recovery_latitude', 'deployment_longitude', 'recovery_longitude'),
+        ('deployment_latitude', 'recovery_latitude'), ('deployment_longitude', 'recovery_longitude'),
         ('deployment_cruise', 'recovery_cruise'), ('deployment_personnel', 'recovery_personnel'), 'testing_mission',
         'comment', 'acknowledgement', 'contributor_name',
         'contributor_role', 'creator_email', 'creator_name', 'creator_url', 'data_repository_link',
@@ -121,11 +121,6 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
     inlines = [
         ImageInline,
     ]
-
-    class Media:
-        css = {
-            "all": ("custom.css",)
-        }
 
 
 custom_admin_site.site.register(PlatformDeployment, PlatformDeploymentAdmin)
