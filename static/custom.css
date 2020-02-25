@@ -1,17 +1,15 @@
-.fieldBox.field-deployment_latitude{
-    margin-right: 70px;
-    margin-bottom: 10px;
+.fieldBox.field-start_time{
+    width: 550px;
 }
-.fieldBox.field-recovery_latitude{
-    margin-right: 300px;
-    margin-bottom: 10px;
+.fieldBox.field-deployment_latitude{
+    width: 550px;
 }
 .fieldBox.field-deployment_longitude{
-    margin-right: 60px;
+    width: 550px;
 }
-
-.fieldBox.form-row.field-deployment_latitude.field-recovery_latitude.field-deployment_longitude.field-recovery_longitude{
-    height: 120px;
-    width: 1020px
+.fieldBox.field-deployment_cruise{
+    width: 550px;
 }
-
+.fieldBox.field-deployment_personnel{
+    width: 550px;
+}
