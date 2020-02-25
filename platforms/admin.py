@@ -122,6 +122,11 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
         ImageInline,
     ]
 
+    class Media:
+        css = {
+            "all": ("custom.css",)
+        }
+
 
 custom_admin_site.site.register(PlatformDeployment, PlatformDeploymentAdmin)
 
