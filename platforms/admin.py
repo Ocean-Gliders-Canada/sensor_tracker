@@ -5,7 +5,7 @@ from django.utils.safestring import mark_safe
 from django_admin_listfilter_dropdown.filters import DropdownFilter
 from common.admin_common import BaseCommentBoxInline
 from common.admin_common import CommentBoxAdminBase
-from instruments.models import InstrumentOnPlatform, SensorOnInstrument
+from instruments.models import InstrumentOnPlatform, SensorOnInstrument, Instrument
 from platforms.models import (
     PlatformType,
     Platform,
@@ -70,10 +70,10 @@ class PlatformAdmin(admin.ModelAdmin):
         for obj in objs:
             obj.url_edit_link = make_edit_link(obj)
             obj.url_instrument_change = make_edit_link(obj.instrument)
-        sensor_on_instrument_link = make_add_link(SensorOnInstrument)
+        instrument_on_platform_add_link = make_add_link(InstrumentOnPlatform)
         extra_context = {
             "extra_content": objs,
-            "instrument_on_platform_add_link": sensor_on_instrument_link,
+            "instrument_on_platform_add_link": instrument_on_platform_add_link,
 
         }
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
@@ -107,6 +107,7 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
         'publisher_email', 'publisher_name', 'publisher_url', 'metadata_link', 'references', 'sea_name',
         'depth',
     )
+    change_form_template = 'admin/custom_instrument_change_form.html'
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['title', 'deployment_number']
     exclude = ('platform_name',)
@@ -121,6 +122,37 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
     inlines = [
         ImageInline,
     ]
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        platform_development_obj = PlatformDeployment.objects.get(id=int(object_id))
+        s = platform_development_obj.start_time
+        e = platform_development_obj.end_time
+        instrument_obj = Instrument.objects.get(id=int(object_id))
+        instrument_on_platform_qs = InstrumentOnPlatform.objects.filter(instrument=instrument_obj, start_time__gte=s,
+                                                                        end_time__lte=e).order_by(
+            'start_time').prefetch_related('platform')
+        objs = list(instrument_on_platform_qs)
+        for obj in objs:
+            obj.url_edit_link = make_edit_link(obj)
+            obj.url_platform_change = make_edit_link(obj.platform)
+        sensor_on_instrument = SensorOnInstrument.objects.filter(instrument=instrument_obj, start_time__gte=s,
+                                                                 end_time__lte=e)
+        sensor_on_instrument = sensor_on_instrument.prefetch_related('sensor').prefetch_related('instrument')
+
+        sensor_obj_set = []
+        for soi in sensor_on_instrument:
+            soi.url_edit_link = make_edit_link(soi)
+            soi.url_sensor_cahnge = make_edit_link(soi.sensor)
+            sensor_obj_set.append(soi)
+        instrument_on_platform_add_link = make_add_link(InstrumentOnPlatform)
+        sensor_on_instrument_add_link = make_add_link(SensorOnInstrument)
+        extra_context = {
+            "extra_content": objs,
+            "inline_content": sensor_obj_set,
+            "instrument_on_platform_add_link": instrument_on_platform_add_link,
+            "sensor_on_instrument_add_link": sensor_on_instrument_add_link,
+        }
+        return super().change_view(request, object_id, form_url='', extra_context=extra_context)
 
     class Media:
         css = {
