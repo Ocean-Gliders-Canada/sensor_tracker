@@ -192,6 +192,9 @@ class Sensor(ModelBase):
     def __str__(self):
         return "%s" % (self.identifier)
 
+    # class Meta:
+    #     unique_together = ('identifier', 'instrument',)
+
 
 class SensorOnInstrument(ModelBase):
     class Meta:

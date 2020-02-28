@@ -6,6 +6,7 @@ from common.model import ModelBase, CommentModelBase
 
 class PlatformType(ModelBase):
     model = models.CharField(max_length=300)
+    # model = models.CharField(max_length=300, unique=True)
     manufacturer = models.ForeignKey('general.Manufacturer', on_delete=models.CASCADE)
 
     def __str__(self):
@@ -35,11 +36,15 @@ class Platform(ModelBase):
     def __str__(self):
         return "{} - {}".format(self.name, self.serial_number)
 
+    class Meta:
+        unique_together = ('name', 'serial_number',)
+
 
 class PlatformPowerType(ModelBase):
     name = models.CharField(
         max_length=500,
-        help_text="Power source of this deployment"
+        help_text="Power source of this deployment",
+        unique=True
     )
 
     def __str__(self):
@@ -225,6 +230,9 @@ class PlatformDeployment(ModelBase):
         if self.end_time is not None:
             return_string += ' - {}'.format(self.end_time.strftime('%Y-%m-%d'))
         return return_string
+
+    # class Meta:
+    #     unique_together = ('platform', 'start_time',)
 
 
 class DeploymentImage(ModelBase):

@@ -6,7 +6,8 @@ class Institution(ModelBase):
     # Name of the institution
     name = models.CharField(
         max_length=300,
-        help_text="Name of the institution"
+        help_text="Name of the institution",
+        unique=True
     )
     # re.match(r'(https?(://)?)?(?P<url>.*)', url)
     url = models.CharField(
@@ -32,7 +33,8 @@ class Institution(ModelBase):
 class Project(ModelBase):
     name = models.CharField(
         max_length=1000,
-        help_text="<b>Example:</b> Collaborative Operations with Mote Marine Laboratory"
+        help_text="<b>Example:</b> Collaborative Operations with Mote Marine Laboratory",
+        unique=True
     )
 
     def __str__(self):
@@ -40,7 +42,7 @@ class Project(ModelBase):
 
 
 class Manufacturer(ModelBase):
-    name = models.CharField(max_length=300)
+    name = models.CharField(max_length=300, unique=True)
     street = models.TextField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=40, blank=True, null=True)
     province = models.CharField(max_length=80, blank=True, null=True)
