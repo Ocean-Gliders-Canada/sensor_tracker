@@ -45,7 +45,6 @@ class ApiBaseViewMeta(type):
 class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCreateModelMixin, CustomUpdateModelMixin,
                   metaclass=ApiBaseViewMeta):
     # either accept accept_option or use default get_method and post method
-    accept = []
     accept_basic = []
     accept_default = ["format", "depth", "limit", "offset"]
     accept_option = []
@@ -59,15 +58,12 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.filterset_class = filterset_class_factory(self)
+        test = kwargs.pop("test", False)
 
-    def variable_check(self, the_get):
+        if not test:
+            self.filterset_class = filterset_class_factory(self)
 
-        # to check if all required variable are here
-        for v in self.accept:
-            if v not in the_get:
-                raise VariableError(self.variable_error_message)
-
+    def _unwelcome_parameter_check(self, the_get):
         # check if receving any unwelcome parameters
         all_accept_variable = self.accept_default + list(self.accept_option) + list(self.accept_basic)
         unexpected_variable = []
@@ -79,7 +75,7 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
                 ", ".join(unexpected_variable))
             raise InvalidParameterError(content)
 
-        # to check no given value that should be here
+    def _check_for_mutual_exclusion(self, the_get):
         assign_list = []
         for i in range(len(self.mutual_exclusion)):
             assign_list.append([])
@@ -96,14 +92,20 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
         for x in assign_list:
             if len(x) > 0:
                 count += 1
+        # todo add error message to explain the error
         if count > 1:
             raise VariableError(self.variable_error_message)
+
+    def variable_check(self, the_get):
+        self._unwelcome_parameter_check(the_get)
+
+        self._check_for_mutual_exclusion(the_get)
 
         return True
 
     def generate_input_argument(self, the_get):
         input_dict = dict()
-        for v in self.accept:
+        for v in self.accept_basic:
             input_dict[v] = the_get[v]
 
         for v in self.accept_option:
