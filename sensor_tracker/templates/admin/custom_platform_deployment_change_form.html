@@ -1,0 +1,25 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block after_field_sets %}
+     <h3>Instrument On platform</h3>
+    {% if extra_content %}
+        {% include "admin/custom_instrument_on_platform.html" %}
+    {% else %}
+        <p>There is no instrument_on_platform data</p>
+    {% endif %}
+     <a href="{{ instrument_on_platform_add_link }}" target="_blank">add instrument on platform table</a>
+    <h3>Sensor On Instrument</h3>
+    {% if inline_content %}
+        {% include "admin/sensor_on_instrument_info.html" %}
+    {% else %}
+    <p>There is no sensor_on_instrument data</p>
+    {% endif %}
+    <a href="{{ sensor_on_instrument_add_link }}" target="_blank">add sensor on instrument table</a>
+
+{% endblock %}
+{% block inline_field_sets %}
+    {% for inline_admin_formset in inline_admin_formsets %}
+        {% include inline_admin_formset.opts.template %}
+    {% endfor %}
+{% endblock %}
