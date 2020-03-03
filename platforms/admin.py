@@ -1,3 +1,4 @@
+from api.core.qs_getter import GetQuerySetMethod
 from custom_admin import admin as custom_admin_site
 from django.contrib import admin
 from django.utils.safestring import mark_safe
@@ -107,7 +108,7 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
         'publisher_email', 'publisher_name', 'publisher_url', 'metadata_link', 'references', 'sea_name',
         'depth',
     )
-    change_form_template = 'admin/custom_instrument_change_form.html'
+    change_form_template = 'admin/custom_platform_deployment_change_form.html'
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['title', 'deployment_number']
     exclude = ('platform_name',)
@@ -125,22 +126,21 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         platform_development_obj = PlatformDeployment.objects.get(id=int(object_id))
-        s = platform_development_obj.start_time
-        e = platform_development_obj.end_time
-        instrument_obj = Instrument.objects.get(id=int(object_id))
-        instrument_on_platform_qs = InstrumentOnPlatform.objects.filter(instrument=instrument_obj, start_time__gte=s,
-                                                                        end_time__lte=e).order_by(
-            'start_time').prefetch_related('platform')
+        start_time = platform_development_obj.start_time
+        end_time = platform_development_obj.end_time
+        platform_name = platform_development_obj.platform.name
+        instrument_on_platform_qs = GetQuerySetMethod.get_instrument_on_platform_by_platform_and_time(
+            platform_name=platform_name, start_time=start_time, end_time=end_time).prefetch_related(
+            'platform').prefetch_related('instrument')
         objs = list(instrument_on_platform_qs)
         for obj in objs:
             obj.url_edit_link = make_edit_link(obj)
             obj.url_platform_change = make_edit_link(obj.platform)
-        sensor_on_instrument = SensorOnInstrument.objects.filter(instrument=instrument_obj, start_time__gte=s,
-                                                                 end_time__lte=e)
-        sensor_on_instrument = sensor_on_instrument.prefetch_related('sensor').prefetch_related('instrument')
-
+        sensors = GetQuerySetMethod.get_sensor_on_instrument(platform_name=platform_name,
+                                                             deployment_start_time=start_time)
+        sensors = sensors.order_by('instrument_id').prefetch_related('sensor').prefetch_related('instrument')
         sensor_obj_set = []
-        for soi in sensor_on_instrument:
+        for soi in sensors:
             soi.url_edit_link = make_edit_link(soi)
             soi.url_sensor_cahnge = make_edit_link(soi.sensor)
             sensor_obj_set.append(soi)
