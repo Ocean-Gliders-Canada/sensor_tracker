@@ -9,7 +9,6 @@ from api.core.qs_getter import GetQuerySetMethod
 from .create_mock_sensor_tracker_database import replace_to_id, filter_out_create_day_modified_day
 from .dictionary_search_functions import get_platform_by_name_serial, get_platform_by_serial, get_by_name, \
     get_by_given_id, get_by
-from api.core.serializer import PlatformSerializer
 
 
 def model_objs_to_dict_list(objs):
