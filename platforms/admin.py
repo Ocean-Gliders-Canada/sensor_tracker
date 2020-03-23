@@ -58,6 +58,7 @@ class PlatformAdmin(admin.ModelAdmin):
     search_fields = ['name', 'serial_number']
     list_display = ('name', 'wmo_id', 'serial_number', 'platform_type', 'institution', 'purchase_date')
     change_form_template = 'admin/custom_platform_change_form.html'
+    change_list_template = 'admin/custom_change_list.html'
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -109,6 +110,7 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
         'depth',
     )
     change_form_template = 'admin/custom_platform_deployment_change_form.html'
+    change_list_template = 'admin/custom_change_list.html'
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['title', 'deployment_number']
     exclude = ('platform_name',)

@@ -1,16 +1,30 @@
+import codecs
+import csv
+
 from django.contrib.auth.models import Group, User, AnonymousUser
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.admin import AdminSite
 from functools import update_wrapper
+
+from django.http import HttpResponse, StreamingHttpResponse
+from django.template import loader
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render_to_response
 from django.views.generic.base import TemplateView
 from rest_framework.authtoken.models import Token
 
+from api.core.qs_getter import GetQuerySetMethod
 from users.admin import CustomUserAdmin
 
 
 class TokenView(TemplateView):
     template_name = 'admin/account.html'
 
+class Echo:
+    """用返回value的形式 代替将数据存入内存的方式"""
+
+    def write(self, value):
+        return value
 
 class CustomAdminSite(AdminSite):
 
@@ -98,6 +112,23 @@ class CustomAdminSite(AdminSite):
                 re_path(regex, wrap(self.app_index), name='app_list'),
             ]
         return urlpatterns
+
+    @csrf_exempt
+    def download(self, request):
+        print(request)
+        return render_to_response('admin/a.html')
+        # response = StreamingHttpResponse(content_type='text/csv')
+        # response['Content-'] = "attachment;filename='abc.csv'"
+        #
+        # rows = ("{},{}\n".format(row, row) for row in range(1, 100000))
+        # response.streaming_content = rows
+        # # print(type(rows))
+        # # response = HttpResponse('success')
+        # return response
+
+
+
+
 
 
 site = CustomAdminSite()
