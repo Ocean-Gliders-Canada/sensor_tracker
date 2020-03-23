@@ -115,7 +115,9 @@ class CustomAdminSite(AdminSite):
 
     @csrf_exempt
     def download(self, request):
-        print(request)
+        if True:
+            print(request.POST)
+
         return render_to_response('admin/a.html')
         # response = StreamingHttpResponse(content_type='text/csv')
         # response['Content-'] = "attachment;filename='abc.csv'"

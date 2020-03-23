@@ -82,11 +82,13 @@
             <script language="javaScript">
                 function download_file(cl) {
                     var $local_cl = $(cl);
-                    console.log($local_cl);
+                    var a = cl.innerHTML;
+                    console.log(a);
                     jQuery.ajax({
                         type: "POST",
                         url: "./download?type=csv",
-                        data:{data:$local_cl},
+                        data:a,
+
                     });
                 }
             </script>
