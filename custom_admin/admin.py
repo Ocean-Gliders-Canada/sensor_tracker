@@ -21,7 +21,7 @@ class TokenView(TemplateView):
     template_name = 'admin/account.html'
 
 class Echo:
-    """用返回value的形式 代替将数据存入内存的方式"""
+
 
     def write(self, value):
         return value
