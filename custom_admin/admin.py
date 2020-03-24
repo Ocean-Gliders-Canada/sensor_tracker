@@ -137,6 +137,17 @@ class CustomAdminSite(AdminSite):
         filter_info = post.get('filter')[0]
         print(str(filter_info))
 
+    def get_model(self, post):
+        model_name = post.get('model')
+        display_fields = None
+        target_model = None
+        for _, model_admin in self._registry.items():
+            if hasattr(model_admin, "opts"):
+                if model_name == model_admin.opts.model_name:
+                    display_fields = model_admin.list_display
+                    target_model = model_admin.opts.model
+                    break
+        return target_model, display_fields
 
     @csrf_exempt
     def download(self, request):
