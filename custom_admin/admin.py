@@ -1,30 +1,21 @@
 import codecs
 import csv
-
+import re
 from django.contrib.auth.models import Group, User, AnonymousUser
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.admin import AdminSite
 from functools import update_wrapper
 
 from django.http import HttpResponse, StreamingHttpResponse
-from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render_to_response
 from django.views.generic.base import TemplateView
 from rest_framework.authtoken.models import Token
-
-from api.core.qs_getter import GetQuerySetMethod
 from users.admin import CustomUserAdmin
 
 
 class TokenView(TemplateView):
     template_name = 'admin/account.html'
 
-class Echo:
-
-
-    def write(self, value):
-        return value
 
 class CustomAdminSite(AdminSite):
 
@@ -113,12 +104,82 @@ class CustomAdminSite(AdminSite):
             ]
         return urlpatterns
 
+    def get_qs(self, post):
+        from general.admin import InstitutionAdmin, ManufacturerAdmin, ProjectAdmin
+        from instruments.admin import SensorAdmin, SensorOnInstrumentAdmin, InstrumentAdmin, InstrumentCommentBoxAdmin, \
+            InstrumentOnPlatformAdmin
+        from platforms.admin import PlatformAdmin, PlatformCommentAdmin, PlatformDeploymentAdmin, \
+            PlatformDeploymentCommentBoxAdmin, PlatformPowerTypeAdmin, PlatformTypeAdmin
+        from general.models import Institution, Project, Manufacturer
+        from instruments.models import Sensor, SensorOnInstrument, Instrument, InstrumentOnPlatform, InstrumentComment, \
+            InstrumentCommentBox
+        from platforms.models import Platform, PlatformComment, PlatformCommentBox, PlatformDeployment, \
+            PlatformDeploymentComment, PlatformDeploymentCommentBox, PlatformPowerType, PlatformType
+
+        model_name = post.get('model')
+        model_match = {
+            'institution': [Institution, InstitutionAdmin],
+            'manufacturer': [Manufacturer, ManufacturerAdmin],
+            'project': [Project, ProjectAdmin],
+            'sensor': [Sensor, SensorAdmin],
+            'sensoroninstrument': [SensorOnInstrument, SensorOnInstrumentAdmin],
+            'instrument': [Instrument, InstrumentAdmin],
+            'instrumentonplatform': [InstrumentOnPlatform, InstrumentOnPlatformAdmin],
+            'instrumentcommentbox': [InstrumentCommentBox, InstrumentCommentBoxAdmin],
+            'platform': [Platform, PlatformAdmin],
+            'platformtype': [PlatformType, PlatformTypeAdmin],
+            'platformpowertype': [PlatformPowerType, PlatformPowerTypeAdmin],
+            'platformdeployment': [PlatformDeployment, PlatformDeploymentAdmin],
+            'platformdeploymentcommentbox': [PlatformDeploymentCommentBox, PlatformDeploymentCommentBoxAdmin],
+            'platformcommentbox': [PlatformCommentBox, PlatformCommentAdmin],
+        }
+        model = model_match.get(model_name[0])
+        filter_info = post.get('filter')[0]
+        print(str(filter_info))
+
+
     @csrf_exempt
     def download(self, request):
         if True:
-            print(request.POST)
+            post = request.POST
+            print(post)
+            post_dict = dict(post)
+            print(post_dict)
+            self.get_qs(post_dict)
+            # keys = list(post_dict.keys())
+            # raw_data = keys[0]
+            # # print(raw_data)
+            #
+            # header = []
+            # data = []
+            # for line in raw_data.split('\n'):
+            #     # print(line)
+            #     if line.isupper():
+            #         # print(line)
+            #         header.append(line)
+            #     else:
+            #         if line == '\t' or line == '':
+            #             continue
+            #         print(line)
+            #         data_line = re.split('\t|\t\t', line)
+            #         if data_line[0] == '':
+            #             data_line.pop(0)
+            #         # data_line = line.split()
+            #         data.append(data_line)
+            #
+            # print(header)
+            # print(data)
 
-        return render_to_response('admin/a.html')
+            # post_dict = dict(post)
+            # post_list = list(post_dict.values())
+            # print('<th scope=' + post_list[0][0])
+            # dom = parseString('<th scope=' + post_list[0][0])
+            # print(dom.getElementsByTagName('th'))
+
+            # print(post_list[0][0])
+
+        # return render_to_response('admin/a.html')
+        return HttpResponse('success')
         # response = StreamingHttpResponse(content_type='text/csv')
         # response['Content-'] = "attachment;filename='abc.csv'"
         #
@@ -127,10 +188,6 @@ class CustomAdminSite(AdminSite):
         # # print(type(rows))
         # # response = HttpResponse('success')
         # return response
-
-
-
-
 
 
 site = CustomAdminSite()

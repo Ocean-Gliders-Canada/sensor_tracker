@@ -14,6 +14,7 @@ class InstitutionAdmin(admin.ModelAdmin):
 
         'url', 'created_date', 'modified_date',)
     readonly_fields = ('created_date', 'modified_date',)
+    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(Institution, InstitutionAdmin)
@@ -21,6 +22,7 @@ custom_admin_site.site.register(Institution, InstitutionAdmin)
 
 class ProjectAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date',)
+    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(Project, ProjectAdmin)
@@ -33,6 +35,7 @@ class ManufacturerAdmin(admin.ModelAdmin):
         'contact_email',
         'created_date', 'modified_date')
     readonly_fields = ('created_date', 'modified_date',)
+    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(Manufacturer, ManufacturerAdmin)

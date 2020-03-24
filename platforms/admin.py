@@ -45,6 +45,7 @@ class PlatformTypeAdmin(admin.ModelAdmin):
     list_display = ('model', 'manufacturer')
     list_filter = ('manufacturer',)
     readonly_fields = ('created_date', 'modified_date',)
+    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(PlatformType, PlatformTypeAdmin)
@@ -167,6 +168,7 @@ custom_admin_site.site.register(PlatformDeployment, PlatformDeploymentAdmin)
 
 class PlatformPowerTypeAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date',)
+    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(PlatformPowerType, PlatformPowerTypeAdmin)
@@ -183,6 +185,7 @@ class PlatformCommentAdmin(CommentBoxAdminBase):
     )
     list_filter = (PlatformCommentBoxListFilter,)
     list_display = ('platform',)
+    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(PlatformCommentBox, PlatformCommentAdmin)
@@ -197,6 +200,7 @@ class PlatformDeploymentCommentBoxAdmin(CommentBoxAdminBase):
     inlines = (
         PlatformDeploymentCommentBoxInline,
     )
+    change_list_template = 'admin/custom_change_list.html'
     list_filter = (PlatformDeploymentCommentBoxListFilter,)
     list_display = ('title', 'deployment_number', 'platform', 'start_time', 'end_time')
     search_fields = [
