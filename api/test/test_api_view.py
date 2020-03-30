@@ -13,6 +13,18 @@ class ApiTestCase(TestCase):
         self.factory = APIRequestFactory()
         self.database_json = create_mock_database()
 
+    def test_manufacturer_api_view(self):
+        # Test Manufacturer API
+        view = GetManufacturer.as_view({'get': 'list'})
+
+        # Test Manufacturer List
+        self.the_list_test(view, "manufacturer")
+
+        # Test get manufacturer by parameter
+        self.the_parameter_get_test(view, "manufacturer", {"name": "Teledyne Webb"})
+
+
+
     def test_get_APIs(self):
 
         # Test Project API
@@ -50,15 +62,6 @@ class ApiTestCase(TestCase):
         # Test get institution by parameter
         self.the_parameter_get_test(view, "institution", {"name": "OTN"})
 
-        # Test Manufacturer API
-        view = GetManufacturer.as_view({'get': 'list'})
-
-        # Test Manufacturer List
-        self.the_list_test(view, "manufacturer")
-
-        # Test get manufacturer by parameter
-        self.the_parameter_get_test(view, "manufacturer", {"name": "Teledyne Webb"})
-
         # Test Platform API
         view = GetPlatform.as_view({'get': 'list'})
 
@@ -67,7 +70,6 @@ class ApiTestCase(TestCase):
 
         # Test get platform by parameter
         self.the_parameter_get_test(view, "platform", {"serial_number": "200"})
-        self.the_parameter_get_test(view, "platform", {"active": True})
 
         # platform's special get
         self.special_platform_test(view, "platform")
@@ -190,7 +192,6 @@ class ApiTestCase(TestCase):
                                    {"platform_name": platform_name, "deployment_start_time": "2019-09-25"})
         data_list = view(request).data["results"]
         print(data_list)
-
 
     def instrument_on_platform_test(self, view):
         platform_name = "otn200"

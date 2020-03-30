@@ -131,7 +131,7 @@ class GetQuerySetMethod:
 
     @staticmethod
     @query_optimize_decorator()
-    def get_institutions( name=None):
+    def get_institutions(name=None):
         if not name:
             return Institution.objects.all()
         else:
