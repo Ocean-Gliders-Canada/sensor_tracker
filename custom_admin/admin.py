@@ -117,11 +117,11 @@ class CustomAdminSite(AdminSite):
         return target_model, model_admin, display_fields, list_filter
 
     def get_filter_dict(self, key, value):
-        plus_in_url = '%2B'
-        space_in_url = '+'
-        if plus_in_url in value or space_in_url in value:
-            new = value.replace(space_in_url, ' ')
-            new = new.replace(plus_in_url, '+')
+        PLUS_IN_URL = '%2B'
+        SPACE_IN_URL = '+'
+        if PLUS_IN_URL in value or SPACE_IN_URL in value:
+            new = value.replace(SPACE_IN_URL, ' ')
+            new = new.replace(PLUS_IN_URL, '+')
             filter_dict = {key: new}
         else:
             filter_dict = {key: value}
