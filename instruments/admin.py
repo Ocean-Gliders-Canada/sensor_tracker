@@ -50,7 +50,7 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
         InstrumentOnPlatformInstrumentIdentifierFilter,
         InstrumentOnPlatformSortFilter
     )
-
+    change_list_template = 'admin/custom_change_list.html'
     list_display = (
         'instrument_identifier', 'instrument_serial', 'instrument_short_name', 'instrument_long_name', 'platform',
         'start_time', 'end_time', 'comment')
@@ -84,6 +84,7 @@ class SensorAdmin(admin.ModelAdmin):
         SensorInstrumentIdentifierFilter,
     )
     change_form_template = 'admin/custom_sensor_change_form.html'
+    change_list_template = 'admin/custom_change_list.html'
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         sensor_obj = Sensor.objects.get(id=int(object_id))
@@ -152,6 +153,7 @@ class InstrumentAdmin(admin.ModelAdmin):
     list_display = ('identifier', 'short_name', 'long_name', 'serial', 'manufacturer', 'created_date', 'modified_date')
     form = InstrumentForm
     change_form_template = 'admin/custom_instrument_change_form.html'
+    change_list_template = 'admin/custom_change_list.html'
     list_per_page = 40
 
     def get_queryset(self, request):
@@ -195,6 +197,7 @@ class SensorOnInstrumentAdmin(admin.ModelAdmin):
         SensorOnInstrumentPlatformFilter,
     )
     form = SensorOnInstrumentForm
+    change_list_template = 'admin/custom_change_list.html'
 
     def get_queryset(self, request):
         qs = super().get_queryset(request).prefetch_related('instrument').prefetch_related('sensor')
@@ -239,6 +242,7 @@ class InstrumentCommentBoxAdmin(CommentBoxAdminBase):
     list_display = ('instrument_identifier', 'instrument_short_name', 'instrument_serial', 'on_platform')
     search_fields = ['instrument__identifier', 'instrument__short_name', 'instrument__long_name',
                      'instrument__serial']
+    change_list_template = 'admin/custom_change_list.html'
 
     def get_queryset(self, request):
         qs = super(InstrumentCommentBoxAdmin, self).get_queryset(request)

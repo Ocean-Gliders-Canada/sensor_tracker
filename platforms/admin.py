@@ -45,6 +45,7 @@ class PlatformTypeAdmin(admin.ModelAdmin):
     list_display = ('model', 'manufacturer')
     list_filter = ('manufacturer',)
     readonly_fields = ('created_date', 'modified_date',)
+    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(PlatformType, PlatformTypeAdmin)
@@ -58,6 +59,7 @@ class PlatformAdmin(admin.ModelAdmin):
     search_fields = ['name', 'serial_number']
     list_display = ('name', 'wmo_id', 'serial_number', 'platform_type', 'institution', 'purchase_date')
     change_form_template = 'admin/custom_platform_change_form.html'
+    change_list_template = 'admin/custom_change_list.html'
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -109,6 +111,7 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
         'depth',
     )
     change_form_template = 'admin/custom_platform_deployment_change_form.html'
+    change_list_template = 'admin/custom_change_list.html'
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['title', 'deployment_number']
     exclude = ('platform_name',)
@@ -165,6 +168,7 @@ custom_admin_site.site.register(PlatformDeployment, PlatformDeploymentAdmin)
 
 class PlatformPowerTypeAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date',)
+    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(PlatformPowerType, PlatformPowerTypeAdmin)
@@ -181,6 +185,7 @@ class PlatformCommentAdmin(CommentBoxAdminBase):
     )
     list_filter = (PlatformCommentBoxListFilter,)
     list_display = ('platform',)
+    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(PlatformCommentBox, PlatformCommentAdmin)
@@ -195,6 +200,7 @@ class PlatformDeploymentCommentBoxAdmin(CommentBoxAdminBase):
     inlines = (
         PlatformDeploymentCommentBoxInline,
     )
+    change_list_template = 'admin/custom_change_list.html'
     list_filter = (PlatformDeploymentCommentBoxListFilter,)
     list_display = ('title', 'deployment_number', 'platform', 'start_time', 'end_time')
     search_fields = [
