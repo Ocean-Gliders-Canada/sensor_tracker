@@ -41,18 +41,7 @@
 {% block coltype %}flex{% endblock %}
 {% block content %}
     <div id="content-main">
-{#        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>#}
-{#        <script language="javaScript">#}
-{#            function download_f#}
-{#                jQuery.ajax({#}
-{#                    type: "POST",#}
-{#                    url: "./download?type=csv",    #}
-{#                    data: cl,#}
-{#                });#}
-{#            }#}
-{#        </script>#}
         {% block object-tools %}
-{#            <button type="button" onclick="download_file(this)">download</button>#}
             <ul class="object-tools">
                 {% block object-tools-items %}
                     {% change_list_object_tools %}
