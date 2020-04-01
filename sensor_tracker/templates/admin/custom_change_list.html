@@ -97,7 +97,13 @@
                             model: window.location.pathname.replace('admin/', '').split('/')[2],
                             filter: JSON.stringify(filter),
                         },
-
+                        success: function(data) {
+                            var blob = new Blob([data]);
+                            var link = document.createElement('a');
+                            link.href = window.URL.createObjectURL(blob);
+                            link.download = "model.csv";
+                            link.click();
+                        }
                     });
                 }
             </script>

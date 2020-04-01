@@ -1,12 +1,11 @@
-import codecs
+import ast
 import csv
-import re
 from django.contrib.auth.models import Group, User, AnonymousUser
-from django.contrib.auth.admin import GroupAdmin, UserAdmin
+from django.contrib.auth.admin import GroupAdmin
 from django.contrib.admin import AdminSite
 from functools import update_wrapper
 
-from django.http import HttpResponse, StreamingHttpResponse
+from django.http import StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateView
 from rest_framework.authtoken.models import Token
@@ -104,90 +103,111 @@ class CustomAdminSite(AdminSite):
             ]
         return urlpatterns
 
-    def get_qs(self, post):
-        from general.admin import InstitutionAdmin, ManufacturerAdmin, ProjectAdmin
-        from instruments.admin import SensorAdmin, SensorOnInstrumentAdmin, InstrumentAdmin, InstrumentCommentBoxAdmin, \
-            InstrumentOnPlatformAdmin
-        from platforms.admin import PlatformAdmin, PlatformCommentAdmin, PlatformDeploymentAdmin, \
-            PlatformDeploymentCommentBoxAdmin, PlatformPowerTypeAdmin, PlatformTypeAdmin
-        from general.models import Institution, Project, Manufacturer
-        from instruments.models import Sensor, SensorOnInstrument, Instrument, InstrumentOnPlatform, InstrumentComment, \
-            InstrumentCommentBox
-        from platforms.models import Platform, PlatformComment, PlatformCommentBox, PlatformDeployment, \
-            PlatformDeploymentComment, PlatformDeploymentCommentBox, PlatformPowerType, PlatformType
+    def get_model(self, post):
+        model_name = post.get('model')[0]
+        display_fields = None
+        target_model = None
+        for _, model_admin in self._registry.items():
+            if hasattr(model_admin, "opts"):
+                if model_name == model_admin.opts.model_name:
+                    display_fields = model_admin.list_display
+                    target_model = model_admin.opts.model
+                    list_filter = model_admin.list_filter
+                    break
+        return target_model, model_admin, display_fields, list_filter
 
-        model_name = post.get('model')
-        model_match = {
-            'institution': [Institution, InstitutionAdmin],
-            'manufacturer': [Manufacturer, ManufacturerAdmin],
-            'project': [Project, ProjectAdmin],
-            'sensor': [Sensor, SensorAdmin],
-            'sensoroninstrument': [SensorOnInstrument, SensorOnInstrumentAdmin],
-            'instrument': [Instrument, InstrumentAdmin],
-            'instrumentonplatform': [InstrumentOnPlatform, InstrumentOnPlatformAdmin],
-            'instrumentcommentbox': [InstrumentCommentBox, InstrumentCommentBoxAdmin],
-            'platform': [Platform, PlatformAdmin],
-            'platformtype': [PlatformType, PlatformTypeAdmin],
-            'platformpowertype': [PlatformPowerType, PlatformPowerTypeAdmin],
-            'platformdeployment': [PlatformDeployment, PlatformDeploymentAdmin],
-            'platformdeploymentcommentbox': [PlatformDeploymentCommentBox, PlatformDeploymentCommentBoxAdmin],
-            'platformcommentbox': [PlatformCommentBox, PlatformCommentAdmin],
-        }
-        model = model_match.get(model_name[0])
-        filter_info = post.get('filter')[0]
-        print(str(filter_info))
+    def get_filter_dict(self, key, value):
+        if '%2B' in value or '+' in value:
+            new = value.replace('+', ' ')
+            new = new.replace('%2B', '+')
+            filter_dict = {key: new}
+        else:
+            filter_dict = {key: value}
+        return filter_dict
+
+    def get_qs_1(self, request, target_model, model_admin, list_filter, filter_info):
+        queryset = target_model.objects.all()
+        if filter_info:
+            for key in filter_info:
+                for item in list_filter:
+                    if isinstance(item, str) and item in key:
+                        filter_dict = {key: filter_info.get(key)}
+                        queryset = queryset.filter(**filter_dict)
+                    elif isinstance(item, tuple) and key in item:
+                        filter_dict = {key: filter_info.get(key)}
+                        queryset = queryset.filter(**filter_dict)
+                    elif not isinstance(item, (str, tuple)) and item.parameter_name == key:
+                        filter_dict = self.get_filter_dict(key, filter_info.get(key))
+                        item = item(request=None, params=filter_dict, model=target_model, model_admin=model_admin)
+                        queryset = queryset & item.queryset(request=request, queryset=queryset)
+        return queryset
+
+    def get_qs_2(self, request, target_model, model_admin, list_filter, filter_info):
+        queryset = target_model.objects.all()
+        flag = True
+        for key in filter_info:
+            list_filter = list(list_filter)
+            list_filter.reverse()
+            for item in list_filter:
+                if isinstance(item, str) and item in key:
+                    filter_dict = {key: filter_info.get(key)}
+                    queryset.filter(**filter_dict)
+                    flag = False
+                    break
+                if not isinstance(item, str) and item.parameter_name == key:
+                    if '%2B' in filter_info.get(key):
+                        new = filter_info.get(key).replace('%2B', '+')
+                        filter_dict = {key: new}
+                    else:
+                        filter_dict = {key: filter_info.get(key)}
+                    item = item(request=None, params=filter_dict, model=target_model, model_admin=model_admin)
+                    queryset = item.queryset(request=request, queryset=queryset)
+                    flag = False
+                    break
+            if not flag:
+                break
+            return queryset
+
+    def get_filter_info(self, post):
+        filter_info = post.get('filter')
+        filter_info = ast.literal_eval(filter_info)
+
+        return filter_info
 
 
     @csrf_exempt
     def download(self, request):
-        if True:
-            post = request.POST
-            print(post)
-            post_dict = dict(post)
-            print(post_dict)
-            self.get_qs(post_dict)
-            # keys = list(post_dict.keys())
-            # raw_data = keys[0]
-            # # print(raw_data)
-            #
-            # header = []
-            # data = []
-            # for line in raw_data.split('\n'):
-            #     # print(line)
-            #     if line.isupper():
-            #         # print(line)
-            #         header.append(line)
-            #     else:
-            #         if line == '\t' or line == '':
-            #             continue
-            #         print(line)
-            #         data_line = re.split('\t|\t\t', line)
-            #         if data_line[0] == '':
-            #             data_line.pop(0)
-            #         # data_line = line.split()
-            #         data.append(data_line)
-            #
-            # print(header)
-            # print(data)
+        post = request.POST
+        filter_info = self.get_filter_info(post)
+        post_dict = dict(post)
+        target_model, model_admin, display_fields, list_filter = self.get_model(post_dict)
+        if filter_info:
+            queryset = self.get_qs_1(request, target_model, model_admin, list_filter, filter_info)
+        else:
+            queryset = target_model.objects.all()
+        path = "temp.csv"
 
-            # post_dict = dict(post)
-            # post_list = list(post_dict.values())
-            # print('<th scope=' + post_list[0][0])
-            # dom = parseString('<th scope=' + post_list[0][0])
-            # print(dom.getElementsByTagName('th'))
+        with open(path, 'w') as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=display_fields)
+            writer.writeheader()
+            for item in queryset:
+                d = {}
+                for field in display_fields:
+                    d[field] = getattr(item, field)
+                writer.writerow(d)
 
-            # print(post_list[0][0])
-
-        # return render_to_response('admin/a.html')
-        return HttpResponse('success')
-        # response = StreamingHttpResponse(content_type='text/csv')
-        # response['Content-'] = "attachment;filename='abc.csv'"
-        #
-        # rows = ("{},{}\n".format(row, row) for row in range(1, 100000))
-        # response.streaming_content = rows
-        # # print(type(rows))
-        # # response = HttpResponse('success')
-        # return response
+        def file_iterator(file_name, chunk_size=512):
+            with open(file_name, 'r') as f:
+                while True:
+                    c = f.read(chunk_size)
+                    if c:
+                        yield c
+                    else:
+                        break
+        response = StreamingHttpResponse(file_iterator(path))
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment; filename="model.csv"'
+        return response
 
 
 site = CustomAdminSite()
