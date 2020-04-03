@@ -5,37 +5,34 @@ from .models import (
     Project,
     Manufacturer
 )
+from common.admin_common import CustomChangeListAdminMixin
 
-
-class InstitutionAdmin(admin.ModelAdmin):
+class InstitutionAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     list_display = (
         'name', 'street', 'city', 'province', 'postal_code', 'country', 'contact_name', 'contact_phone',
         'contact_email',
 
         'url', 'created_date', 'modified_date',)
     readonly_fields = ('created_date', 'modified_date',)
-    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(Institution, InstitutionAdmin)
 
 
-class ProjectAdmin(admin.ModelAdmin):
+class ProjectAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date',)
-    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(Project, ProjectAdmin)
 
 
-class ManufacturerAdmin(admin.ModelAdmin):
+class ManufacturerAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     list_display = (
         'name', 'street', 'city', 'province', 'postal_code', 'country', 'contact_name', 'contact_phone',
 
         'contact_email',
         'created_date', 'modified_date')
     readonly_fields = ('created_date', 'modified_date',)
-    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(Manufacturer, ManufacturerAdmin)

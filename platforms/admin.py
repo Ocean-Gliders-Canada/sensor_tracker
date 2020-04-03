@@ -5,7 +5,7 @@ from django.utils.safestring import mark_safe
 
 from django_admin_listfilter_dropdown.filters import DropdownFilter
 from common.admin_common import BaseCommentBoxInline
-from common.admin_common import CommentBoxAdminBase
+from common.admin_common import CommentBoxAdminMixin
 from instruments.models import InstrumentOnPlatform, SensorOnInstrument, Instrument
 from platforms.models import (
     PlatformType,
@@ -39,19 +39,19 @@ from platforms.admin_filter import (
     PlatformActiveFilter,
     PlatformDeploymentCommentBoxListFilter
 )
+from common.admin_common import CustomChangeListAdminMixin
 
 
-class PlatformTypeAdmin(admin.ModelAdmin):
+class PlatformTypeAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     list_display = ('model', 'manufacturer')
     list_filter = ('manufacturer',)
     readonly_fields = ('created_date', 'modified_date',)
-    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(PlatformType, PlatformTypeAdmin)
 
 
-class PlatformAdmin(admin.ModelAdmin):
+class PlatformAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     form = PlatformForm
     list_filter = (
         "platform_type", PlatformActiveFilter,)
@@ -59,7 +59,6 @@ class PlatformAdmin(admin.ModelAdmin):
     search_fields = ['name', 'serial_number']
     list_display = ('name', 'wmo_id', 'serial_number', 'platform_type', 'institution', 'purchase_date')
     change_form_template = 'admin/custom_platform_change_form.html'
-    change_list_template = 'admin/custom_change_list.html'
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -99,7 +98,7 @@ class ImageInline(admin.StackedInline):
         return u
 
 
-class PlatformDeploymentAdmin(admin.ModelAdmin):
+class PlatformDeploymentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     fields = (
         'wmo_id', 'deployment_number', 'platform', 'institution', 'project', 'power_type', 'title',
         ('start_time', 'end_time'),
@@ -111,7 +110,6 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
         'depth',
     )
     change_form_template = 'admin/custom_platform_deployment_change_form.html'
-    change_list_template = 'admin/custom_change_list.html'
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['title', 'deployment_number']
     exclude = ('platform_name',)
@@ -166,9 +164,8 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
 custom_admin_site.site.register(PlatformDeployment, PlatformDeploymentAdmin)
 
 
-class PlatformPowerTypeAdmin(admin.ModelAdmin):
+class PlatformPowerTypeAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date',)
-    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(PlatformPowerType, PlatformPowerTypeAdmin)
@@ -178,14 +175,13 @@ class PlatformCommentBoxInline(BaseCommentBoxInline):
     model = PlatformComment
 
 
-class PlatformCommentAdmin(CommentBoxAdminBase):
+class PlatformCommentAdmin(CustomChangeListAdminMixin, CommentBoxAdminMixin, admin.ModelAdmin):
     form = PlatformCommentForm
     inlines = (
         PlatformCommentBoxInline,
     )
     list_filter = (PlatformCommentBoxListFilter,)
     list_display = ('platform',)
-    change_list_template = 'admin/custom_change_list.html'
 
 
 custom_admin_site.site.register(PlatformCommentBox, PlatformCommentAdmin)
@@ -195,12 +191,11 @@ class PlatformDeploymentCommentBoxInline(BaseCommentBoxInline):
     model = PlatformDeploymentComment
 
 
-class PlatformDeploymentCommentBoxAdmin(CommentBoxAdminBase):
+class PlatformDeploymentCommentBoxAdmin(CustomChangeListAdminMixin, CommentBoxAdminMixin, admin.ModelAdmin):
     form = PlatformDeploymentCommentBoxForm
     inlines = (
         PlatformDeploymentCommentBoxInline,
     )
-    change_list_template = 'admin/custom_change_list.html'
     list_filter = (PlatformDeploymentCommentBoxListFilter,)
     list_display = ('title', 'deployment_number', 'platform', 'start_time', 'end_time')
     search_fields = [
