@@ -5,10 +5,12 @@ from django.contrib.auth.admin import GroupAdmin
 from django.contrib.admin import AdminSite
 from functools import update_wrapper
 
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateView
 from rest_framework.authtoken.models import Token
+
+from api.core.qs_getter import GetQuerySetMethod
 from users.admin import CustomUserAdmin
 
 
@@ -179,6 +181,10 @@ class CustomAdminSite(AdminSite):
 
     @csrf_exempt
     def download(self, request):
+
+        GetQuerySetMethod.get_hierarchy_by_platform_name('BOP', '2017-11-08 10:54:43-04')
+        return HttpResponse('s')
+
         post = request.POST
         filter_info = self.get_filter_info(post)
         post_dict = dict(post)
