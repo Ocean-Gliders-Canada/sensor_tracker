@@ -44,9 +44,9 @@ class ApiBaseViewMeta(type):
 
 class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCreateModelMixin, CustomUpdateModelMixin,
                   metaclass=ApiBaseViewMeta):
-    # either accept accept_basic or use default get_method and post method
+    # either accept accept_option or use default get_method and post method
     accept_default = ["format", "depth", "limit", "offset"]
-    accept_basic = []
+    accept_option = []
     mutual_exclusion = []
     variable_error_message = ""
     queryset_method = None
@@ -64,7 +64,7 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
 
     def _unwelcome_parameter_check(self, the_get):
         # check if receving any unwelcome parameters
-        all_accept_variable = self.accept_default + list(self.accept_basic)
+        all_accept_variable = self.accept_default + list(self.accept_option)
         unexpected_variable = []
         for v in the_get:
             if v not in all_accept_variable:
@@ -104,7 +104,7 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
 
     def generate_input_argument(self, the_get):
         input_dict = dict()
-        for v in self.accept_basic:
+        for v in self.accept_option:
             if v in the_get:
                 input_dict[v] = the_get[v]
         return input_dict

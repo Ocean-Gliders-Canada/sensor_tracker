@@ -17,7 +17,7 @@ from .core.qs_getter import GetQuerySetMethod
 
 class GetManufacturer(ApiBaseView):
     """Get manufacturer data"""
-    accept_basic = {
+    accept_option = {
         "name": "The name of manufactures",
     }
     serializer_class = serializer.ManufacturerSerializer
@@ -26,7 +26,7 @@ class GetManufacturer(ApiBaseView):
 
 class GetInstitutions(ApiBaseView):
     """Get institution data"""
-    accept_basic = {
+    accept_option = {
         "name": "The name of the institution."
     }
     queryset_method = GetQuerySetMethod.get_institutions
@@ -35,7 +35,7 @@ class GetInstitutions(ApiBaseView):
 
 class GetProject(ApiBaseView):
     """Get project data"""
-    accept_basic = {
+    accept_option = {
         "name": "The name of the project."
     }
     queryset_method = GetQuerySetMethod.get_project
@@ -45,7 +45,7 @@ class GetProject(ApiBaseView):
 # Instrument models
 class GetInstrument(ApiBaseView):
     """Get instrument data list"""
-    accept_basic = {
+    accept_option = {
         "identifier": "The name used to identify this instrument in the raw data.",
         "short_name": "The short, general name for the instrument.",
         "long_name": "The full name for the instrument",
@@ -62,7 +62,7 @@ class GetInstrument(ApiBaseView):
 
 class GetSensor(ApiBaseView):
     """Get sensor data"""
-    accept_basic = {
+    accept_option = {
         "identifier": "The identifier of the sensor",
         "short_name": "The short name of the sensor",
         "long_name": "The long name of the sensor",
@@ -82,7 +82,7 @@ class GetSensor(ApiBaseView):
 
 # todo : think about how ppl would use this
 # class GetInstrumentComment(ApiBaseView):
-#     accept_basic = [
+#     accept_option = [
 #         "identifier",
 #         "short_name",
 #         "long_name",
@@ -99,7 +99,7 @@ class GetSensor(ApiBaseView):
 
 class GetSensorOnInstrument(ApiBaseView):
     """Get sensor on instrument data"""
-    accept_basic = {
+    accept_option = {
         "platform_name": "The name of the platform",
         "deployment_start_time": "The start time of the deployment",
         "instrument_identifier": "The identifier of instrument"
@@ -110,7 +110,7 @@ class GetSensorOnInstrument(ApiBaseView):
 
 class GetInstrumentOnPlatform(ApiBaseView):
     """Get instrument on platform data"""
-    accept_basic = {
+    accept_option = {
         "identifier": "The identifier of the instrument",
         "platform_name": "The name of the platform"
     }
@@ -124,7 +124,7 @@ class GetInstrumentOnPlatform(ApiBaseView):
 # platform model
 class GetPower(ApiBaseView):
     """Get power data"""
-    accept_basic = {
+    accept_option = {
         "name": "The name of the battery."
     }
     serializer_class = serializer.PlatformPowerTypeSerializer
@@ -133,7 +133,7 @@ class GetPower(ApiBaseView):
 
 class GetPlatform(ApiBaseView):
     """Get platform data"""
-    accept_basic = {
+    accept_option = {
         "name": "The name used to identify this instrument in the raw data.",
         "serial_number": "The serial number of the platform",
         "wmo_id": "",
@@ -149,7 +149,7 @@ class GetPlatform(ApiBaseView):
 
 class GetPlatformType(ApiBaseView):
     """Get platform type data"""
-    accept_basic = {
+    accept_option = {
         "model": "The model of the ",
         "how": "The way how to filter out the platform model"
     }
@@ -159,7 +159,7 @@ class GetPlatformType(ApiBaseView):
 
 class GetDeployment(ApiBaseView):
     """Get deployment data"""
-    accept_basic = {
+    accept_option = {
         "wmo_id": "The WMO ID of the deployment",
         "testing_mission": "The name of the testing mission",
         "deployment_number": "The deployment number of the mission",
@@ -180,7 +180,7 @@ class GetDeployment(ApiBaseView):
 
 class GetPlatformDeploymentComment(ApiBaseView):
     """Get platform deployment data"""
-    accept_basic = {
+    accept_option = {
         "platform_name": "The name of deployment's platform",
         "start_time": "The start time of deployment",
         "modified_date": "The time of comment modified"
@@ -191,7 +191,7 @@ class GetPlatformDeploymentComment(ApiBaseView):
 
 class GetPlatformComment(ApiBaseView):
     """Get platform comment data"""
-    accept_basic = {
+    accept_option = {
         "platform_name": "The name of deployment's platform",
     }
     serializer_class = serializer.PlatformCommentSerializer
