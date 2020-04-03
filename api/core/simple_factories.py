@@ -24,7 +24,7 @@ def filterset_class_factory(view_obj):
         # todo: I am thinking hard about this
         return filterset_class
     else:
-        type_arguments = filterset_field_attributes_dict_generator(model, view_obj.accept_option)
+        type_arguments = filterset_field_attributes_dict_generator(model, view_obj.accept_basic)
         filterset_class = type(model.__name__ + "_filterset_class", (filters.FilterSet,), type_arguments)
     return filterset_class
 
