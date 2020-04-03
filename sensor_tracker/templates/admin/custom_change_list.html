@@ -69,28 +69,27 @@
             {% endblock %}
             <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
             <script language="javaScript">
-                function download_file(cl) {
+                function download_file() {
                     let search = location.search.substring(1);
                     let filter = {};
                     if (search != ""){
                         filter = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
                     }
 
-                    console.log(search);
-                    console.log(filter);
+                    let model_name = window.location.pathname.replace('admin/', '').split('/')[2];
                     jQuery.ajax({
                         type: "POST",
                         url: "/download",
                         data: {
                             format: 'csv',
-                            model: window.location.pathname.replace('admin/', '').split('/')[2],
+                            model: model_name,
                             filter: JSON.stringify(filter),
                         },
                         success: function(data) {
                             var blob = new Blob([data]);
                             var link = document.createElement('a');
                             link.href = window.URL.createObjectURL(blob);
-                            link.download = "model.csv";
+                            link.download = model_name + ".csv";
                             link.click();
                         }
                     });
