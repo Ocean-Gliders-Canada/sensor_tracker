@@ -9,8 +9,6 @@ from django.http import StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateView
 from rest_framework.authtoken.models import Token
-
-from api.core.qs_getter import GetQuerySetMethod
 from users.admin import CustomUserAdmin
 
 
@@ -177,6 +175,7 @@ class CustomAdminSite(AdminSite):
         filter_info = ast.literal_eval(filter_info)
 
         return filter_info
+
 
     @csrf_exempt
     def download(self, request):
