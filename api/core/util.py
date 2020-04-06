@@ -3,6 +3,8 @@ from datetime import datetime
 from django.apps import apps
 from django.conf import settings
 
+CASE_IN_SENSITIVE_FILTER_SUFFIX = '__iexact'
+
 
 def filter_objs(objs, way_to_filter):
     new_objs = []
@@ -56,3 +58,25 @@ def get_model_name(app_names):
 @lru_cache(maxsize=None)
 def get_all_model_name():
     return get_model_name(settings.LOCAL_APPS)
+
+
+def change_to_case_insensitive_parameter(parameter_dictionary, parameter_alter_list=None):
+    """ Covert diction key to key + __iexact
+    if given parameter_alter_list, only alter the variables in list other wise covert all of it
+    :param parameter_dictionary: diction input
+    :param parameter_alter_list: variable list
+    :return: dictionary
+    """
+    new_parameter_dictionary = dict()
+    if parameter_alter_list is None:
+        parameter_alter_list = parameter_dictionary.keys()
+    else:
+        if type(parameter_alter_list) != list:
+            raise AttributeError("parameter_alter_list: {} should be list".format(
+                parameter_alter_list))
+    for key, item in parameter_dictionary.items():
+        if key in parameter_alter_list:
+            new_parameter_dictionary[key + CASE_IN_SENSITIVE_FILTER_SUFFIX] = item
+        else:
+            new_parameter_dictionary[key] = item
+    return new_parameter_dictionary

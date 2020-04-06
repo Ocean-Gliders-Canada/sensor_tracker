@@ -15,16 +15,18 @@ Including another URLconf
 """
 
 from django.conf.urls import url, include
-from django.contrib import admin
-
+# from django.contrib import admin
+from custom_admin import admin
 from django.conf.urls.static import static
 
 from django.conf import settings
 from django.urls import path
+
 urlpatterns = [
                   url(r'^admin/', admin.site.urls),
                   url(r'^', admin.site.urls),
                   url(r'^api/', include(('api.urls', 'api'), namespace='api')),
+                  url(r'^download/*', admin.site.download),
                   path('api-auth/', include('rest_framework.urls'))
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

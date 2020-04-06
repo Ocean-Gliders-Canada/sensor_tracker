@@ -11,7 +11,7 @@ from .util import (time_format_identifier,
                    filter_objs)
 from .exceptions import ImproperInput
 from .decorator import query_optimize_decorator
-
+from .util import change_to_case_insensitive_parameter
 from platforms.models import *
 from instruments.models import *
 from general.models import *
@@ -55,8 +55,10 @@ class GetQuerySetMethod:
             if output == INCLUDE_ALL_SENSOR.lower() or output == INCLUDE_ALL_SENSOR:
                 the_dict.pop("include_in_output")
             the_dict = no_none_dict(the_dict)
+            case_insensitive_parameter = change_to_case_insensitive_parameter(the_dict,
+                                                                              ["identifier", "short_name", "long_name"])
 
-            qs = Sensor.objects.filter(**the_dict)
+            qs = Sensor.objects.filter(**case_insensitive_parameter)
         return qs
 
     @staticmethod
@@ -169,16 +171,26 @@ class GetQuerySetMethod:
     def get_deployments(wmo_id=None, platform_name=None, institution_name=None, project_name=None, title=None,
                         testing_mission=None,
                         start_time=None, deployment_number=None):
+        WMO_ID = "wmo_id"
+        PLATFORM_NAME = "platform__name"
+        INSTITUTION_NAME = "institution__name"
+        PROJECT_NAME = "project__name"
+        TITLE = "title"
+        TESTING_MISSION = "testing_mission"
+        START_TIME = "start_time"
+        DEPLOYMENT_NUMBER = "deployment_number"
+
         the_dict = {
-            "wmo_id": wmo_id,
-            "platform__name": platform_name,
-            "institution__name": institution_name,
-            "project__name": project_name,
-            "title": title,
-            "testing_mission": testing_mission,
-            "start_time": start_time,
-            "deployment_number": deployment_number
+            WMO_ID: wmo_id,
+            PLATFORM_NAME: platform_name,
+            INSTITUTION_NAME: institution_name,
+            PROJECT_NAME: project_name,
+            TITLE: title,
+            TESTING_MISSION: testing_mission,
+            START_TIME: start_time,
+            DEPLOYMENT_NUMBER: deployment_number
         }
+
         if not any(the_dict.values()):
             qs = PlatformDeployment.objects.all()
         else:
@@ -187,15 +199,20 @@ class GetQuerySetMethod:
                 time_format_type = time_format_identifier(start_time)
                 # create for day range search when not providing full date detail
                 if time_format_type == YEAR_DAY:
-                    the_dict.pop("start_time")
+                    the_dict.pop(START_TIME)
                     begin, end = time_to_time_range(start_time)
                     qs = PlatformDeployment.objects.filter(start_time__gte=begin, start_time__lte=end)
 
             the_dict = no_none_dict(the_dict)
+            case_insensitive_dict_for_some_variables = change_to_case_insensitive_parameter(the_dict,
+                                                                                            [PLATFORM_NAME,
+                                                                                             INSTITUTION_NAME,
+                                                                                             PROJECT_NAME])
             if qs is None:
-                qs = PlatformDeployment.objects.filter(**the_dict)
+
+                qs = PlatformDeployment.objects.filter(**case_insensitive_dict_for_some_variables)
             else:
-                qs = qs.filter(**the_dict)
+                qs = qs.filter(**case_insensitive_dict_for_some_variables)
         return qs
 
     @staticmethod
@@ -252,7 +269,8 @@ class GetQuerySetMethod:
     @query_optimize_decorator(['manufacturer'])
     def get_instrument_by_platform(platform_name=None):
         if platform_name:
-            qs = InstrumentOnPlatform.objects.filter(platform__name=platform_name).prefetch_related('instrument')
+            qs = InstrumentOnPlatform.objects.filter(platform__name__iexact=platform_name).prefetch_related(
+                'instrument')
             instrument_on_platform_objs = list(qs)
             pk_list = []
             for o in instrument_on_platform_objs:
@@ -278,12 +296,15 @@ class GetQuerySetMethod:
                 "manufacturer__name": manufacturer
             }
             the_dict = no_none_dict(the_dict)
-            qs = Instrument.objects.filter(**the_dict)
+            case_insensitive_parameter = change_to_case_insensitive_parameter(the_dict,
+                                                                              ["identifier", "short_name", "long_name",
+                                                                               "manufacturer__name"])
+            qs = Instrument.objects.filter(**case_insensitive_parameter)
 
         return qs
 
     @staticmethod
-    @query_optimize_decorator()
+    @query_optimize_decorator(['instrument'])
     def get_instruments_by_deployment(platform_name=None, deployment_start_time=None):
         pk_list = []
         if deployment_start_time:
@@ -300,11 +321,11 @@ class GetQuerySetMethod:
                         start_t = deployment_obj.start_time
                         end_t = deployment_obj.end_time
                         if end_t:
-                            instrument_on_platform_qs.prefetch_related("instrument").filter(
+                            instrument_on_platform_qs = instrument_on_platform_qs.filter(
                                 Q(start_time__lte=start_t) & Q(end_time__gte=end_t) | Q(start_time__lte=start_t) & Q(
                                     end_time=None))
                         else:
-                            instrument_on_platform_qs.prefetch_related("instrument").filter(
+                            instrument_on_platform_qs = instrument_on_platform_qs.filter(
                                 Q(start_time__lte=start_t))
                         for o in instrument_on_platform_qs:
                             if o.end_time:
@@ -347,7 +368,7 @@ class GetQuerySetMethod:
     @query_optimize_decorator(['platform', 'instrument'])
     def _get_instrument_on_platform(identifier=None):
         if identifier:
-            qs = InstrumentOnPlatform.objects.filter(instrument__identifier=identifier)
+            qs = InstrumentOnPlatform.objects.filter(instrument__identifier__iexact=identifier)
         else:
             qs = InstrumentOnPlatform.objects.all()
         return qs
@@ -356,10 +377,24 @@ class GetQuerySetMethod:
     @query_optimize_decorator(['platform', 'instrument'])
     def get_instrument_on_platform_by_platform(platform_name=None):
         if platform_name:
-            instrument_on_platform_objs = InstrumentOnPlatform.objects.filter(platform__name=platform_name)
+            instrument_on_platform_objs = InstrumentOnPlatform.objects.filter(platform__name__iexact=platform_name)
         else:
             instrument_on_platform_objs = InstrumentOnPlatform.objects.all()
 
+        return instrument_on_platform_objs
+
+    @staticmethod
+    @query_optimize_decorator(['platform', 'instrument'])
+    def get_instrument_on_platform_by_platform_and_time(platform_name, start_time=None, end_time=None):
+        instrument_on_platform_objs = InstrumentOnPlatform.objects.filter(platform__name=platform_name)
+        if end_time:
+            instrument_on_platform_objs = instrument_on_platform_objs.filter(
+                Q(start_time__lte=start_time) & Q(end_time__gte=end_time) | Q(start_time__lte=start_time) & Q(
+                    end_time=None))
+        else:
+            instrument_on_platform_objs = instrument_on_platform_objs.filter(Q(start_time__lte=start_time))
+
+        instrument_on_platform_objs = instrument_on_platform_objs.order_by('instrument_id')
         return instrument_on_platform_objs
 
     @staticmethod
@@ -374,7 +409,7 @@ class GetQuerySetMethod:
     def get_instrument_on_platform_by_instrument(identifier=None, serial=None):
         qs = InstrumentOnPlatform.objects.all()
         if identifier:
-            qs = qs.filter(instrument__identifier=identifier)
+            qs = qs.filter(instrument__identifier__iexact=identifier)
         if serial:
             qs = qs.filter(instrument__serial=serial)
         return qs
@@ -385,14 +420,13 @@ class GetQuerySetMethod:
         # ["match", "contains", "regex"]
         # all exceptions will be handled in upper level
         if model:
-
             try:
                 lower_how = how.lower()
             except AttributeError:
                 raise AttributeError("Invalid model")
 
             if lower_how == "match":
-                qs = PlatformType.objects.filter(model=model)
+                qs = PlatformType.objects.filter(model__iexact=model)
             elif lower_how == 'contains':
                 all_objs_query = PlatformType.objects.all()
 
@@ -430,7 +464,7 @@ class GetQuerySetMethod:
                     res_pk_list.append(o.id)
                 qs = PlatformType.objects.filter(pk__in=res_pk_list)
             else:
-                raise ImproperInput("how should be match or contains or regex")
+                return GetQuerySetMethod.get_platform_type(model = model, how="contains")
         else:
             qs = PlatformType.objects.all()
         return qs
@@ -439,7 +473,7 @@ class GetQuerySetMethod:
     @query_optimize_decorator(['user', 'platform_comment_box'])
     def get_platform_comment(platform_name=None):
         if platform_name:
-            box_qs = PlatformCommentBox.objects.filter(platform__name=platform_name)
+            box_qs = PlatformCommentBox.objects.filter(platform__name__iexact=platform_name)
             box_pk_list = []
             for o in box_qs:
                 box_pk_list.append(o.id)
@@ -459,12 +493,12 @@ class GetQuerySetMethod:
 
             if instruments_qs is None:
                 if instrument_identifier:
-                    instruments_qs = Instrument.objects.filter(identifier=instrument_identifier)
+                    instruments_qs = Instrument.objects.filter(identifier__iexact=instrument_identifier)
                 else:
                     instruments_qs = SensorOnInstrument.objects.none()
             else:
                 if instrument_identifier:
-                    instruments_qs = instruments_qs.filter(identifier=instrument_identifier)
+                    instruments_qs = instruments_qs.filter(identifier__iexact=instrument_identifier)
 
             sensor_on_instrument_list = list(instruments_qs)
             qs = SensorOnInstrument.objects.filter(instrument__in=sensor_on_instrument_list)

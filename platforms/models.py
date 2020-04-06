@@ -1,20 +1,18 @@
-import os
-
 from django.db import models
 from django.contrib.auth.admin import User
 
+from common.model import ModelBase, CommentModelBase
 
-class PlatformType(models.Model):
+
+class PlatformType(ModelBase):
     model = models.CharField(max_length=300)
     manufacturer = models.ForeignKey('general.Manufacturer', on_delete=models.CASCADE)
-    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
-        return "%s - %s" % (self.model, self.manufacturer)
+        return "{} - {}".format(self.model, self.manufacturer)
 
 
-class Platform(models.Model):
+class Platform(ModelBase):
     name = models.CharField(
         max_length=300,
         help_text="The name of the platform"
@@ -33,33 +31,29 @@ class Platform(models.Model):
     )
     purchase_date = models.DateTimeField(null=True, blank=True)
     active = models.BooleanField(default=True, null=False, help_text="check if the platform is currently active")
-    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
-        return "%s - %s" % (self.name, self.serial_number)
+        return "{} - {}".format(self.name, self.serial_number)
 
 
-class PlatformPowerType(models.Model):
+class PlatformPowerType(ModelBase):
     name = models.CharField(
         max_length=500,
         help_text="Power source of this deployment"
     )
-    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
-        return "%s" % (self.name)
+        return "{}".format(self.name)
 
 
-class PlatformDeployment(models.Model):
+class PlatformDeployment(ModelBase):
     wmo_id = models.IntegerField(
         null=True,
         blank=True,
         help_text="The WMO ID for the mission. See: <a href='http://www.jcomm.info/index.php?option=com_oe&task=viewGroupRecord&groupID=155'>WMO Contact Info</a> to acquire"
     )
     deployment_number = models.IntegerField(null=True, blank=True)
-    platform = models.ForeignKey(Platform, on_delete=False)
+    platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
     institution = models.ForeignKey(
         'general.Institution',
         on_delete=models.PROTECT,
@@ -163,49 +157,77 @@ class PlatformDeployment(models.Model):
         help_text="The sea in which the study is being conducted: <a href='https://www.nodc.noaa.gov/General/NODC-Archive/seanamelist.txt'>Sea Names</a>",
     )
 
-    latitude = models.FloatField(
+    deployment_latitude = models.FloatField(
         null=True,
         blank=True,
         help_text='The latitude of the deployment'
     )
 
-    longitude = models.FloatField(
+    deployment_longitude = models.FloatField(
         null=True,
         blank=True,
         help_text='The longitude of the deployment'
     )
+    recovery_latitude = models.FloatField(
+        null=True,
+        blank=True,
+        help_text='The latitude of the recovery'
+    )
 
+    recovery_longitude = models.FloatField(
+        null=True,
+        blank=True,
+        help_text='The longitude of the recovery'
+    )
+    deployment_cruise = models.CharField(
+        null=True,
+        blank=True,
+        help_text='The cruise of the deployment',
+        max_length=100
+    )
+    recovery_cruise = models.CharField(
+        null=True,
+        blank=True,
+        help_text='The cruise of the recovery',
+        max_length=100
+    )
+    deployment_personnel = models.CharField(
+        null=True,
+        blank=True,
+        help_text='The personnel of the deployment',
+        max_length=150
+    )
+    recovery_personnel = models.CharField(
+        null=True,
+        blank=True,
+        help_text='The personnel of the recovery',
+        max_length=150
+    )
     depth = models.FloatField(
         null=True,
         blank=True,
         help_text='The depth of the deployment'
     )
-    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return_string = ''
         if self.deployment_number is not None:
-            return_string += '%s - ' % self.deployment_number
+            return_string += '{} - '.format(self.deployment_number)
         if self.title is not None:
-            return_string += '%s - ' % self.title
-        # if self.platform_name is not None:
+            return_string += '{} - '.format(self.title)
+            # if self.platform_name is not None:
 
         else:
-            return_string += '%s - %s' % (
-                self.platform.name,
-                self.start_time.strftime('%Y-%m-%d')
-            )
-        return_string += '%s - %s' % (
-            self.platform.name,
-            self.start_time.strftime('%Y-%m-%d')
-        )
+            return_string += '{} - {}'.format(self.platform.name,
+                                              self.start_time.strftime('%Y-%m-%d'))
+        return_string += '{} - {}'.format(self.platform.name,
+                                          self.start_time.strftime('%Y-%m-%d'))
         if self.end_time is not None:
-            return_string += ' - %s' % self.end_time.strftime('%Y-%m-%d')
+            return_string += ' - {}'.format(self.end_time.strftime('%Y-%m-%d'))
         return return_string
 
 
-class DeploymentImage(models.Model):
+class DeploymentImage(ModelBase):
     class Meta:
         verbose_name = "Image"
         verbose_name_plural = "Images"
@@ -213,46 +235,49 @@ class DeploymentImage(models.Model):
     platform_deployment = models.ForeignKey('PlatformDeployment', on_delete=models.CASCADE)
     title = models.CharField(max_length=300, null=False)
     picture = models.ImageField(upload_to="uploaded_media", null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
-        return "%s picture" % (self.platform_deployment)
+        return "{} picture".format(self.platform_deployment)
 
 
 class PlatformDeploymentCommentBox(models.Model):
+    class Meta:
+        verbose_name = 'Platform Deployment Comment Box'
+        verbose_name_plural = 'Platform Deployment Comment Boxes'
+
     platform_deployment = models.OneToOneField('PlatformDeployment', on_delete=models.PROTECT)
 
     def __str__(self):
-        return "%s comment box" % (self.platform_deployment)
+        return "{} comment box".format(self.platform_deployment)
 
 
-class PlatformDeploymentComment(models.Model):
+class PlatformDeploymentComment(CommentModelBase):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     comment = models.TextField(help_text="Comments")
-    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     platform_deployment_comment_box = models.ForeignKey(PlatformDeploymentCommentBox, on_delete=models.CASCADE)
-    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
+    models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return "%s" % (self.id)
+        return "{}".format(self.id)
 
 
 class PlatformCommentBox(models.Model):
+    class Meta:
+        verbose_name = 'Platform Comment Box'
+        verbose_name_plural = 'Platform Comment Boxes'
+
     platform = models.OneToOneField('Platform', on_delete=models.PROTECT)
 
     def __str__(self):
-        return "%s comment box" % (self.platform)
+        return "{} comment box".format(self.platform)
 
 
-class PlatformComment(models.Model):
+class PlatformComment(CommentModelBase):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     comment = models.TextField(
         help_text="This is a good place to log any problems or changes with a platform"
     )
-    created_date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     platform_comment_box = models.ForeignKey(PlatformCommentBox, on_delete=models.CASCADE)
-    modified_date = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
-        return "%s" % (self.id)
+        return "{}".format(self.id)

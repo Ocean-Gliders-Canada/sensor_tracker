@@ -1,17 +1,14 @@
 import warnings
 
 from django.contrib import admin
-from django.forms import ModelForm
+from custom_admin import admin as custom_admin_site
 from django import forms
 from datetime import datetime
-from django.db.models import Q
 
 from django.core.exceptions import ObjectDoesNotExist
 from instruments.admin_filter import (
     SensorOnInstrumentPlatformFilter,
 )
-
-from suit.widgets import SuitSplitDateTimeWidget
 
 from instruments.admin_filter import (
     InstrumentPlatformNameFilter,
@@ -33,19 +30,17 @@ from .models import (
     SensorOnInstrument,
 )
 
-from django.urls import reverse
-
-from platforms.models import Platform
-
-
-class InstrumentOnPlatformForm(ModelForm):
-    class Meta:
-        model = InstrumentOnPlatform
-        fields = '__all__'
-        widgets = {
-            'start_time': SuitSplitDateTimeWidget,
-            'end_time': SuitSplitDateTimeWidget
-        }
+from common.admin_common import CommentBoxAdminMixin
+from common.utilities import make_edit_link, make_add_link
+from instruments.model_form import (
+    InstrumentOnPlatformForm,
+    SensorForm,
+    InstrumentForm,
+    SensorOnInstrumentForm,
+    InstrumentCommentBoxForm
+)
+from common.admin_common import BaseCommentBoxInline
+from common.admin_common import CustomChangeListAdminMixin
 
 
 class InstrumentOnPlatformAdmin(admin.ModelAdmin):
@@ -56,7 +51,7 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
         InstrumentOnPlatformInstrumentIdentifierFilter,
         InstrumentOnPlatformSortFilter
     )
-
+    change_list_template = 'admin/custom_change_list.html'
     list_display = (
         'instrument_identifier', 'instrument_serial', 'instrument_short_name', 'instrument_long_name', 'platform',
         'start_time', 'end_time', 'comment')
@@ -75,29 +70,10 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
         return instance.instrument.serial
 
 
-admin.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
+custom_admin_site.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
 
 
-class SensorForm(ModelForm):
-    class Meta:
-        model = Sensor
-        fields = '__all__'
-
-    def clean(self):
-        cleaned_data = super().clean()
-        include_in_output = cleaned_data.get("include_in_output")
-        long_name = cleaned_data.get("long_name")
-
-        if include_in_output and not long_name:
-            # Only do something if both fields are valid so far.
-
-            raise forms.ValidationError(
-                "Long name must be given when included in output checked"
-            )
-
-
-@admin.register(Sensor)
-class SensorAdmin(admin.ModelAdmin):
+class SensorAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     form = SensorForm
     search_fields = ['identifier', 'long_name', 'standard_name']
     readonly_fields = ('created_date', 'modified_date')
@@ -108,6 +84,29 @@ class SensorAdmin(admin.ModelAdmin):
         SensorPlatformNameFilter,
         SensorInstrumentIdentifierFilter,
     )
+    change_form_template = 'admin/custom_sensor_change_form.html'
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        sensor_obj = Sensor.objects.get(id=int(object_id))
+        instrument_on_platform_qs = SensorOnInstrument.objects.filter(sensor=sensor_obj).order_by(
+            'start_time').prefetch_related('instrument').prefetch_related('sensor')
+        objs = list(instrument_on_platform_qs)
+        for obj in objs:
+            obj.url_edit_link = make_edit_link(obj)
+            obj.url_instrument_change = make_edit_link(obj.instrument)
+
+        sensor_on_instrument_add_link = make_add_link(SensorOnInstrument)
+        extra_context = {
+            "extra_content": objs,
+            "sensor_on_instrument_add_link": sensor_on_instrument_add_link,
+        }
+        return super().change_view(request, object_id, form_url='', extra_context=extra_context)
+
+    def delete_queryset(self, request, queryset):
+        super().delete_queryset(request, queryset)
+
+    def delete_model(self, request, queryset):
+        super().delete_model(request, queryset)
 
     def save_model(self, request, obj, form, change):
         time = datetime.now()
@@ -141,48 +140,10 @@ class SensorAdmin(admin.ModelAdmin):
             super().save_model(request, obj, form, change)
 
 
-class InstrumentForm(ModelForm):
-    class Meta:
-        model = Instrument
-        fields = '__all__'
+custom_admin_site.site.register(Sensor, SensorAdmin)
 
 
-class PlatformForm(ModelForm):
-    class Meta:
-        model = Platform
-        fields = '__all__'
-
-
-class PlatformInline(admin.StackedInline):
-    model = InstrumentOnPlatform
-
-    exclude = ["comment"]
-    readonly_fields = ["platform", "start_time", "end_time"]
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        qs = qs.prefetch_related('instrument').prefetch_related('platform')
-        return qs
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-
-class InstrumentOnPlatformDisplayItem:
-    def __init__(self, instance):
-        self.instrument_on_platform_instance = instance
-
-
-class SensorOnInstrumentInline(admin.StackedInline):
-    model = Sensor
-    min_num = 0
-
-
-@admin.register(Instrument)
-class InstrumentAdmin(admin.ModelAdmin):
+class InstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date')
 
     list_filter = (InstrumentPlatformTypeFilter,
@@ -191,7 +152,7 @@ class InstrumentAdmin(admin.ModelAdmin):
     search_fields = ['identifier', 'short_name', 'long_name', 'serial', 'manufacturer__name']
     list_display = ('identifier', 'short_name', 'long_name', 'serial', 'manufacturer', 'created_date', 'modified_date')
     form = InstrumentForm
-    change_form_template = 'admin/custom_change_form.html'
+    change_form_template = 'admin/custom_instrument_change_form.html'
     list_per_page = 40
 
     def get_queryset(self, request):
@@ -215,48 +176,21 @@ class InstrumentAdmin(admin.ModelAdmin):
             soi.url_edit_link = make_edit_link(soi)
             soi.url_sensor_cahnge = make_edit_link(soi.sensor)
             sensor_obj_set.append(soi)
-
+        instrument_on_platform_add_link = make_add_link(InstrumentOnPlatform)
+        sensor_on_instrument_add_link = make_add_link(SensorOnInstrument)
         extra_context = {
             "extra_content": objs,
-            "inline_content": sensor_obj_set
+            "inline_content": sensor_obj_set,
+            "instrument_on_platform_add_link": instrument_on_platform_add_link,
+            "sensor_on_instrument_add_link": sensor_on_instrument_add_link,
         }
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
 
 
-def make_edit_link(instance):
-    opt = instance._meta
-    link = reverse('admin:{}_{}_change'.format(opt.app_label, opt.model_name), args=(instance.id,))
-    return link
+custom_admin_site.site.register(Instrument, InstrumentAdmin)
 
 
-class SensorOnInstrumentForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-        self.fields['sensor'].disabled = True
-        self.fields['instrument'].disabled = True
-
-    class Meta:
-        model = SensorOnInstrument
-        fields = '__all__'
-
-    def clean(self):
-        cleaned_data = super().clean()
-        instrument = cleaned_data.get("instrument")
-        sensor = cleaned_data.get("sensor")
-        soi_qs = SensorOnInstrument.objects.filter(instrument=instrument, sensor=sensor, end_time=None)
-        if hasattr(self, 'instrance'):
-            self_id = self.instrument.id
-            soi_qs = soi_qs.filter(~Q(id=self_id))
-        if soi_qs.count() != 0:
-            raise forms.ValidationError(
-                "Must put end time for exist {} {} sensor on instrument table before creating a new one.".format(
-                    instrument.identifier, sensor.identifier)
-            )
-
-
-@admin.register(SensorOnInstrument)
-class SensorOnInstrumentAdmin(admin.ModelAdmin):
+class SensorOnInstrumentAdmin( CustomChangeListAdminMixin, admin.ModelAdmin):
     list_display = ('sensor', 'instrument', 'start_time', 'end_time')
     list_filter = (
         SensorOnInstrumentPlatformFilter,
@@ -267,9 +201,6 @@ class SensorOnInstrumentAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request).prefetch_related('instrument').prefetch_related('sensor')
 
         return qs
-
-    def has_add_permission(self, request):
-        return False
 
     def save_model(self, request, obj, form, change):
         if change:
@@ -294,21 +225,14 @@ class SensorOnInstrumentAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-class InstrumentCommentBoxInline(admin.TabularInline):
+custom_admin_site.site.register(SensorOnInstrument, SensorOnInstrumentAdmin)
+
+
+class InstrumentCommentBoxInline(BaseCommentBoxInline):
     model = InstrumentComment
-    extra = 0
-    readonly_fields = ('user', 'created_date', 'modified_date')
-
-    fields = ('user', 'created_date', 'modified_date', 'comment')
 
 
-class InstrumentCommentBoxForm(ModelForm):
-    class Meta:
-        model = InstrumentCommentBox
-        fields = ('instrument',)
-
-
-class InstrumentCommentBoxAdmin(admin.ModelAdmin):
+class InstrumentCommentBoxAdmin(CustomChangeListAdminMixin, CommentBoxAdminMixin, admin.ModelAdmin):
     form = InstrumentCommentBoxForm
     inlines = [
         InstrumentCommentBoxInline
@@ -316,14 +240,6 @@ class InstrumentCommentBoxAdmin(admin.ModelAdmin):
     list_display = ('instrument_identifier', 'instrument_short_name', 'instrument_serial', 'on_platform')
     search_fields = ['instrument__identifier', 'instrument__short_name', 'instrument__long_name',
                      'instrument__serial']
-
-    def save_formset(self, request, form, formset, change):
-        instances = formset.save(commit=False)
-
-        for instance in instances:
-            instance.user = request.user
-
-        formset.save()
 
     def get_queryset(self, request):
         qs = super(InstrumentCommentBoxAdmin, self).get_queryset(request)
@@ -352,4 +268,4 @@ class InstrumentCommentBoxAdmin(admin.ModelAdmin):
             return " and ".join(platform_names)
 
 
-admin.site.register(InstrumentCommentBox, InstrumentCommentBoxAdmin)
+custom_admin_site.site.register(InstrumentCommentBox, InstrumentCommentBoxAdmin)

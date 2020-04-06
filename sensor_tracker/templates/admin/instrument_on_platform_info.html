@@ -12,13 +12,13 @@
         <tbody>
         {% for c in extra_content %}
             <tr>
-                <td><a href="{{ c.url_platform_change }}">{{ c.platform.name }}</a></td>
+                <td><a href="{{ c.url_platform_change }}" target="_blank">{{ c.platform.name }}</a></td>
                 <td>{{ c.start_time }}</td>
                 <td>{{ c.end_time }}</td>
-                <td><a href="{{ c.url_edit_link }}">edit</a></td>
+                <td><a href="{{ c.url_edit_link }}" target="_blank">edit</a></td>
             </tr>
         {% endfor %}
 
     </table>
-    <a href="/admin/instruments/instrumentonplatform/add/">add instrument on platform table</a>
+
 </div>
