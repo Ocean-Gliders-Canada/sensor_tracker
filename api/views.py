@@ -12,6 +12,8 @@ from .core.api_base import ApiBaseView
 from .core import serializer
 from .core.qs_getter import GetQuerySetMethod
 
+PLATFORM_DEPLOYMENT_START_TIME_DESCRIPTION = "The start time of the deployment. Time format could be Y-m-d H:M:S (2019-09-11 14:00:00) or Y-m-d(2019-09-11) "
+
 
 # General Models
 
@@ -51,7 +53,7 @@ class GetInstrument(ApiBaseView):
         "long_name": "The full name for the instrument",
         "serial": "The serial number of Instrument",
         "platform_name": "The name of platform that the instrument attach to",
-        "deployment_start_time": "The start time of the deployment"
+        "deployment_start_time": PLATFORM_DEPLOYMENT_START_TIME_DESCRIPTION
     }
     mutual_exclusion = (
         ["identifier", "short_name", "long_name", "serial"], ["platform_name", "start_time"])
@@ -66,7 +68,7 @@ class GetSensor(ApiBaseView):
         "identifier": "The identifier of the sensor",
         "long_name": "The long name of the sensor",
         "platform_name": "The name of the platform with sensor attach to",
-        "deployment_start_time": "The start time of deployment",
+        "deployment_start_time": PLATFORM_DEPLOYMENT_START_TIME_DESCRIPTION,
         "instrument_identifier": "The name of the instrument that sensor attach to",
         "output": "if the include in output option checked"
     }
@@ -99,7 +101,7 @@ class GetSensorOnInstrument(ApiBaseView):
     """Get sensor on instrument data"""
     accept_option = {
         "platform_name": "The name of the platform",
-        "deployment_start_time": "The start time of the deployment",
+        "deployment_start_time": PLATFORM_DEPLOYMENT_START_TIME_DESCRIPTION,
         "instrument_identifier": "The identifier of instrument"
     }
     serializer_class = serializer.SensorOnInstrumentSerializer
@@ -160,7 +162,7 @@ class GetDeployment(ApiBaseView):
         "wmo_id": "The WMO ID of the deployment",
         "testing_mission": "The name of the testing mission",
         "deployment_number": "The deployment number of the mission",
-        "start_time": "The start time of the deployment",
+        "start_time": PLATFORM_DEPLOYMENT_START_TIME_DESCRIPTION,
         "platform_name": "The name of the platform",
         "institution_name": "The name of institution",
         "model": "The model of the platform",
@@ -178,7 +180,7 @@ class GetPlatformDeploymentComment(ApiBaseView):
     """Get platform deployment data"""
     accept_option = {
         "platform_name": "The name of deployment's platform",
-        "start_time": "The start time of deployment",
+        "start_time": PLATFORM_DEPLOYMENT_START_TIME_DESCRIPTION,
         "modified_date": "The time of comment modified"
     }
     serializer_class = serializer.PlatformDeploymentCommentSerializer
