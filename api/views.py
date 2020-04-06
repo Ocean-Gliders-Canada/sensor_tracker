@@ -64,18 +64,16 @@ class GetSensor(ApiBaseView):
     """Get sensor data"""
     accept_option = {
         "identifier": "The identifier of the sensor",
-        "short_name": "The short name of the sensor",
         "long_name": "The long name of the sensor",
         "platform_name": "The name of the platform with sensor attach to",
         "deployment_start_time": "The start time of deployment",
         "instrument_identifier": "The name of the instrument that sensor attach to",
-        "instrument_serial": "The serial number of the instrument that sensor attach to",
         "output": "if the include in output option checked"
     }
     mutual_exclusion = (
         ["identifier", "short_name", "long_name"],
         ["platform_name", "deployment_start_time"],
-        ["instrument_identifier", "instrument_serial"])
+        ["instrument_identifier", ])
     serializer_class = serializer.SensorSerializer
     queryset_method = GetQuerySetMethod.get_sensors
 
@@ -134,9 +132,8 @@ class GetPower(ApiBaseView):
 class GetPlatform(ApiBaseView):
     """Get platform data"""
     accept_option = {
-        "name": "The name used to identify this instrument in the raw data.",
+        "platform_name": "The name used to identify this instrument in the raw data.",
         "serial_number": "The serial number of the platform",
-        "wmo_id": "",
         "model": "The model of the platform",
         "how": "The way how to filter the platform"
     }
@@ -163,7 +160,6 @@ class GetDeployment(ApiBaseView):
         "wmo_id": "The WMO ID of the deployment",
         "testing_mission": "The name of the testing mission",
         "deployment_number": "The deployment number of the mission",
-        "sea_name": "",
         "start_time": "The start time of the deployment",
         "platform_name": "The name of the platform",
         "institution_name": "The name of institution",
