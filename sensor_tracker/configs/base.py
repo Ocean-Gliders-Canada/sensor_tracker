@@ -158,7 +158,7 @@ ALLOWED_HOSTS = config_agent.general_info['ALLOWED_HOSTS']
 
 DEBUG = config_agent.DEBUG
 
-STATIC_ROOT = '/etc/nginx/html/sensor_tracker/'
+STATIC_ROOT = '/var/www/static/sensor_tracker/'
 FILE_UPLOAD_MAX_MEMORY_SIZE = 20000
 if config_agent.general_info['STATIC_ROOT']:
     STATIC_ROOT = config_agent.general_info['STATIC_ROOT']
