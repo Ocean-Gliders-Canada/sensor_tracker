@@ -304,7 +304,6 @@ class GetQuerySetMethod:
         return qs
 
     @staticmethod
-    @query_optimize_decorator(['instrument'])
     def get_instruments_by_deployment(platform_name=None, deployment_start_time=None):
         pk_list = []
         if deployment_start_time:
