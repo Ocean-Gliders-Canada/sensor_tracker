@@ -55,6 +55,9 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     authentication_classes = (TokenAuthentication, SessionAuthentication)
 
+    MAXI_DEPTH = 10
+    MIN_DEPTH = 0
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         test = kwargs.pop("test", False)
@@ -115,20 +118,20 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
             try:
                 depth = int(depth)
             except VariableError:
-                depth = 0
+                depth = ApiBaseView.MIN_DEPTH
         elif type(depth) is not int:
             raise Exception
-        if depth > 10:
-            depth = 10
-        elif depth < 0:
-            depth = 0
+        if depth > ApiBaseView.MAXI_DEPTH:
+            depth = ApiBaseView.MAXI_DEPTH
+        elif depth < ApiBaseView.MIN_DEPTH:
+            depth = ApiBaseView.MIN_DEPTH
         return depth
 
     def _inner_initial(self):
         """Checking and prepare input variables for following get query set functions"""
 
         get_dict = copy.deepcopy(self.request._request.GET)
-        depth = get_dict.get("depth", 0)
+        depth = get_dict.get("depth", self.MIN_DEPTH)
 
         depth = self._depth_limit(depth)
         self.serializer_class = serializer_factory(self.serializer_class, depth)
@@ -138,7 +141,7 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
             if depth:
                 kwargs["depth"] = depth
             else:
-                kwargs["depth"] = 0
+                kwargs["depth"] = self.MIN_DEPTH
             qs = self.queryset_method(**kwargs)
             self.queryset = qs
         return kwargs

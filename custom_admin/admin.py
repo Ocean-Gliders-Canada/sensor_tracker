@@ -1,5 +1,4 @@
 import ast
-import csv
 from django.contrib.auth.models import Group, User, AnonymousUser
 from django.contrib.auth.admin import GroupAdmin
 from django.contrib.admin import AdminSite
@@ -127,7 +126,7 @@ class CustomAdminSite(AdminSite):
             filter_dict = {key: value}
         return filter_dict
 
-    def get_qs_1(self, request, target_model, model_admin, list_filter, filter_info):
+    def get_qs(self, request, target_model, model_admin, list_filter, filter_info):
         queryset = target_model.objects.all()
         if filter_info:
             for key in filter_info:
@@ -144,38 +143,28 @@ class CustomAdminSite(AdminSite):
                         queryset = queryset & item.queryset(request=request, queryset=queryset)
         return queryset
 
-    def get_qs_2(self, request, target_model, model_admin, list_filter, filter_info):
-        queryset = target_model.objects.all()
-        flag = True
-        for key in filter_info:
-            list_filter = list(list_filter)
-            list_filter.reverse()
-            for item in list_filter:
-                if isinstance(item, str) and item in key:
-                    filter_dict = {key: filter_info.get(key)}
-                    queryset.filter(**filter_dict)
-                    flag = False
-                    break
-                if not isinstance(item, str) and item.parameter_name == key:
-                    if '%2B' in filter_info.get(key):
-                        new = filter_info.get(key).replace('%2B', '+')
-                        filter_dict = {key: new}
-                    else:
-                        filter_dict = {key: filter_info.get(key)}
-                    item = item(request=None, params=filter_dict, model=target_model, model_admin=model_admin)
-                    queryset = item.queryset(request=request, queryset=queryset)
-                    flag = False
-                    break
-            if not flag:
-                break
-            return queryset
-
     def get_filter_info(self, post):
         filter_info = post.get('filter')
         filter_info = ast.literal_eval(filter_info)
-
         return filter_info
 
+    def get_csv(self, display_fields, queryset):
+        header = ','.join(display_fields) + '\n'
+        lines = []
+        for item in queryset:
+            line = []
+            for field in display_fields:
+                value = getattr(item, field)
+                if value is None:
+                    value = ''
+                elif not isinstance(value, str):
+                    value = str(value)
+                line.append(value)
+            line_str = ','.join(line)
+            lines.append(line_str)
+        data = '\n'.join(lines)
+        res_csv = header + data
+        return res_csv
 
     @csrf_exempt
     def download(self, request):
@@ -184,31 +173,14 @@ class CustomAdminSite(AdminSite):
         post_dict = dict(post)
         target_model, model_admin, display_fields, list_filter = self.get_model(post_dict)
         if filter_info:
-            queryset = self.get_qs_1(request, target_model, model_admin, list_filter, filter_info)
+            queryset = self.get_qs(request, target_model, model_admin, list_filter, filter_info)
         else:
             queryset = target_model.objects.all()
-        path = "temp.csv"
-
-        with open(path, 'w') as csv_file:
-            writer = csv.DictWriter(csv_file, fieldnames=display_fields)
-            writer.writeheader()
-            for item in queryset:
-                d = {}
-                for field in display_fields:
-                    d[field] = getattr(item, field)
-                writer.writerow(d)
-
-        def file_iterator(file_name, chunk_size=512):
-            with open(file_name, 'r') as f:
-                while True:
-                    c = f.read(chunk_size)
-                    if c:
-                        yield c
-                    else:
-                        break
-        response = StreamingHttpResponse(file_iterator(path))
+        response = StreamingHttpResponse(content_type='text/csv')
         response['Content-Type'] = 'application/octet-stream'
         response['Content-Disposition'] = 'attachment; filename="model.csv"'
+        res_csv = self.get_csv(display_fields, queryset)
+        response.streaming_content = res_csv
         return response
 
 

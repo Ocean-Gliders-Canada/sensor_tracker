@@ -461,7 +461,7 @@ class GetQuerySetMethod:
                     res_pk_list.append(o.id)
                 qs = PlatformType.objects.filter(pk__in=res_pk_list)
             else:
-                raise ImproperInput("how should be match or contains or regex")
+                return GetQuerySetMethod.get_platform_type(model = model, how="contains")
         else:
             qs = PlatformType.objects.all()
         return qs
