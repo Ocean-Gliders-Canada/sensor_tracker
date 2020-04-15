@@ -31,6 +31,36 @@ class Platform(ModelBase):
     )
     purchase_date = models.DateTimeField(null=True, blank=True)
     active = models.BooleanField(default=True, null=False, help_text="check if the platform is currently active")
+    contributors_email = models.TextField(
+        null=True,
+        blank=True,
+        help_text="A comma separated list of the emails for those specified in the contributor_name attribute"
+    )
+    agencies = models.TextField(
+        null=True,
+        blank=True,
+        help_text="A comma separated list of agencies involved with this data set"
+    )
+    agencies_role = models.TextField(
+        null=True,
+        blank=True,
+    )
+    site = models.TextField(
+        null=True,
+        blank=True,
+    )
+    program = models.TextField(
+        null=True,
+        blank=True,
+    )
+    transmission_system = models.TextField(
+        null=True,
+        blank=True,
+    )
+    positioning_system = models.TextField(
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return "{} - {}".format(self.name, self.serial_number)

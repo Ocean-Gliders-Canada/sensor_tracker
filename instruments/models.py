@@ -188,6 +188,10 @@ class Sensor(ModelBase):
         blank=True,
         help_text="This is a good place to document anything unusual about this particular sensor. IE: wavelengths for spectral sensors"
     )
+    model = models.TextField(
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return "%s" % (self.identifier)
