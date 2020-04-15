@@ -24,8 +24,6 @@ class HierarchyTest(TestCase):
                                           project=project, power_type=platform_power_type,
                                           start_time=date)
         instrument1 = Instrument.objects.create(identifier='test_instrument_identifier', serial='test_serial')
-        # instrument1.created_date = date
-        # instrument1.save()
         InstrumentOnPlatform.objects.create(instrument=instrument1, platform=platform1, start_time=date,)
         sensor1 = Sensor.objects.create(identifier='1', long_name='long')
 
