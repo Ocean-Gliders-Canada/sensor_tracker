@@ -12,33 +12,34 @@ class GetHierarchy:
     GET_INSTRUMENT_FUNCTION = GetQuerySetMethod.get_instrument_on_platform_by_platform_and_time
     GET_SENSOR_FUNCTION = GetQuerySetMethod.get_sensor_on_instrument
 
-    def get_sensors_list(self, sensors, sensor_fields):
+    def get_dict(self, item, fields):
+        item_dict = {}
+        for field in fields:
+            value = getattr(item, field)
+            if isinstance(value, datetime.datetime):
+                value = value.strftime("%Y-%m-%d %H:%M:%S")
+            elif isinstance(value, (PlatformType, Institution, Manufacturer, Instrument)):
+                value = str(value)
+            item_dict[field] = value
+        return item_dict
+
+    def get_sensors_list(self, sensors):
         sensor_list = []
+        sensor = Sensor._meta.fields
+        sensor_fields = [sensor[i].name for i in range(len(sensor))]
         for sensor in sensors:
-            sensor_dict = {}
-            for sen_field in sensor_fields:
-                value = getattr(sensor, sen_field)
-                if isinstance(value, datetime.datetime):
-                    value = value.strftime("%Y-%m-%d %H:%M:%S")
-                elif isinstance(value, (PlatformType, Institution, Manufacturer, Instrument)):
-                    value = str(value)
-                sensor_dict[sen_field] = value
+            sensor_dict = self.get_dict(sensor, sensor_fields)
             sensor_list.append(sensor_dict)
         return sensor_list
 
-    def get_instrument_list(self, sensor_qs, sensor_fields, instrument_qs, instrument_fields):
+    def get_instrument_list(self, sensor_qs, instrument_qs):
         instrument_list = []
+        instrument = Instrument._meta.fields
+        instrument_fields = [instrument[i].name for i in range(len(instrument))]
         for ins in instrument_qs:
-            instrument_dict = {}
-            for ins_field in instrument_fields:
-                value = getattr(ins, ins_field)
-                if isinstance(value, datetime.datetime):
-                    value = value.strftime("%Y-%m-%d %H:%M:%S")
-                elif isinstance(value, (PlatformType, Institution, Manufacturer, Instrument)):
-                    value = str(value)
-                instrument_dict[ins_field] = value
+            instrument_dict = self.get_dict(ins, instrument_fields)
             sensors = sensor_qs.pop(0)
-            sensor_list = self.get_sensors_list(sensors, sensor_fields)
+            sensor_list = self.get_sensors_list(sensors)
             instrument_dict['sensors_on_curr_instrument'] = sensor_list
             instrument_list.append(instrument_dict)
         return instrument_list
@@ -54,11 +55,7 @@ class GetHierarchy:
             elif isinstance(value, (PlatformType, Institution, Manufacturer, Instrument)):
                 value = str(value)
             res[plat_field] = value
-        sensor = Sensor._meta.fields
-        sensor_fields = [sensor[i].name for i in range(len(sensor))]
-        instrument = Instrument._meta.fields
-        instrument_fields = [instrument[i].name for i in range(len(instrument))]
-        instrument_list = self.get_instrument_list(sensor_qs, sensor_fields, instrument_qs, instrument_fields)
+        instrument_list = self.get_instrument_list(sensor_qs, instrument_qs)
         res['instrument_on_curr_platform'] = instrument_list
         json_res = json.dumps(res)
         return json_res
