@@ -36,6 +36,10 @@ class Instrument(ModelBase):
         blank=True,
         help_text="This is a good place to document anything unusual about this instrument's configuration"
     )
+    model = models.TextField(
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return_string = '%s - %s' % (self.identifier, self.short_name)
