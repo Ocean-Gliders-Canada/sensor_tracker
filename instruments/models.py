@@ -108,7 +108,7 @@ class Sensor(ModelBase):
         help_text="The name used to identify this sensor in the raw data. ie: sci_water_temp"
     )
     long_name = models.CharField(
-        max_length=50,
+        max_length=300,
         null=True,
         blank=True,
         help_text="*REQUIRED if 'Include in output' is checked. The general name for the sensor. IE: temperature"
