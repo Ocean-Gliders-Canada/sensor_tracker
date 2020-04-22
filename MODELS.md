@@ -111,7 +111,6 @@
   - This is a good place to document anything unusual about this particular sensor. IE: wavelengths for spectral sensors
 
 ## Platforms
-**Properties**
 
 ### Platform Comment Boxes
 **Properties per box**
