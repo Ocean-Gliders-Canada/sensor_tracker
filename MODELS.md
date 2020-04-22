@@ -3,7 +3,7 @@
 ## General
 
 ### Institutions
-Properties
+**Properties**
 - Name
 - Name of the institution
 - Url
@@ -18,7 +18,7 @@ Properties
 - Contact email
 
 ### Manufacturers
-Properties
+**Properties**
 - Name
 - Street
 - City
@@ -30,19 +30,19 @@ Properties
 - Contact email
 
 ### Projects
-Properties
+**Properties**
 - Name
 
 ## Instruments
 
 ### Instrument Comment Boxes
-Properties per box
+**Properties per box**
 - Event Time
 - Comment
 
 
 ### Instrument on Platform History
-Properties
+**Properties**
 - Instrument
   - The instrument that was put on a platform
 - Platform
@@ -54,7 +54,7 @@ Properties
 - Comment
 
 ### Instruments	
-Properties
+**Properties**
 - Identifier
   - The name used to identify this instrument in the raw data. IE: SATCTD7229, sci_water
 - Short name
@@ -68,7 +68,7 @@ Properties
   - This is a good place to document anything unusual about this instrument's configuration
 
 ### Sensor on Instrument History
-Properties
+**Properties**
 - Instrument
   - The instrument that was put on a platform
 - Sensor
@@ -80,6 +80,7 @@ Properties
 - Comment
 
 ### Sensors	
+**Properties**
 - Identifier
   - The name used to identify this sensor in the raw data. ie: sci_water_temp
 - Long name
@@ -110,17 +111,22 @@ Properties
   - This is a good place to document anything unusual about this particular sensor. IE: wavelengths for spectral sensors
 
 ## Platforms
+**Properties**
 
-### Platform Comment Boxes	
+### Platform Comment Boxes
+**Properties per box**
 
 ### Platform Deployment Comment Boxes	
 
 ### Platform deployments	
+**Properties**
 
 ### Platform power types	
+**Properties**
 
 ### Platform types	
+**Properties**
 
 ### Platforms
-
+**Properties**
 
