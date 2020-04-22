@@ -35,24 +35,6 @@
 
 ## Instruments
 
-### Instrument Comment Boxes
-**Properties per box**
-- Event Time
-- Comment
-
-
-### Instrument on Platform History
-**Properties**
-- Instrument
-  - The instrument that was put on a platform
-- Platform
-  - The platform that the instrument was put on
-- Start time
-  - The date the instrument was put on the platform
-- End time
-  - The date the instrument was removed from the platform
-- Comment
-
 ### Instruments	
 **Properties**
 - Identifier
@@ -66,6 +48,24 @@
 - Master instrument
 - Comment
   - This is a good place to document anything unusual about this instrument's configuration
+
+### Instrument Comment Boxes
+**Properties per box**
+- User
+- Event Time
+- Comment
+
+### Instrument on Platform History
+**Properties**
+- Instrument
+  - The instrument that was put on a platform
+- Platform
+  - The platform that the instrument was put on
+- Start time
+  - The date the instrument was put on the platform
+- End time
+  - The date the instrument was removed from the platform
+- Comment
 
 ### Sensor on Instrument History
 **Properties**
@@ -111,21 +111,119 @@
   - This is a good place to document anything unusual about this particular sensor. IE: wavelengths for spectral sensors
 
 ## Platforms
-
-### Platform Comment Boxes
-**Properties per box**
-
-### Platform Deployment Comment Boxes	
-
-### Platform deployments	
 **Properties**
-
-### Platform power types	
-**Properties**
+- Name
+  - The name of the platform
+- Wmo id
+  - The WMO ID for the mission. See: WMO Contact Info to acquire
+- Serial number
+  - Platform type
+- Institution
+  - The institution who owns the platform
+- Purchase date
+- Active
+  - check if the platform is currently active
 
 ### Platform types	
 **Properties**
+- Model
+- Manufacturer
+
+### Platform power types	
+**Properties**
+- Model
+- Manufacturer
 
 ### Platforms
 **Properties**
+- Name
+  - The name of the platform
+- Wmo id
+  - The WMO ID for the mission. See: WMO Contact Info to acquire
+- Serial number
+  - Platform type
+- Institution
+  - The institution who owns the platform
+- Purchase date
+- Active
+  - check if the platform is currently active
+
+### Platform Comment Boxes
+**Properties per box**
+- User
+- Event Time
+- Comment
+
+### Platform deployments	
+**Properties**
+- Wmo id
+  - The WMO ID for the mission. See: WMO Contact Info to acquire
+- Deployment number
+- Platform
+- Institution
+  - The institution responsible for the deployment.
+- Project
+  - The project the data is being collected under.
+- Power type
+  - The battery type which was using in this deployment.
+- Title
+  - A short descriptive title for the deployment.
+- Start time
+- End time
+- Deployment latitude
+  - The latitude of the deployment
+- Recovery latitude
+  - The latitude of the recovery
+- Deployment longitude
+  - The longitude of the deployment
+- Recovery longitude
+  - The longitude of the recovery
+- Deployment cruise
+  - The cruise of the deployment
+- Recovery cruise
+  - The cruise of the recovery
+- Deployment personnel
+  - The personnel of the deployment
+- Recovery personnel
+  - The personnel of the recovery
+- Testing mission
+  - Whether this is a testing mission rather than a real deployment.
+- Comment
+  - The general comments for the deployment.
+- Acknowledgement
+  - Example: This deployment is supported by funding from NOAA
+- Contributor name
+  - A comma separated list of contributors to this data set
+  - Example: "Jerry Garcia, Bob Weir, Bill Graham"
+- Contributor role
+  - A comma separated list of the roles for those specified in the contributor_name attribute
+  - Example: "Principal Investigator, Principal Investigator, Data Manager"
+- Creator email
+  - The email of person collected data.
+- Creator name
+  - A comma separated of names of the person who collected the data.
+- Creator url
+  - A comma separated of URLs for the person who collected the data.
+- Data repository link
+  - URL for the repository from: Erddap.
+- Publisher email
+  - E-mail address of the publisher of the data.
+- Publisher name
+  - Name of the publisher of the data.
+- Publisher url
+  - A URL for the publisher of the data.
+- Metadata link
+  - This attribute provides a link to a complete metadata record for this data set or the collection that contains this data set.
+- References
+  - Published or web-based references that describe the data or methods used to produce it.
+- Sea name
+  - The sea in which the study is being conducted: Sea Names
+- Depth
+  - The depth of the deployment
+
+### Platform Deployment Comment Boxes	
+**Properties per box**
+- User
+- Event Time
+- Comment
 
