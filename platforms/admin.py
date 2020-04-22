@@ -104,10 +104,10 @@ class PlatformDeploymentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
         ('start_time', 'end_time'),
         ('deployment_latitude', 'recovery_latitude'), ('deployment_longitude', 'recovery_longitude'),
         ('deployment_cruise', 'recovery_cruise'), ('deployment_personnel', 'recovery_personnel'), 'testing_mission',
-        'comment', 'acknowledgement', 'contributor_name',
-        'contributor_role', 'creator_email', 'creator_name', 'creator_url', 'data_repository_link',
-        'publisher_email', 'publisher_name', 'publisher_url', 'metadata_link', 'references', 'sea_name',
-        'depth',
+        'comment', 'acknowledgement', 'agencies', 'agencies_role', 'contributor_name', 'contributors_email',
+        'contributor_role', 'creator_email', 'creator_sector', 'creator_name', 'creator_url', 'data_repository_link', 'program',
+        'publisher_email', 'publisher_name', 'publisher_url', 'publisher_country', 'positioning_system', 'metadata_link', 'references', 'sea_name', 'site',
+        'transmission_system', 'depth',
     )
     change_form_template = 'admin/custom_platform_deployment_change_form.html'
     readonly_fields = ('created_date', 'modified_date',)
