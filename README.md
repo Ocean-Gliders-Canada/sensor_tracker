@@ -5,13 +5,15 @@ instrument, and sensor metadata. This is intended as both informational and to b
 
 For license information, please refer to [**LICENSE.md**](LICENSE.md)
 
+For information on the models and properties currently available, see [**MODELS.md**](MODELS.md)
+
 Setup:
 =============
 **Install**
 
 * [**PostGreSQL**](https://www.postgresql.org/download/)
 * [**Python 3.7**](https://www.python.org/downloads/)
-* [**NGINX**](https://www.nginx.com/resources/wiki/start/topics/tutorials/install/)
+* [**NGINX**](https://www.nginx.com/resources/wiki/start/topics/tutorials/install/) (suggested)
 
 **Download code**
 
