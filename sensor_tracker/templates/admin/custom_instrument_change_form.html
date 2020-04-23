@@ -2,6 +2,12 @@
 {% load i18n admin_urls %}
 
 {% block after_field_sets %}
+    <h3>Instrument Comment Boxes</h3>
+    {% if comment_box_content %}
+        {% include "admin/custom_comment_box.html" %}
+    {% else %}
+        <p>There is no instrument comment boxes data</p>
+    {% endif %}
      <h3>Instrument On platform</h3>
     {% if extra_content %}
         {% include "admin/instrument_on_platform_info.html" %}

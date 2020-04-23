@@ -24,6 +24,7 @@ from django.urls import path
 
 urlpatterns = [
                   url(r'^admin/', admin.site.urls),
+                  url(r'^admin/', admin.site.urls),
                   url(r'^', admin.site.urls),
                   url(r'^api/', include(('api.urls', 'api'), namespace='api')),
                   url(r'^download/*', admin.site.download),
