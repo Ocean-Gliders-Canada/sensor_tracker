@@ -30,7 +30,7 @@ from .models import (
     SensorOnInstrument,
 )
 
-from common.admin_common import CommentBoxAdminBase
+from common.admin_common import CommentBoxAdminMixin
 from common.utilities import make_edit_link, make_add_link
 from instruments.model_form import (
     InstrumentOnPlatformForm,
@@ -40,6 +40,7 @@ from instruments.model_form import (
     InstrumentCommentBoxForm
 )
 from common.admin_common import BaseCommentBoxInline
+from common.admin_common import CustomChangeListAdminMixin
 
 
 class InstrumentOnPlatformAdmin(admin.ModelAdmin):
@@ -50,7 +51,7 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
         InstrumentOnPlatformInstrumentIdentifierFilter,
         InstrumentOnPlatformSortFilter
     )
-
+    change_list_template = 'admin/custom_change_list.html'
     list_display = (
         'instrument_identifier', 'instrument_serial', 'instrument_short_name', 'instrument_long_name', 'platform',
         'start_time', 'end_time', 'comment')
@@ -72,7 +73,7 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
 custom_admin_site.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
 
 
-class SensorAdmin(admin.ModelAdmin):
+class SensorAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     form = SensorForm
     search_fields = ['identifier', 'long_name', 'standard_name']
     readonly_fields = ('created_date', 'modified_date')
@@ -142,7 +143,7 @@ class SensorAdmin(admin.ModelAdmin):
 custom_admin_site.site.register(Sensor, SensorAdmin)
 
 
-class InstrumentAdmin(admin.ModelAdmin):
+class InstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date')
 
     list_filter = (InstrumentPlatformTypeFilter,
@@ -189,7 +190,7 @@ class InstrumentAdmin(admin.ModelAdmin):
 custom_admin_site.site.register(Instrument, InstrumentAdmin)
 
 
-class SensorOnInstrumentAdmin(admin.ModelAdmin):
+class SensorOnInstrumentAdmin( CustomChangeListAdminMixin, admin.ModelAdmin):
     list_display = ('sensor', 'instrument', 'start_time', 'end_time')
     list_filter = (
         SensorOnInstrumentPlatformFilter,
@@ -231,7 +232,7 @@ class InstrumentCommentBoxInline(BaseCommentBoxInline):
     model = InstrumentComment
 
 
-class InstrumentCommentBoxAdmin(CommentBoxAdminBase):
+class InstrumentCommentBoxAdmin(CustomChangeListAdminMixin, CommentBoxAdminMixin, admin.ModelAdmin):
     form = InstrumentCommentBoxForm
     inlines = [
         InstrumentCommentBoxInline

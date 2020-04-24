@@ -131,7 +131,7 @@ class GetQuerySetMethod:
 
     @staticmethod
     @query_optimize_decorator()
-    def get_institutions( name=None):
+    def get_institutions(name=None):
         if not name:
             return Institution.objects.all()
         else:
@@ -304,7 +304,7 @@ class GetQuerySetMethod:
         return qs
 
     @staticmethod
-    @query_optimize_decorator()
+    @query_optimize_decorator([])
     def get_instruments_by_deployment(platform_name=None, deployment_start_time=None):
         pk_list = []
         if deployment_start_time:
@@ -321,11 +321,11 @@ class GetQuerySetMethod:
                         start_t = deployment_obj.start_time
                         end_t = deployment_obj.end_time
                         if end_t:
-                            instrument_on_platform_qs.prefetch_related("instrument").filter(
+                            instrument_on_platform_qs = instrument_on_platform_qs.filter(
                                 Q(start_time__lte=start_t) & Q(end_time__gte=end_t) | Q(start_time__lte=start_t) & Q(
                                     end_time=None))
                         else:
-                            instrument_on_platform_qs.prefetch_related("instrument").filter(
+                            instrument_on_platform_qs = instrument_on_platform_qs.filter(
                                 Q(start_time__lte=start_t))
                         for o in instrument_on_platform_qs:
                             if o.end_time:
@@ -381,6 +381,20 @@ class GetQuerySetMethod:
         else:
             instrument_on_platform_objs = InstrumentOnPlatform.objects.all()
 
+        return instrument_on_platform_objs
+
+    @staticmethod
+    @query_optimize_decorator(['platform', 'instrument'])
+    def get_instrument_on_platform_by_platform_and_time(platform_name, start_time=None, end_time=None):
+        instrument_on_platform_objs = InstrumentOnPlatform.objects.filter(platform__name=platform_name)
+        if end_time:
+            instrument_on_platform_objs = instrument_on_platform_objs.filter(
+                Q(start_time__lte=start_time) & Q(end_time__gte=end_time) | Q(start_time__lte=start_time) & Q(
+                    end_time=None))
+        else:
+            instrument_on_platform_objs = instrument_on_platform_objs.filter(Q(start_time__lte=start_time))
+
+        instrument_on_platform_objs = instrument_on_platform_objs.order_by('instrument_id')
         return instrument_on_platform_objs
 
     @staticmethod
@@ -450,7 +464,7 @@ class GetQuerySetMethod:
                     res_pk_list.append(o.id)
                 qs = PlatformType.objects.filter(pk__in=res_pk_list)
             else:
-                raise ImproperInput("how should be match or contains or regex")
+                return GetQuerySetMethod.get_platform_type(model = model, how="contains")
         else:
             qs = PlatformType.objects.all()
         return qs

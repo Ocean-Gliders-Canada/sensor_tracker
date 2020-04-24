@@ -23,8 +23,7 @@ class CustomFilterBackend(DjangoFilterBackend):
         return res_fileds
 
     def get_schema_fields(self, view):
-        res = super().get_schema_fields(view)
-        res += self.get_special_fields(view)
+        res = self.get_special_fields(view)
         res += generate_default_field()
         return res
 

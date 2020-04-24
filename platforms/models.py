@@ -213,6 +213,51 @@ class PlatformDeployment(ModelBase):
         blank=True,
         help_text='The depth of the deployment'
     )
+    contributors_email = models.TextField(
+        null=True,
+        blank=True,
+        help_text="A comma separated list of the emails for those specified in the contributor_name attribute"
+    )
+    agencies = models.TextField(
+        null=True,
+        blank=True,
+        help_text="A comma separated list of agencies involved with this data set"
+    )
+    agencies_role = models.TextField(
+        null=True,
+        blank=True,
+        help_text="A comma separated list of the roles for those specified in the agencies attribute, example: Funding agency, operating agency, scientific agency, reference data center"
+    )
+    site = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Name of the regularly sample line or area"
+    )
+    program = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Name of the sustained/long term glider program supporting the glider mission. JCOMMOPS uses program to manage glider mission metadata. Example: NANOOS glider program / MOOSE / Balearic Island Observatory / IMOS glider program are programs in the JCOMMOPS system"
+    )
+    transmission_system = models.TextField(
+        null=True,
+        blank=True,
+        help_text="A comma separated list of the telecom technology used by the glider, example: Iridium,Freewave,Cellular"
+    )
+    positioning_system = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Describes the positioning system used by the glider, example: GPS"
+    )
+    creator_sector = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Describes the platform (network) operator’s societal sector"
+    )
+    publisher_country = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Country of the person or organization that distributes the data"
+    )
 
     def __str__(self):
         return_string = ''

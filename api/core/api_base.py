@@ -45,8 +45,6 @@ class ApiBaseViewMeta(type):
 class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCreateModelMixin, CustomUpdateModelMixin,
                   metaclass=ApiBaseViewMeta):
     # either accept accept_option or use default get_method and post method
-    accept = []
-    accept_basic = []
     accept_default = ["format", "depth", "limit", "offset"]
     accept_option = []
     mutual_exclusion = []
@@ -57,19 +55,19 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     authentication_classes = (TokenAuthentication, SessionAuthentication)
 
+    MAXI_DEPTH = 10
+    MIN_DEPTH = 0
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.filterset_class = filterset_class_factory(self)
+        test = kwargs.pop("test", False)
 
-    def variable_check(self, the_get):
+        if not test:
+            self.filterset_class = filterset_class_factory(self)
 
-        # to check if all required variable are here
-        for v in self.accept:
-            if v not in the_get:
-                raise VariableError(self.variable_error_message)
-
+    def _unwelcome_parameter_check(self, the_get):
         # check if receving any unwelcome parameters
-        all_accept_variable = self.accept_default + list(self.accept_option) + list(self.accept_basic)
+        all_accept_variable = self.accept_default + list(self.accept_option)
         unexpected_variable = []
         for v in the_get:
             if v not in all_accept_variable:
@@ -79,7 +77,7 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
                 ", ".join(unexpected_variable))
             raise InvalidParameterError(content)
 
-        # to check no given value that should be here
+    def _check_for_mutual_exclusion(self, the_get):
         assign_list = []
         for i in range(len(self.mutual_exclusion)):
             assign_list.append([])
@@ -96,20 +94,57 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
         for x in assign_list:
             if len(x) > 0:
                 count += 1
+        # todo add error message to explain the error
         if count > 1:
             raise VariableError(self.variable_error_message)
+
+    def variable_check(self, the_get):
+        self._unwelcome_parameter_check(the_get)
+
+        self._check_for_mutual_exclusion(the_get)
 
         return True
 
     def generate_input_argument(self, the_get):
         input_dict = dict()
-        for v in self.accept:
-            input_dict[v] = the_get[v]
-
         for v in self.accept_option:
             if v in the_get:
                 input_dict[v] = the_get[v]
         return input_dict
+
+    @staticmethod
+    def _depth_limit(depth):
+        if type(depth) is str:
+            try:
+                depth = int(depth)
+            except VariableError:
+                depth = ApiBaseView.MIN_DEPTH
+        elif type(depth) is not int:
+            raise Exception
+        if depth > ApiBaseView.MAXI_DEPTH:
+            depth = ApiBaseView.MAXI_DEPTH
+        elif depth < ApiBaseView.MIN_DEPTH:
+            depth = ApiBaseView.MIN_DEPTH
+        return depth
+
+    def _inner_initial(self):
+        """Checking and prepare input variables for following get query set functions"""
+
+        get_dict = copy.deepcopy(self.request._request.GET)
+        depth = get_dict.get("depth", self.MIN_DEPTH)
+
+        depth = self._depth_limit(depth)
+        self.serializer_class = serializer_factory(self.serializer_class, depth)
+        kwargs = None
+        if self.variable_check(get_dict):
+            kwargs = self.generate_input_argument(get_dict)
+            if depth:
+                kwargs["depth"] = depth
+            else:
+                kwargs["depth"] = self.MIN_DEPTH
+            qs = self.queryset_method(**kwargs)
+            self.queryset = qs
+        return kwargs
 
     def initial(self, request, *args, **kwargs):
         # the step before handle the request by handler
@@ -119,34 +154,8 @@ class ApiBaseView(GenericViewSet, ListModelMixin, RetrieveModelMixin, CustomCrea
                 "or override the `get_queryset()` method."
                 % self.__class__.__name__
         )
-        # create the queryset and enhanced the serializer class
-        get_dict = copy.deepcopy(self.request._request.GET)
-        depth = get_dict.get("depth", 0)
 
-        def depth_limit(depth):
-            if type(depth) is str:
-                try:
-                    depth = int(depth)
-                except Exception:
-                    depth = 0
-                if depth > 10:
-                    depth = 10
-                elif depth < 0:
-                    depth = 0
-            return depth
-
-        depth = depth_limit(depth)
-        self.serializer_class = serializer_factory(self.serializer_class, depth)
-
-        if self.variable_check(get_dict):
-            kwargs = self.generate_input_argument(get_dict)
-            if depth:
-                kwargs["depth"] = depth
-            else:
-                kwargs["depth"] = 0
-            qs = self.queryset_method(**kwargs)
-            self.queryset = qs
-
+        self._inner_initial()
         assert self.serializer_class is not None, (
                 "'%s' should either include a `serializer_class` attribute, "
                 "or override the `get_serializer_class()` method."

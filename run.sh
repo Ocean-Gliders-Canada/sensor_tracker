@@ -54,7 +54,8 @@ start()
     if ! status; then
         echo "-> Starting django server"
         LOG_FILE="${LOGS}/server.$(date "+%Y_%m_%d").log"
-        nohup uwsgi ${UWSGI_CONFIG} >> ${LOG_FILE} 2>&1 &
+        ${CONDA_ENV}/bin/python manage.py collectstatic --noinput
+        nohup ${CONDA_ENV}/bin/uwsgi ${UWSGI_CONFIG} >> ${LOG_FILE} 2>&1 &
         sleep 5
         echo -e "tail -n 200 ${LOG_FILE}\n======================="
         tail -n 200 ${LOG_FILE}

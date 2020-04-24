@@ -1,10 +1,11 @@
+from api.core.qs_getter import GetQuerySetMethod
 from custom_admin import admin as custom_admin_site
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 from django_admin_listfilter_dropdown.filters import DropdownFilter
 from common.admin_common import BaseCommentBoxInline
-from common.admin_common import CommentBoxAdminBase
+from common.admin_common import CommentBoxAdminMixin
 from instruments.models import InstrumentOnPlatform, SensorOnInstrument, Instrument
 from platforms.models import (
     PlatformType,
@@ -38,9 +39,10 @@ from platforms.admin_filter import (
     PlatformActiveFilter,
     PlatformDeploymentCommentBoxListFilter
 )
+from common.admin_common import CustomChangeListAdminMixin
 
 
-class PlatformTypeAdmin(admin.ModelAdmin):
+class PlatformTypeAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     list_display = ('model', 'manufacturer')
     list_filter = ('manufacturer',)
     readonly_fields = ('created_date', 'modified_date',)
@@ -49,7 +51,7 @@ class PlatformTypeAdmin(admin.ModelAdmin):
 custom_admin_site.site.register(PlatformType, PlatformTypeAdmin)
 
 
-class PlatformAdmin(admin.ModelAdmin):
+class PlatformAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     form = PlatformForm
     list_filter = (
         "platform_type", PlatformActiveFilter,)
@@ -96,18 +98,18 @@ class ImageInline(admin.StackedInline):
         return u
 
 
-class PlatformDeploymentAdmin(admin.ModelAdmin):
+class PlatformDeploymentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     fields = (
         'wmo_id', 'deployment_number', 'platform', 'institution', 'project', 'power_type', 'title',
         ('start_time', 'end_time'),
-        ('deployment_latitude', 'recovery_latitude', 'deployment_longitude', 'recovery_longitude'),
+        ('deployment_latitude', 'recovery_latitude'), ('deployment_longitude', 'recovery_longitude'),
         ('deployment_cruise', 'recovery_cruise'), ('deployment_personnel', 'recovery_personnel'), 'testing_mission',
-        'comment', 'acknowledgement', 'contributor_name',
-        'contributor_role', 'creator_email', 'creator_name', 'creator_url', 'data_repository_link',
-        'publisher_email', 'publisher_name', 'publisher_url', 'metadata_link', 'references', 'sea_name',
-        'depth',
+        'comment', 'acknowledgement', 'agencies', 'agencies_role', 'contributor_name', 'contributors_email',
+        'contributor_role', 'creator_email', 'creator_sector', 'creator_name', 'creator_url', 'data_repository_link', 'program',
+        'publisher_email', 'publisher_name', 'publisher_url', 'publisher_country', 'positioning_system', 'metadata_link', 'references', 'sea_name', 'site',
+        'transmission_system', 'depth',
     )
-    change_form_template = 'admin/custom_instrument_change_form.html'
+    change_form_template = 'admin/custom_platform_deployment_change_form.html'
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['title', 'deployment_number']
     exclude = ('platform_name',)
@@ -125,22 +127,21 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         platform_development_obj = PlatformDeployment.objects.get(id=int(object_id))
-        s = platform_development_obj.start_time
-        e = platform_development_obj.end_time
-        instrument_obj = Instrument.objects.get(id=int(object_id))
-        instrument_on_platform_qs = InstrumentOnPlatform.objects.filter(instrument=instrument_obj, start_time__gte=s,
-                                                                        end_time__lte=e).order_by(
-            'start_time').prefetch_related('platform')
+        start_time = platform_development_obj.start_time
+        end_time = platform_development_obj.end_time
+        platform_name = platform_development_obj.platform.name
+        instrument_on_platform_qs = GetQuerySetMethod.get_instrument_on_platform_by_platform_and_time(
+            platform_name=platform_name, start_time=start_time, end_time=end_time).prefetch_related(
+            'platform').prefetch_related('instrument')
         objs = list(instrument_on_platform_qs)
         for obj in objs:
             obj.url_edit_link = make_edit_link(obj)
             obj.url_platform_change = make_edit_link(obj.platform)
-        sensor_on_instrument = SensorOnInstrument.objects.filter(instrument=instrument_obj, start_time__gte=s,
-                                                                 end_time__lte=e)
-        sensor_on_instrument = sensor_on_instrument.prefetch_related('sensor').prefetch_related('instrument')
-
+        sensors = GetQuerySetMethod.get_sensor_on_instrument(platform_name=platform_name,
+                                                             deployment_start_time=start_time)
+        sensors = sensors.order_by('instrument_id').prefetch_related('sensor').prefetch_related('instrument')
         sensor_obj_set = []
-        for soi in sensor_on_instrument:
+        for soi in sensors:
             soi.url_edit_link = make_edit_link(soi)
             soi.url_sensor_cahnge = make_edit_link(soi.sensor)
             sensor_obj_set.append(soi)
@@ -163,7 +164,7 @@ class PlatformDeploymentAdmin(admin.ModelAdmin):
 custom_admin_site.site.register(PlatformDeployment, PlatformDeploymentAdmin)
 
 
-class PlatformPowerTypeAdmin(admin.ModelAdmin):
+class PlatformPowerTypeAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date',)
 
 
@@ -174,7 +175,7 @@ class PlatformCommentBoxInline(BaseCommentBoxInline):
     model = PlatformComment
 
 
-class PlatformCommentAdmin(CommentBoxAdminBase):
+class PlatformCommentAdmin(CustomChangeListAdminMixin, CommentBoxAdminMixin, admin.ModelAdmin):
     form = PlatformCommentForm
     inlines = (
         PlatformCommentBoxInline,
@@ -190,7 +191,7 @@ class PlatformDeploymentCommentBoxInline(BaseCommentBoxInline):
     model = PlatformDeploymentComment
 
 
-class PlatformDeploymentCommentBoxAdmin(CommentBoxAdminBase):
+class PlatformDeploymentCommentBoxAdmin(CustomChangeListAdminMixin, CommentBoxAdminMixin, admin.ModelAdmin):
     form = PlatformDeploymentCommentBoxForm
     inlines = (
         PlatformDeploymentCommentBoxInline,

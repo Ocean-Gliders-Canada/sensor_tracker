@@ -195,7 +195,7 @@ class InstrumentOnPlatformInstrumentIdentifierFilter(admin.SimpleListFilter):
             return queryset
         else:
             identifier, serial = decode_instrument_identifier_serial(the_value)
-            return GetQuerySetMethod.get_instrument_on_platform_by_instrument(identifier=identifier,
+            return queryset & GetQuerySetMethod.get_instrument_on_platform_by_instrument(identifier=identifier,
                                                                               serial=serial)
 
 
@@ -218,7 +218,7 @@ class InstrumentOnPlatformPlatformNameFilter(admin.SimpleListFilter):
         if self.value() is None:
             return queryset
         else:
-            return GetQuerySetMethod.get_instrument_on_platform_by_platform(platform_name=self.value())
+            return queryset & GetQuerySetMethod.get_instrument_on_platform_by_platform(platform_name=self.value())
 
 
 # Sensor filters
@@ -238,7 +238,8 @@ class SensorPlatformNameFilter(admin.SimpleListFilter):
         if self.value() is None:
             return queryset
         else:
-            return GetQuerySetMethod.get_sensors(..., platform_name=self.value())
+            return queryset & GetQuerySetMethod.get_sensors(..., platform_name=self.value())
+
 
 
 class SensorInstrumentIdentifierFilter(admin.SimpleListFilter):
@@ -258,7 +259,7 @@ class SensorInstrumentIdentifierFilter(admin.SimpleListFilter):
             return queryset
         else:
             identifier, serial = decode_instrument_identifier_serial(self.value())
-            queryset = GetQuerySetMethod.get_sensors(..., instrument_identifier=identifier)
+            queryset = queryset & GetQuerySetMethod.get_sensors(..., instrument_identifier=identifier)
 
             return queryset
 
@@ -279,6 +280,6 @@ class SensorOnInstrumentPlatformFilter(admin.SimpleListFilter):
         if self.value() is None:
             return queryset
         else:
-            queryset = GetQuerySetMethod.get_sensor_on_instrument(platform_name=self.value())
+            queryset = queryset & GetQuerySetMethod.get_sensor_on_instrument(platform_name=self.value())
 
             return queryset
