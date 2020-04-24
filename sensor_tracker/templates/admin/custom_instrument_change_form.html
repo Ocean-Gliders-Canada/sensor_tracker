@@ -8,6 +8,7 @@
     {% else %}
         <p>There is no instrument comment boxes data</p>
     {% endif %}
+    <a href="{{ comment_box_add_link }}" target="_blank">add comment box on platform table</a>
      <h3>Instrument On platform</h3>
     {% if extra_content %}
         {% include "admin/instrument_on_platform_info.html" %}

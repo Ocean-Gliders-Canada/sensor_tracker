@@ -186,11 +186,13 @@ class InstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
             sensor_obj_set.append(soi)
         instrument_on_platform_add_link = make_add_link(InstrumentOnPlatform)
         sensor_on_instrument_add_link = make_add_link(SensorOnInstrument)
+        comment_box_add_link = make_add_link(InstrumentCommentBox)
         extra_context = {
             "extra_content": objs,
             "inline_content": sensor_obj_set,
             "instrument_on_platform_add_link": instrument_on_platform_add_link,
             "sensor_on_instrument_add_link": sensor_on_instrument_add_link,
+            'comment_box_add_link': comment_box_add_link,
             "comment_box_content": comment_box_objs,
         }
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
