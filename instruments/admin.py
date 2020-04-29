@@ -70,9 +70,6 @@ class InstrumentOnPlatformAdmin(admin.ModelAdmin):
         return instance.instrument.serial
 
 
-custom_admin_site.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
-
-
 class SensorAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     form = SensorForm
     search_fields = ['identifier', 'long_name', 'standard_name']
@@ -140,9 +137,6 @@ class SensorAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
             super().save_model(request, obj, form, change)
 
 
-custom_admin_site.site.register(Sensor, SensorAdmin)
-
-
 class InstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date')
 
@@ -187,10 +181,7 @@ class InstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
 
 
-custom_admin_site.site.register(Instrument, InstrumentAdmin)
-
-
-class SensorOnInstrumentAdmin( CustomChangeListAdminMixin, admin.ModelAdmin):
+class SensorOnInstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     list_display = ('sensor', 'instrument', 'start_time', 'end_time')
     list_filter = (
         SensorOnInstrumentPlatformFilter,
@@ -223,9 +214,6 @@ class SensorOnInstrumentAdmin( CustomChangeListAdminMixin, admin.ModelAdmin):
                         obj.sensor.save()
 
         super().save_model(request, obj, form, change)
-
-
-custom_admin_site.site.register(SensorOnInstrument, SensorOnInstrumentAdmin)
 
 
 class InstrumentCommentBoxInline(BaseCommentBoxInline):
@@ -268,4 +256,8 @@ class InstrumentCommentBoxAdmin(CustomChangeListAdminMixin, CommentBoxAdminMixin
             return " and ".join(platform_names)
 
 
+custom_admin_site.site.register(Instrument, InstrumentAdmin)
+custom_admin_site.site.register(InstrumentOnPlatform, InstrumentOnPlatformAdmin)
 custom_admin_site.site.register(InstrumentCommentBox, InstrumentCommentBoxAdmin)
+custom_admin_site.site.register(Sensor, SensorAdmin)
+custom_admin_site.site.register(SensorOnInstrument, SensorOnInstrumentAdmin)

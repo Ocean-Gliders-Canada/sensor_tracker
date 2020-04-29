@@ -48,9 +48,6 @@ class PlatformTypeAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date',)
 
 
-custom_admin_site.site.register(PlatformType, PlatformTypeAdmin)
-
-
 class PlatformAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     form = PlatformForm
     list_filter = (
@@ -79,9 +76,6 @@ class PlatformAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
 
         }
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
-
-
-custom_admin_site.site.register(Platform, PlatformAdmin)
 
 
 class ImageInline(admin.StackedInline):
@@ -161,14 +155,8 @@ class PlatformDeploymentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
         }
 
 
-custom_admin_site.site.register(PlatformDeployment, PlatformDeploymentAdmin)
-
-
 class PlatformPowerTypeAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date',)
-
-
-custom_admin_site.site.register(PlatformPowerType, PlatformPowerTypeAdmin)
 
 
 class PlatformCommentBoxInline(BaseCommentBoxInline):
@@ -182,9 +170,6 @@ class PlatformCommentAdmin(CustomChangeListAdminMixin, CommentBoxAdminMixin, adm
     )
     list_filter = (PlatformCommentBoxListFilter,)
     list_display = ('platform',)
-
-
-custom_admin_site.site.register(PlatformCommentBox, PlatformCommentAdmin)
 
 
 class PlatformDeploymentCommentBoxInline(BaseCommentBoxInline):
@@ -234,4 +219,9 @@ class PlatformDeploymentCommentBoxAdmin(CustomChangeListAdminMixin, CommentBoxAd
     end_time.admin_order_field = 'platform_deployment__end_time'
 
 
+custom_admin_site.site.register(PlatformType, PlatformTypeAdmin)
+custom_admin_site.site.register(PlatformPowerType, PlatformPowerTypeAdmin)
+custom_admin_site.site.register(Platform, PlatformAdmin)
+custom_admin_site.site.register(PlatformCommentBox, PlatformCommentAdmin)
+custom_admin_site.site.register(PlatformDeployment, PlatformDeploymentAdmin)
 custom_admin_site.site.register(PlatformDeploymentCommentBox, PlatformDeploymentCommentBoxAdmin)
