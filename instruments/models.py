@@ -188,6 +188,10 @@ class Sensor(ModelBase):
         blank=True,
         help_text="This is a good place to document anything unusual about this particular sensor. IE: wavelengths for spectral sensors"
     )
+    active = models.BooleanField(
+        default=True,
+        help_text="Whether or not the sensor is decommissioned."
+    )
 
     def __str__(self):
         return "%s" % (self.identifier)
@@ -219,6 +223,10 @@ class SensorOnInstrument(ModelBase):
         help_text="The date the instrument was removed from the platform"
     )
     comment = models.TextField(null=True, blank=True)
+    active = models.BooleanField(
+        default=True,
+        help_text="Whether or not the instrument is decommissioned."
+    )
 
     def __str__(self):
         return "%s - %s - %s" % (self.sensor, self.instrument, self.start_time)
