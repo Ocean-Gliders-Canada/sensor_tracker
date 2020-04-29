@@ -1,10 +1,10 @@
 import warnings
-
+from django.shortcuts import redirect
 from django.contrib import admin
 from custom_admin import admin as custom_admin_site
 from django import forms
 from datetime import datetime
-
+from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from instruments.admin_filter import (
     SensorOnInstrumentPlatformFilter,
@@ -30,8 +30,6 @@ from .models import (
     SensorOnInstrument,
 )
 
-from common.admin_common import CommentBoxAdminMixin
-from common.utilities import make_edit_link, make_add_link
 from instruments.model_form import (
     InstrumentOnPlatformForm,
     SensorForm,
@@ -41,6 +39,8 @@ from instruments.model_form import (
 )
 from common.admin_common import BaseCommentBoxInline
 from common.admin_common import CustomChangeListAdminMixin
+from common.admin_common import CommentBoxAdminMixin
+from common.utilities import make_edit_link, make_add_link
 
 
 class InstrumentOnPlatformAdmin(admin.ModelAdmin):
@@ -187,6 +187,8 @@ class InstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
         instrument_on_platform_add_link = make_add_link(InstrumentOnPlatform)
         sensor_on_instrument_add_link = make_add_link(SensorOnInstrument)
         comment_box_add_link = make_add_link(InstrumentCommentBox)
+        if box is None:
+            comment_box_add_link = comment_box_add_link + "?instrument=" + str(instrument_obj.id)
         extra_context = {
             "extra_content": objs,
             "inline_content": sensor_obj_set,
@@ -197,10 +199,11 @@ class InstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
         }
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
 
+
 custom_admin_site.site.register(Instrument, InstrumentAdmin)
 
 
-class SensorOnInstrumentAdmin( CustomChangeListAdminMixin, admin.ModelAdmin):
+class SensorOnInstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     list_display = ('sensor', 'instrument', 'start_time', 'end_time')
     list_filter = (
         SensorOnInstrumentPlatformFilter,
@@ -276,6 +279,21 @@ class InstrumentCommentBoxAdmin(CustomChangeListAdminMixin, CommentBoxAdminMixin
             return '-'
         else:
             return " and ".join(platform_names)
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        return super().change_view(request, object_id, form_url='', extra_context=extra_context)
+
+    def add_view(self, request, form_url='', extra_context=None):
+        GET_dict = request.GET
+        instrument = GET_dict.get("instrument", None)
+        if instrument:
+            try:
+                the_object = InstrumentCommentBox.objects.create(instrument_id=instrument)
+            except IntegrityError:
+                the_object = InstrumentCommentBox.objects.get(instrument_id=instrument)
+            edit_link = make_edit_link(the_object)
+            return redirect(edit_link)
+        return super().add_view(request, form_url, extra_context)
 
 
 custom_admin_site.site.register(InstrumentCommentBox, InstrumentCommentBoxAdmin)
