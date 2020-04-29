@@ -1,0 +1,31 @@
+{% load i18n static %}
+<div class="results">
+    <table id="result_list">
+        <thead>
+        <tr>
+            <th scope="col" {{ header.class_attrib }}>User</th>
+            <th scope="col" {{ header.class_attrib }}>Create Date</th>
+            <th scope="col" {{ header.class_attrib }}>Modified Date</th>
+            <th scope="col" {{ header.class_attrib }}>Event time</th>
+            <th scope="col" {{ header.class_attrib }}>Comment</th>
+            <th scope="col" {{ header.class_attrib }}>Edit link</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in comment_box_content %}
+            <tr>
+{#                <td><a href="{{ c.url_platform_change }}" target="_blank">{{ c.instrument.identifier }}</a></td>#}
+                <td>{{ c.user }}</td>
+                <td>{{ c.created_date }}</td>
+                <td>{{ c.modified_date }}</td>
+                <td>{{ c.event_time }}</td>
+                <td>{{ c.comment }}</td>
+{#                <textarea name="instrumentcomment_set-0-comment" cols="40" rows="10" class="vLargeTextField" id="id_instrumentcomment_set-0-comment">{{ c.comment }}</textarea>#}
+                <td><a href="{{ c.url_edit_link }}" target="_blank">edit</a></td>
+{#                <td><a href="{{ c.url_edit_link }}" target="_blank">edit</a></td>#}
+            </tr>
+        {% endfor %}
+
+    </table>
+    <input type="submit" value="Save" class="default" name="_save">
+</div>

@@ -1,0 +1,19 @@
+{% extends "admin/custom_sensor_change_form.html" %}
+{% load i18n %}
+{% block submit_buttons_bottom %}
+{{ block.super }}
+<div class="submit-row list-group">
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script language="javaScript">
+                function clone() {
+                    let obj_id = window.location.pathname.split('/')[4];
+                    url = window.location.pathname.replace(obj_id+'/change/', 'add?clone='+obj_id);
+                    return url;
+                }
+            </script>
+<button type="button" title="Cancel" class="list-group-item active?" name="_cancel" onclick="location.href=clone()">
+<span class="glyphicon step-backward"></span>
+<span class="text">Clone</span>
+</button>
+</div>
+{% endblock %}

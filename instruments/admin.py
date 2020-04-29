@@ -81,7 +81,8 @@ class SensorAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
         SensorPlatformNameFilter,
         SensorInstrumentIdentifierFilter,
     )
-    change_form_template = 'admin/custom_sensor_change_form.html'
+    add_form_template = 'admin/custom_sensor_change_form.html'
+    change_form_template = 'admin/custom_clone_sensor_change_form.html'
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         sensor_obj = Sensor.objects.get(id=int(object_id))
@@ -146,7 +147,8 @@ class InstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     search_fields = ['identifier', 'short_name', 'long_name', 'serial', 'manufacturer__name']
     list_display = ('identifier', 'short_name', 'long_name', 'serial', 'manufacturer', 'created_date', 'modified_date')
     form = InstrumentForm
-    change_form_template = 'admin/custom_instrument_change_form.html'
+    add_form_template = 'admin/custom_instrument_change_form.html'
+    change_form_template = 'admin/custom_clone_instrument_change_form.html'
     list_per_page = 40
 
     def get_queryset(self, request):
@@ -156,9 +158,15 @@ class InstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         instrument_obj = Instrument.objects.get(id=int(object_id))
+        instrument_comment_box = InstrumentCommentBox.objects.filter(instrument=instrument_obj).first()
+        instrument_comment = InstrumentComment.objects.filter(instrument_comment_box=instrument_comment_box)
         instrument_on_platform_qs = InstrumentOnPlatform.objects.filter(instrument=instrument_obj).order_by(
             'start_time').prefetch_related('platform')
         objs = list(instrument_on_platform_qs)
+        comment_box_objs = list(instrument_comment)
+        box = instrument_comment_box
+        for comment_box_obj in comment_box_objs:
+            comment_box_obj.url_edit_link = make_edit_link(box)
         for obj in objs:
             obj.url_edit_link = make_edit_link(obj)
             obj.url_platform_change = make_edit_link(obj.platform)
@@ -168,20 +176,30 @@ class InstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
         sensor_obj_set = []
         for soi in sensor_on_instrument:
             soi.url_edit_link = make_edit_link(soi)
-            soi.url_sensor_cahnge = make_edit_link(soi.sensor)
+            soi.url_sensor_change = make_edit_link(soi.sensor)
             sensor_obj_set.append(soi)
         instrument_on_platform_add_link = make_add_link(InstrumentOnPlatform)
         sensor_on_instrument_add_link = make_add_link(SensorOnInstrument)
+        comment_box_add_link = make_add_link(InstrumentCommentBox)
         extra_context = {
             "extra_content": objs,
             "inline_content": sensor_obj_set,
             "instrument_on_platform_add_link": instrument_on_platform_add_link,
             "sensor_on_instrument_add_link": sensor_on_instrument_add_link,
+            'comment_box_add_link': comment_box_add_link,
+            "comment_box_content": comment_box_objs,
         }
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
 
+<<<<<<< HEAD
 
 class SensorOnInstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
+=======
+custom_admin_site.site.register(Instrument, InstrumentAdmin)
+
+
+class SensorOnInstrumentAdmin( CustomChangeListAdminMixin, admin.ModelAdmin):
+>>>>>>> dev
     list_display = ('sensor', 'instrument', 'start_time', 'end_time')
     list_filter = (
         SensorOnInstrumentPlatformFilter,
