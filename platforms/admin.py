@@ -25,7 +25,6 @@ from common.utilities import (
     make_add_link
 )
 from platforms.model_form import (
-    PlatformDeploymentForm,
     ImageForm,
     PlatformForm,
     PlatformDeploymentCommentBoxForm,
@@ -33,7 +32,6 @@ from platforms.model_form import (
 )
 
 from platforms.admin_filter import (
-    PlatformListFilter,
     PlatformCommentBoxListFilter,
     PlatformDeploymentHasNumberFilter,
     PlatformActiveFilter,
@@ -58,7 +56,8 @@ class PlatformAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['name', 'serial_number']
     list_display = ('name', 'wmo_id', 'serial_number', 'platform_type', 'institution', 'purchase_date')
-    change_form_template = 'admin/custom_platform_change_form.html'
+    add_form_template = 'admin/custom_platform_change_form.html'
+    change_form_template = 'admin/custom_clone_platform_change_form.html'
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -104,12 +103,13 @@ class PlatformDeploymentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
         ('start_time', 'end_time'),
         ('deployment_latitude', 'recovery_latitude'), ('deployment_longitude', 'recovery_longitude'),
         ('deployment_cruise', 'recovery_cruise'), ('deployment_personnel', 'recovery_personnel'), 'testing_mission',
-        'comment', 'acknowledgement', 'contributor_name',
-        'contributor_role', 'creator_email', 'creator_name', 'creator_url', 'data_repository_link',
-        'publisher_email', 'publisher_name', 'publisher_url', 'metadata_link', 'references', 'sea_name',
-        'depth',
+        'comment', 'acknowledgement', 'agencies', 'agencies_role', 'contributor_name', 'contributors_email',
+        'contributor_role', 'creator_email', 'creator_sector', 'creator_name', 'creator_url', 'data_repository_link', 'program',
+        'publisher_email', 'publisher_name', 'publisher_url', 'publisher_country', 'positioning_system', 'metadata_link', 'references', 'sea_name', 'site',
+        'transmission_system', 'depth',
     )
-    change_form_template = 'admin/custom_platform_deployment_change_form.html'
+    change_form_template = 'admin/custom_clone_platform_deployment_change_form.html'
+    add_form_template = 'admin/custom_platform_deployment_change_form.html'
     readonly_fields = ('created_date', 'modified_date',)
     search_fields = ['title', 'deployment_number']
     exclude = ('platform_name',)
@@ -143,7 +143,7 @@ class PlatformDeploymentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
         sensor_obj_set = []
         for soi in sensors:
             soi.url_edit_link = make_edit_link(soi)
-            soi.url_sensor_cahnge = make_edit_link(soi.sensor)
+            soi.url_sensor_change = make_edit_link(soi.sensor)
             sensor_obj_set.append(soi)
         instrument_on_platform_add_link = make_add_link(InstrumentOnPlatform)
         sensor_on_instrument_add_link = make_add_link(SensorOnInstrument)

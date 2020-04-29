@@ -149,12 +149,22 @@ class CustomAdminSite(AdminSite):
         return filter_info
 
     def get_csv(self, display_fields, queryset):
+        from instruments.admin import InstrumentCommentBoxAdmin
+        from instruments.models import InstrumentCommentBox
+        from custom_admin.admin import CustomAdminSite
         header = ','.join(display_fields) + '\n'
         lines = []
         for item in queryset:
             line = []
+            obj_is_comment_box = isinstance(item, InstrumentCommentBox)
+            if obj_is_comment_box:
+                instrument_comment_admin = InstrumentCommentBoxAdmin(InstrumentCommentBox, CustomAdminSite)
             for field in display_fields:
-                value = getattr(item, field)
+                if obj_is_comment_box:
+                    func = getattr(instrument_comment_admin, field, None)
+                    value = func(item)
+                else:
+                    value = getattr(item, field)
                 if value is None:
                     value = ''
                 elif not isinstance(value, str):
