@@ -197,10 +197,11 @@ class InstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
         }
         return super().change_view(request, object_id, form_url='', extra_context=extra_context)
 
+
 custom_admin_site.site.register(Instrument, InstrumentAdmin)
 
 
-class SensorOnInstrumentAdmin( CustomChangeListAdminMixin, admin.ModelAdmin):
+class SensorOnInstrumentAdmin(CustomChangeListAdminMixin, admin.ModelAdmin):
     list_display = ('sensor', 'instrument', 'start_time', 'end_time')
     list_filter = (
         SensorOnInstrumentPlatformFilter,

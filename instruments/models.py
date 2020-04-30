@@ -42,11 +42,11 @@ class Instrument(ModelBase):
     )
 
     def __str__(self):
-        return_string = '%s - %s' % (self.identifier, self.short_name)
+        return_string = '{} - {}'.format(self.identifier, self.short_name)
         if self.long_name:
-            return_string += ' - %s' % self.long_name
+            return_string += ' - {}'.format(self.long_name)
         if self.serial:
-            return_string += ' - %s' % self.serial
+            return_string += ' - {}'.format(self.serial)
 
         return return_string
 
@@ -59,7 +59,7 @@ class InstrumentCommentBox(models.Model):
     instrument = models.OneToOneField('Instrument', on_delete=models.PROTECT)
 
     def __str__(self):
-        return "%s comment box" % (self.instrument)
+        return "{} comment box".format(self.instrument)
 
 
 class InstrumentComment(CommentModelBase):
@@ -68,7 +68,7 @@ class InstrumentComment(CommentModelBase):
     instrument_comment_box = models.ForeignKey(InstrumentCommentBox, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "%s" % (self.id)
+        return "{}".format(self.id)
 
 
 class InstrumentOnPlatform(ModelBase):
@@ -99,7 +99,7 @@ class InstrumentOnPlatform(ModelBase):
     comment = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return "%s - %s - %s" % (self.instrument, self.platform, self.start_time)
+        return "{} - {} - {}".format(self.instrument, self.platform, self.start_time)
 
 
 class Sensor(ModelBase):
@@ -194,7 +194,7 @@ class Sensor(ModelBase):
     )
 
     def __str__(self):
-        return "%s" % (self.identifier)
+        return "{}".format(self.identifier)
 
 
 class SensorOnInstrument(ModelBase):
@@ -225,4 +225,4 @@ class SensorOnInstrument(ModelBase):
     comment = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return "%s - %s - %s" % (self.sensor, self.instrument, self.start_time)
+        return "{} - {} - {}".format(self.sensor, self.instrument, self.start_time)

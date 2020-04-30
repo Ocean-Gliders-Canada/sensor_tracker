@@ -258,13 +258,9 @@ class PlatformDeployment(ModelBase):
         return_string = ''
         if self.deployment_number is not None:
             return_string += '{} - '.format(self.deployment_number)
-        if self.title is not None:
+        if self.title:
             return_string += '{} - '.format(self.title)
-            # if self.platform_name is not None:
 
-        else:
-            return_string += '{} - {}'.format(self.platform.name,
-                                              self.start_time.strftime('%Y-%m-%d'))
         return_string += '{} - {}'.format(self.platform.name,
                                           self.start_time.strftime('%Y-%m-%d'))
         if self.end_time is not None:

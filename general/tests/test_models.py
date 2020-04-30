@@ -1,6 +1,4 @@
-from platforms.models import PlatformType, Platform, PlatformPowerType, PlatformDeployment
 from general.models import Manufacturer, Institution, Project
-from datetime import datetime
 from django.test import TestCase
 
 

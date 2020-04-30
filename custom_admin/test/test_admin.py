@@ -2,14 +2,12 @@ from django.test import TestCase
 from custom_admin.admin import CustomAdminSite
 
 
-
 class CustomAdminTest(TestCase):
 
     def setUp(self):
         self.site = CustomAdminSite()
 
     def test_get_filter_info(self):
-
         post1 = {
             'filter': '{"active":"1","platform_type__id__exact":"4"}'
         }
@@ -37,11 +35,3 @@ class CustomAdminTest(TestCase):
         filter_dict = self.site.get_filter_dict(key, value)
         res = {'key': '  ++  '}
         self.assertEqual(filter_dict, res)
-
-
-
-
-
-
-
-
